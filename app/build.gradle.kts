@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "co.edu.uniquindio.entorno"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "co.edu.uniquindio.entorno"
