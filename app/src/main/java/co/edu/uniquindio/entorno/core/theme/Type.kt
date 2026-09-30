@@ -1,4 +1,4 @@
-package co.edu.uniquindio.entorno.ui.theme
+package co.edu.uniquindio.entorno.core.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
