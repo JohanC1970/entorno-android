@@ -42,6 +42,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -59,6 +60,9 @@ dependencies {
     
     // GeoFire
     implementation("com.firebase:geofire-android:3.2.0")
+
+    // Cloudinary
+    implementation("com.cloudinary:cloudinary-android:3.1.2")
 
     // Hilt
     implementation(libs.hilt.android)
