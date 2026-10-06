@@ -3,6 +3,7 @@ package co.edu.uniquindio.entorno.features.auth
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -39,6 +40,8 @@ import co.edu.uniquindio.entorno.core.util.RequestResult
 fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
     onRegisterSuccess: () -> Unit,
+    onNavigateToTerms: () -> Unit = {},
+    onNavigateToPrivacy: () -> Unit = {},
     viewModel: RegisterViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -100,7 +103,7 @@ fun RegisterScreen(
                 value = uiState.name,
                 onValueChange = { viewModel.onNameChange(it) },
                 label = "Nombre completo",
-                placeholder = "Johan García",
+                placeholder = "Andres Osorio",
                 leadingIcon = Icons.Default.Person,
                 errorMessage = uiState.nameError
             )
@@ -190,44 +193,55 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Texto legal
+            // Texto legal interactivo
             val legalText = buildAnnotatedString {
                 append("Al registrarte aceptas los ")
+                pushStringAnnotation(tag = "terms", annotation = "terms")
                 withStyle(
                     style = SpanStyle(
                         color = Color(0xFF303CA2),
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                         textDecoration = TextDecoration.Underline
                     )
                 ) {
                     append("Términos")
                 }
+                pop()
                 append(" y la ")
+                pushStringAnnotation(tag = "privacy", annotation = "privacy")
                 withStyle(
                     style = SpanStyle(
                         color = Color(0xFF303CA2),
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.SemiBold,
                         textDecoration = TextDecoration.Underline
                     )
                 ) {
                     append("Política de privacidad")
                 }
+                pop()
                 append(".")
             }
 
-            Text(
+            ClickableText(
                 text = legalText,
-                fontSize = 13.sp,
-                color = Color(0xFF5A5F73)
+                style = LocalTextStyle.current.copy(
+                    fontSize = 13.sp,
+                    color = Color(0xFF5A5F73)
+                ),
+                onClick = { offset ->
+                    legalText.getStringAnnotations(tag = "terms", start = offset, end = offset)
+                        .firstOrNull()?.let { onNavigateToTerms() }
+                    legalText.getStringAnnotations(tag = "privacy", start = offset, end = offset)
+                        .firstOrNull()?.let { onNavigateToPrivacy() }
+                }
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             Button(
                 onClick = {
-                    // Nota: para pruebas de UI si location es null, podemos setear una ubicación por defecto o requerirla
                     if (uiState.location == null) {
-                        viewModel.onLocationSelected(4.53389, -75.68111) // Armenia por defecto si no seleccionó mapa aún
+                        viewModel.onLocationSelected(4.53389, -75.68111)
                     }
                     viewModel.register()
                 },
@@ -253,7 +267,6 @@ fun RegisterScreen(
                 }
             }
 
-            // Mensaje de éxito o error en registro
             when (val res = uiState.registerResult) {
                 is RequestResult.Success -> {
                     Spacer(modifier = Modifier.height(16.dp))

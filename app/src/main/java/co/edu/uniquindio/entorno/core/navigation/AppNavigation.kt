@@ -14,6 +14,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import co.edu.uniquindio.entorno.features.auth.ForgotPasswordScreen
 import co.edu.uniquindio.entorno.features.auth.RegisterScreen
+import co.edu.uniquindio.entorno.features.legal.PrivacyScreen
+import co.edu.uniquindio.entorno.features.legal.TermsScreen
 import co.edu.uniquindio.entorno.features.login.LoginScreen
 import co.edu.uniquindio.entorno.features.welcome.WelcomeScreen
 
@@ -22,6 +24,8 @@ object Routes {
     const val LOGIN = "login"
     const val REGISTER = "register"
     const val FORGOT_PASSWORD = "forgot_password"
+    const val TERMS = "terms"
+    const val PRIVACY = "privacy"
     const val MAIN = "main"
 }
 
@@ -36,7 +40,9 @@ fun AppNavigation() {
         composable(Routes.WELCOME) {
             WelcomeScreen(
                 onNavigateToRegister = { navController.navigate(Routes.REGISTER) },
-                onNavigateToLogin = { navController.navigate(Routes.LOGIN) }
+                onNavigateToLogin = { navController.navigate(Routes.LOGIN) },
+                onNavigateToTerms = { navController.navigate(Routes.TERMS) },
+                onNavigateToPrivacy = { navController.navigate(Routes.PRIVACY) }
             )
         }
 
@@ -59,12 +65,26 @@ fun AppNavigation() {
                     navController.navigate(Routes.LOGIN) {
                         popUpTo(Routes.REGISTER) { inclusive = true }
                     }
-                }
+                },
+                onNavigateToTerms = { navController.navigate(Routes.TERMS) },
+                onNavigateToPrivacy = { navController.navigate(Routes.PRIVACY) }
             )
         }
 
         composable(Routes.FORGOT_PASSWORD) {
             ForgotPasswordScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.TERMS) {
+            TermsScreen(
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.PRIVACY) {
+            PrivacyScreen(
                 onBackClick = { navController.popBackStack() }
             )
         }

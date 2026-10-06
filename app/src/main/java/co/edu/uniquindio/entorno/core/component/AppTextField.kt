@@ -38,6 +38,7 @@ fun AppTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
+            textStyle = LocalTextStyle.current.copy(color = Color(0xFF111318)),
             placeholder = {
                 if (placeholder.isNotBlank()) {
                     Text(text = placeholder, color = Color(0xFF9CA3AF))
@@ -59,6 +60,10 @@ fun AppTextField(
             isError = errorMessage != null,
             shape = RoundedCornerShape(16.dp),
             colors = OutlinedTextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF111318),
+                unfocusedTextColor = Color(0xFF111318),
+                disabledTextColor = Color(0xFF111318),
+                errorTextColor = Color(0xFF111318),
                 focusedBorderColor = Color(0xFF303CA2),
                 unfocusedBorderColor = Color(0xFFD1D5DB),
                 errorBorderColor = Color(0xFFB3261E),

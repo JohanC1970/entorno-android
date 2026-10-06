@@ -3,6 +3,7 @@ package co.edu.uniquindio.entorno.features.welcome
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -12,6 +13,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -130,37 +132,49 @@ fun WelcomeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Texto legal de términos y privacidad
+                // Texto legal de términos y privacidad interactivo
                 val legalText = buildAnnotatedString {
                     append("Al registrarte, aceptas nuestros ")
+                    pushStringAnnotation(tag = "terms", annotation = "terms")
                     withStyle(
                         style = SpanStyle(
-                            color = Color(0xFF5A5F73),
-                            fontWeight = FontWeight.Medium,
-                            textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                            color = Color(0xFF303CA2),
+                            fontWeight = FontWeight.SemiBold,
+                            textDecoration = TextDecoration.Underline
                         )
                     ) {
                         append("Términos")
                     }
+                    pop()
                     append(" y la ")
+                    pushStringAnnotation(tag = "privacy", annotation = "privacy")
                     withStyle(
                         style = SpanStyle(
-                            color = Color(0xFF5A5F73),
-                            fontWeight = FontWeight.Medium,
-                            textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                            color = Color(0xFF303CA2),
+                            fontWeight = FontWeight.SemiBold,
+                            textDecoration = TextDecoration.Underline
                         )
                     ) {
                         append("Política de privacidad")
                     }
+                    pop()
                     append(".")
                 }
 
-                Text(
+                ClickableText(
                     text = legalText,
-                    fontSize = 12.sp,
-                    color = Color(0xFF74798D),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 8.dp)
+                    style = LocalTextStyle.current.copy(
+                        fontSize = 12.sp,
+                        color = Color(0xFF74798D),
+                        textAlign = TextAlign.Center
+                    ),
+                    modifier = Modifier.padding(horizontal = 8.dp),
+                    onClick = { offset ->
+                        legalText.getStringAnnotations(tag = "terms", start = offset, end = offset)
+                            .firstOrNull()?.let { onNavigateToTerms() }
+                        legalText.getStringAnnotations(tag = "privacy", start = offset, end = offset)
+                            .firstOrNull()?.let { onNavigateToPrivacy() }
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -177,4 +191,3 @@ fun WelcomeScreenPreview() {
         onNavigateToLogin = {}
     )
 }
-
