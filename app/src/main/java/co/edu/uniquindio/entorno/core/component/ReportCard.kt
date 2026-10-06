@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -14,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -29,24 +27,16 @@ import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.R
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.core.theme.categoryColors
-import co.edu.uniquindio.entorno.core.theme.severityColor
 import co.edu.uniquindio.entorno.core.theme.statusColors
 import co.edu.uniquindio.entorno.domain.model.Location
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
-import co.edu.uniquindio.entorno.domain.model.Severity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 private val dateFormatter = DateTimeFormatter.ofPattern("d MMM", Locale.forLanguageTag("es"))
-
-private fun Severity.progress(): Float = when (this) {
-    Severity.LOW -> 0.33f
-    Severity.MEDIUM -> 0.66f
-    Severity.HIGH, Severity.CRITICAL -> 1f
-}
 
 @Composable
 fun ReportCard(
@@ -110,7 +100,7 @@ fun ReportCard(
 }
 
 @Composable
-private fun CategoryChip(category: ReportCategory) {
+fun CategoryChip(category: ReportCategory) {
     val colors = categoryColors(category)
     Surface(shape = RoundedCornerShape(50), color = colors.chipBackground) {
         Row(
@@ -134,7 +124,7 @@ private fun CategoryChip(category: ReportCategory) {
 }
 
 @Composable
-private fun StatusChip(status: ReportStatus) {
+fun StatusChip(status: ReportStatus) {
     val colors = statusColors(status)
     Surface(shape = RoundedCornerShape(50), color = colors.background) {
         Text(
@@ -142,37 +132,6 @@ private fun StatusChip(status: ReportStatus) {
             style = MaterialTheme.typography.labelMedium,
             color = colors.text,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
-        )
-    }
-}
-
-@Composable
-private fun SeverityBar(severity: Severity) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "SEVERIDAD",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        LinearProgressIndicator(
-            progress = { severity.progress() },
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 10.dp)
-                .height(6.dp),
-            color = severityColor(severity),
-            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
-            gapSize = 0.dp,
-            drawStopIndicator = {}
-        )
-        Text(
-            text = severity.label(),
-            style = MaterialTheme.typography.labelMedium,
-            color = severityColor(severity)
         )
     }
 }
