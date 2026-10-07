@@ -4,13 +4,14 @@ import android.net.Uri
 import com.cloudinary.android.MediaManager
 import com.cloudinary.android.callback.ErrorInfo
 import com.cloudinary.android.callback.UploadCallback
+import jakarta.inject.Inject
 import jakarta.inject.Singleton
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @Singleton
-class CloudinaryDataSource {
+class CloudinaryDataSource @Inject constructor() {
 
     private companion object{
         const val UPLOAD_PRESET = ""
