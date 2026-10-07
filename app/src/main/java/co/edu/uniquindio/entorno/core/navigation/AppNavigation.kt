@@ -18,6 +18,26 @@ import co.edu.uniquindio.entorno.features.legal.PrivacyScreen
 import co.edu.uniquindio.entorno.features.legal.TermsScreen
 import co.edu.uniquindio.entorno.features.login.LoginScreen
 import co.edu.uniquindio.entorno.features.welcome.WelcomeScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
+import co.edu.uniquindio.entorno.features.home.HomeScreen
+import co.edu.uniquindio.entorno.features.home.SampleReports
+import co.edu.uniquindio.entorno.features.moderator.PanelModeradorScreen
+import co.edu.uniquindio.entorno.features.moderator.PanelModeradorViewModel
+import co.edu.uniquindio.entorno.features.moderator.RevisarPublicacionScreen
+import co.edu.uniquindio.entorno.features.moderator.RevisarPublicacionViewModel
+import co.edu.uniquindio.entorno.features.notifications.NotificacionesScreen
+import co.edu.uniquindio.entorno.features.notifications.NotificacionesViewModel
+import co.edu.uniquindio.entorno.features.profile.EditarPerfilScreen
+import co.edu.uniquindio.entorno.features.profile.EditarPerfilViewModel
+import co.edu.uniquindio.entorno.features.profile.PerfilScreen
+import co.edu.uniquindio.entorno.features.profile.PerfilViewModel
+import co.edu.uniquindio.entorno.features.report.CommentsScreen
+import co.edu.uniquindio.entorno.features.report.MisReportesScreen
+import co.edu.uniquindio.entorno.features.report.MisReportesViewModel
+import co.edu.uniquindio.entorno.features.report.ReportDetailScreen
+import co.edu.uniquindio.entorno.features.report.SampleComments
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 object Routes {
     const val WELCOME = "welcome"
@@ -27,6 +47,17 @@ object Routes {
     const val TERMS = "terms"
     const val PRIVACY = "privacy"
     const val MAIN = "main"
+    
+    // Nuevas pantallas
+    const val HOME = "home"
+    const val PROFILE = "profile"
+    const val EDIT_PROFILE = "edit_profile"
+    const val MY_REPORTS = "my_reports"
+    const val REPORT_DETAIL = "report_detail"
+    const val COMMENTS = "comments"
+    const val MODERATOR_PANEL = "moderator_panel"
+    const val REVIEW_REPORT = "review_report"
+    const val NOTIFICATIONS = "notifications"
 }
 
 @Composable
@@ -97,7 +128,8 @@ fun AppNavigation() {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(24.dp),
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
@@ -113,6 +145,15 @@ fun AppNavigation() {
                         fontSize = 16.sp,
                         color = Color(0xFF5A5F73)
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Botones para acceder a las nuevas pantallas
+                    Button(onClick = { navController.navigate(Routes.HOME) }, modifier = Modifier.fillMaxWidth()) { Text("Home") }
+                    Button(onClick = { navController.navigate(Routes.PROFILE) }, modifier = Modifier.fillMaxWidth()) { Text("Perfil") }
+                    Button(onClick = { navController.navigate(Routes.MY_REPORTS) }, modifier = Modifier.fillMaxWidth()) { Text("Mis Reportes") }
+                    Button(onClick = { navController.navigate(Routes.MODERATOR_PANEL) }, modifier = Modifier.fillMaxWidth()) { Text("Panel Moderador") }
+                    Button(onClick = { navController.navigate(Routes.NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth()) { Text("Notificaciones") }
+                    
                     Spacer(modifier = Modifier.height(32.dp))
                     Button(
                         onClick = {
@@ -126,6 +167,81 @@ fun AppNavigation() {
                     }
                 }
             }
+        }
+
+        composable(Routes.HOME) {
+            HomeScreen(
+                userName = "Juan Cayón",
+                reports = SampleReports.reports,
+                onNotificationsClick = { navController.navigate(Routes.NOTIFICATIONS) },
+                onReportClick = { _ -> navController.navigate(Routes.REPORT_DETAIL) }
+            )
+        }
+
+        composable(Routes.PROFILE) {
+            val viewModel: PerfilViewModel = viewModel()
+            PerfilScreen(
+                viewModel = viewModel,
+                onEditarClick = { navController.navigate(Routes.EDIT_PROFILE) }
+            )
+        }
+
+        composable(Routes.EDIT_PROFILE) {
+            val viewModel: EditarPerfilViewModel = viewModel()
+            EditarPerfilScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.MY_REPORTS) {
+            val viewModel: MisReportesViewModel = viewModel()
+            MisReportesScreen(
+                viewModel = viewModel,
+                onReporteClick = { _ -> navController.navigate(Routes.REPORT_DETAIL) }
+            )
+        }
+
+        composable(Routes.REPORT_DETAIL) {
+            ReportDetailScreen(
+                report = SampleReports.reports.first(),
+                onBack = { navController.popBackStack() },
+                onCommentsClick = { navController.navigate(Routes.COMMENTS) }
+            )
+        }
+
+        composable(Routes.COMMENTS) {
+            CommentsScreen(
+                report = SampleReports.reports.first(),
+                comments = SampleComments.comments,
+                currentUserId = SampleComments.CURRENT_USER_ID,
+                moderatorIds = SampleComments.moderatorIds,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.MODERATOR_PANEL) {
+            val viewModel: PanelModeradorViewModel = viewModel()
+            PanelModeradorScreen(
+                viewModel = viewModel,
+                onReporteClick = { _ -> navController.navigate(Routes.REVIEW_REPORT) }
+            )
+        }
+
+        composable(Routes.REVIEW_REPORT) {
+            val viewModel: RevisarPublicacionViewModel = viewModel()
+            RevisarPublicacionScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.NOTIFICATIONS) {
+            val viewModel: NotificacionesViewModel = viewModel()
+            NotificacionesScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.popBackStack() }
+            )
         }
     }
 }
