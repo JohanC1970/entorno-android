@@ -17,6 +17,19 @@ navegación. Ese es el trabajo en curso.
 NO reimplementar modelos, repositorios ni fuentes de datos: ya existen.
 Antes de crear cualquier clase de dominio, revisar `domain/model/`.
 
+## Pendientes en dominio y datos (para Johan)
+
+- **Comentarios anidados:** `Comment` ya tiene `parentCommentId: String? = null`
+  (null = comentario raíz; con valor = respuesta, un solo nivel; una respuesta a
+  una respuesta se cuelga del comentario raíz). Falta persistirlo: agregarlo en
+  `CommentDto`, en `Mappers.kt` (`toDomain` y `toDto`) y en `CommentRepositoryImpl`.
+  Hasta entonces el campo se pierde al guardar.
+- **Responder desde la UI:** cuando eso esté, `onSend` de `CommentsScreen` pasa de
+  `(String) -> Unit` a `(String, parentCommentId: String?) -> Unit`, y la lista
+  agrupa las respuestas bajo su comentario raíz (pendiente en presentación).
+- **Rol del autor:** `Comment` no guarda el rol ni el nivel del autor, por eso
+  `CommentsScreen` recibe `moderatorIds`. Ver el `TODO` en `CommentItem.kt`.
+
 ## Estructura de paquetes
 
 ```

@@ -43,3 +43,22 @@ inline fun <reified T : Any> DocumentReference.asFlow(): Flow<T?> = callbackFlow
 
 inline fun <reified E : Enum<E>> String?.toEnumOrDefault(default: E): E =
     enumValues<E>().firstOrNull { it.name == this } ?: default
+
+private const val MINUTE_MS = 60_000L
+private const val HOUR_MS = 60 * MINUTE_MS
+private const val DAY_MS = 24 * HOUR_MS
+
+/**
+ * Formatea un epoch en milisegundos como tiempo relativo: "ahora", "hace 45 min",
+ * "hace 3 h", "hace 2 días". Un valor sin asignar (<= 0) o a futuro (p. ej. un
+ * timestamp de servidor que aún no llega) se muestra como "ahora".
+ */
+fun Long.toRelativeTime(now: Long = System.currentTimeMillis()): String {
+    val elapsed = if (this <= 0L) 0L else now - this
+    return when {
+        elapsed < MINUTE_MS -> "ahora"
+        elapsed < HOUR_MS -> "hace ${elapsed / MINUTE_MS} min"
+        elapsed < DAY_MS -> "hace ${elapsed / HOUR_MS} h"
+        else -> (elapsed / DAY_MS).let { days -> if (days == 1L) "hace 1 día" else "hace $days días" }
+    }
+}
