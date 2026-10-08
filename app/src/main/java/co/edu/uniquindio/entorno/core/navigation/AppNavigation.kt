@@ -124,8 +124,6 @@ fun AppNavigation() {
 
         composable(Routes.HOME) {
             HomeScreen(
-                userName = "Juan Cayón",
-                reports = SampleReports.reports,
                 onNotificationsClick = { navController.navigate(Routes.NOTIFICATIONS) },
                 onReportClick = { report -> navController.navigate(Routes.reportDetail(report.id)) },
                 onCreateClick = { navController.navigate(Routes.CREATE_REPORT) }
@@ -163,14 +161,10 @@ fun AppNavigation() {
             )
         }
 
-        composable(Routes.REPORT_DETAIL) { backStackEntry ->
-            val reportId = backStackEntry.arguments?.getString("reportId")
-            val report = SampleReports.reports.firstOrNull { it.id == reportId }
-                ?: SampleReports.reports.first()
+        composable(Routes.REPORT_DETAIL) {
             ReportDetailScreen(
-                report = report,
                 onBack = { navController.popBackStack() },
-                onCommentsClick = { navController.navigate(Routes.comments(report.id)) }
+                onCommentsClick = { reportId -> navController.navigate(Routes.comments(reportId)) }
             )
         }
 

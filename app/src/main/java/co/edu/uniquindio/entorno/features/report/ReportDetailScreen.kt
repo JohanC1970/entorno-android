@@ -33,6 +33,14 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -91,8 +99,79 @@ private fun Report.milestones(): List<Milestone> {
 
 @Composable
 fun ReportDetailScreen(
+    onBack: () -> Unit = {},
+    onShare: () -> Unit = {},
+    onCommentsClick: (reportId: String) -> Unit = {},
+    onViewOnMap: () -> Unit = {},
+    viewModel: ReportDetailViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
+    when (val report = uiState.report) {
+        null -> ReportDetailPlaceholder(
+            isLoading = uiState.isLoading,
+            snackbarHostState = snackbarHostState,
+            onBack = onBack
+        )
+        else -> ReportDetailContent(
+            report = report,
+            isImportant = uiState.isImportant,
+            snackbarHostState = snackbarHostState,
+            onBack = onBack,
+            onToggleImportant = viewModel::toggleImportant,
+            onShare = onShare,
+            onCommentsClick = { onCommentsClick(report.id) },
+            onViewOnMap = onViewOnMap
+        )
+    }
+}
+
+@Composable
+private fun ReportDetailPlaceholder(
+    isLoading: Boolean,
+    snackbarHostState: SnackbarHostState,
+    onBack: () -> Unit
+) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator()
+            } else {
+                Text(
+                    text = "No encontramos este reporte",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(Modifier.height(16.dp))
+                OutlinedButton(onClick = onBack) { Text("Volver") }
+            }
+        }
+    }
+}
+
+@Composable
+fun ReportDetailContent(
     report: Report,
     isImportant: Boolean = false,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onBack: () -> Unit = {},
     onToggleImportant: () -> Unit = {},
     onShare: () -> Unit = {},
@@ -103,7 +182,8 @@ fun ReportDetailScreen(
     Scaffold(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets(0)
+        contentWindowInsets = WindowInsets(0),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -448,7 +528,7 @@ private const val SAMPLE_DESCRIPTION =
 @Composable
 private fun ReportDetailVerifiedPreview() {
     EntornoTheme {
-        ReportDetailScreen(
+        ReportDetailContent(
             report = SampleReports.reports[0].copy(
                 description = SAMPLE_DESCRIPTION,
                 imageUrls = listOf("a", "b", "c")
@@ -462,7 +542,7 @@ private fun ReportDetailVerifiedPreview() {
 @Composable
 private fun ReportDetailRejectedPreview() {
     EntornoTheme {
-        ReportDetailScreen(
+        ReportDetailContent(
             report = SampleReports.reports[3].copy(
                 description = SAMPLE_DESCRIPTION,
                 rejectionReason = "El reporte no corresponde a una problemática de la comunidad."
@@ -475,7 +555,7 @@ private fun ReportDetailRejectedPreview() {
 @Composable
 private fun ReportDetailVerifiedDarkPreview() {
     EntornoTheme {
-        ReportDetailScreen(
+        ReportDetailContent(
             report = SampleReports.reports[0].copy(
                 description = SAMPLE_DESCRIPTION,
                 imageUrls = listOf("a", "b", "c")

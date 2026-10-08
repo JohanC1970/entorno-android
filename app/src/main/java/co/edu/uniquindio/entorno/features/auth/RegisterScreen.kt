@@ -48,19 +48,33 @@ fun RegisterScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     LaunchedEffect(uiState.registerResult) {
-        if (uiState.registerResult is RequestResult.Success) {
-            onRegisterSuccess()
+        when (val result = uiState.registerResult) {
+            is RequestResult.Success -> {
+                // Se muestra el mensaje antes de pasar a Login; si no, se perdería al navegar
+                snackbarHostState.showSnackbar(result.message)
+                viewModel.clearResult()
+                onRegisterSuccess()
+            }
+            is RequestResult.Failure -> {
+                snackbarHostState.showSnackbar(result.errorMessage)
+                viewModel.clearResult()
+            }
+            else -> Unit
         }
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.White
-    ) {
+    Scaffold(
+        containerColor = Color.White,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp)
         ) {
@@ -265,42 +279,6 @@ fun RegisterScreen(
                         color = Color.White
                     )
                 }
-            }
-
-            when (val res = uiState.registerResult) {
-                is RequestResult.Success -> {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE6F4EA)),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = res.message,
-                            fontSize = 14.sp,
-                            color = Color(0xFF137333),
-                            modifier = Modifier.padding(16.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-                is RequestResult.Failure -> {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE8E6)),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = res.errorMessage,
-                            fontSize = 14.sp,
-                            color = Color(0xFFC5221F),
-                            modifier = Modifier.padding(16.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-                else -> {}
             }
 
             Spacer(modifier = Modifier.height(24.dp))
