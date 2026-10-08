@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -34,9 +35,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,8 +73,36 @@ private val bottomDestinations = listOf(
 
 @Composable
 fun HomeScreen(
-    userName: String,
-    reports: List<Report>,
+    onReportClick: (Report) -> Unit = {},
+    onCreateClick: () -> Unit = {},
+    onNotificationsClick: () -> Unit = {},
+    onMapClick: () -> Unit = {},
+    viewModel: HomeViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
+    HomeContent(
+        uiState = uiState,
+        snackbarHostState = snackbarHostState,
+        onReportClick = onReportClick,
+        onCreateClick = onCreateClick,
+        onNotificationsClick = onNotificationsClick,
+        onMapClick = onMapClick
+    )
+}
+
+@Composable
+fun HomeContent(
+    uiState: HomeUiState,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onReportClick: (Report) -> Unit = {},
     onCreateClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
@@ -73,6 +110,7 @@ fun HomeScreen(
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onCreateClick,
@@ -102,12 +140,31 @@ fun HomeScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item { Greeting(userName, onNotificationsClick) }
+            item { Greeting(uiState.userName, onNotificationsClick) }
             item { SearchBarPlaceholder() }
             item { CategoryFilters() }
             item { SectionHeader(onMapClick) }
-            items(reports, key = { it.id }) { report ->
-                ReportCard(report = report, onClick = { onReportClick(report) })
+            when {
+                uiState.isLoading -> item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                uiState.reports.isEmpty() -> item {
+                    Text(
+                        text = "Aún no hay reportes en tu zona",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(32.dp)
+                    )
+                }
+                else -> items(uiState.reports, key = { it.id }) { report ->
+                    ReportCard(report = report, onClick = { onReportClick(report) })
+                }
             }
         }
     }
@@ -318,11 +375,17 @@ object SampleReports {
     )
 }
 
+private val previewState = HomeUiState(
+    userName = "",
+    reports = SampleReports.reports,
+    isLoading = false
+)
+
 @Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
     EntornoTheme {
-        HomeScreen(userName = "Juan Cayón", reports = SampleReports.reports)
+        HomeContent(uiState = previewState)
     }
 }
 
@@ -330,6 +393,6 @@ private fun HomeScreenPreview() {
 @Composable
 private fun HomeScreenDarkPreview() {
     EntornoTheme {
-        HomeScreen(userName = "Juan Cayón", reports = SampleReports.reports)
+        HomeContent(uiState = previewState)
     }
 }

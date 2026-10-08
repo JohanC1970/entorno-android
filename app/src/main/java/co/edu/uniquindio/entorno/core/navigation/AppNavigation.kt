@@ -32,12 +32,11 @@ import co.edu.uniquindio.entorno.features.profile.EditarPerfilViewModel
 import co.edu.uniquindio.entorno.features.profile.PerfilScreen
 import co.edu.uniquindio.entorno.features.profile.PerfilViewModel
 import co.edu.uniquindio.entorno.features.report.CommentsScreen
+import co.edu.uniquindio.entorno.features.report.CreateReportScreen
 import co.edu.uniquindio.entorno.features.report.MisReportesScreen
 import co.edu.uniquindio.entorno.features.report.MisReportesViewModel
 import co.edu.uniquindio.entorno.features.report.ReportDetailScreen
 import co.edu.uniquindio.entorno.features.report.SampleComments
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 
 object Routes {
     const val WELCOME = "welcome"
@@ -46,18 +45,21 @@ object Routes {
     const val FORGOT_PASSWORD = "forgot_password"
     const val TERMS = "terms"
     const val PRIVACY = "privacy"
-    const val MAIN = "main"
     
     // Nuevas pantallas
     const val HOME = "home"
     const val PROFILE = "profile"
     const val EDIT_PROFILE = "edit_profile"
     const val MY_REPORTS = "my_reports"
-    const val REPORT_DETAIL = "report_detail"
-    const val COMMENTS = "comments"
+    const val REPORT_DETAIL = "report_detail/{reportId}"
+    const val COMMENTS = "comments/{reportId}"
+    const val CREATE_REPORT = "create_report"
     const val MODERATOR_PANEL = "moderator_panel"
     const val REVIEW_REPORT = "review_report"
     const val NOTIFICATIONS = "notifications"
+
+    fun reportDetail(reportId: String) = "report_detail/$reportId"
+    fun comments(reportId: String) = "comments/$reportId"
 }
 
 @Composable
@@ -82,7 +84,7 @@ fun AppNavigation() {
                 onNavigateToRegister = { navController.navigate(Routes.REGISTER) },
                 onNavigateToForgotPassword = { navController.navigate(Routes.FORGOT_PASSWORD) },
                 onLoginSuccess = {
-                    navController.navigate(Routes.MAIN) {
+                    navController.navigate(Routes.HOME) {
                         popUpTo(Routes.WELCOME) { inclusive = true }
                     }
                 }
@@ -120,61 +122,18 @@ fun AppNavigation() {
             )
         }
 
-        composable(Routes.MAIN) {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Color.White
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "¡Bienvenido a Entorno!",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111318)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = "Has iniciado sesión exitosamente.",
-                        fontSize = 16.sp,
-                        color = Color(0xFF5A5F73)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Botones para acceder a las nuevas pantallas
-                    Button(onClick = { navController.navigate(Routes.HOME) }, modifier = Modifier.fillMaxWidth()) { Text("Home") }
-                    Button(onClick = { navController.navigate(Routes.PROFILE) }, modifier = Modifier.fillMaxWidth()) { Text("Perfil") }
-                    Button(onClick = { navController.navigate(Routes.MY_REPORTS) }, modifier = Modifier.fillMaxWidth()) { Text("Mis Reportes") }
-                    Button(onClick = { navController.navigate(Routes.MODERATOR_PANEL) }, modifier = Modifier.fillMaxWidth()) { Text("Panel Moderador") }
-                    Button(onClick = { navController.navigate(Routes.NOTIFICATIONS) }, modifier = Modifier.fillMaxWidth()) { Text("Notificaciones") }
-                    
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Button(
-                        onClick = {
-                            navController.navigate(Routes.WELCOME) {
-                                popUpTo(Routes.MAIN) { inclusive = true }
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF303CA2))
-                    ) {
-                        Text(text = "Cerrar sesión / Volver", color = Color.White)
-                    }
-                }
-            }
-        }
-
         composable(Routes.HOME) {
             HomeScreen(
-                userName = "Juan Cayón",
-                reports = SampleReports.reports,
                 onNotificationsClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                onReportClick = { _ -> navController.navigate(Routes.REPORT_DETAIL) }
+                onReportClick = { report -> navController.navigate(Routes.reportDetail(report.id)) },
+                onCreateClick = { navController.navigate(Routes.CREATE_REPORT) }
+            )
+        }
+
+        composable(Routes.CREATE_REPORT) {
+            CreateReportScreen(
+                onClose = { navController.popBackStack() },
+                onPublished = { navController.popBackStack() }
             )
         }
 
@@ -198,21 +157,23 @@ fun AppNavigation() {
             val viewModel: MisReportesViewModel = viewModel()
             MisReportesScreen(
                 viewModel = viewModel,
-                onReporteClick = { _ -> navController.navigate(Routes.REPORT_DETAIL) }
+                onReporteClick = { reportId -> navController.navigate(Routes.reportDetail(reportId)) }
             )
         }
 
         composable(Routes.REPORT_DETAIL) {
             ReportDetailScreen(
-                report = SampleReports.reports.first(),
                 onBack = { navController.popBackStack() },
-                onCommentsClick = { navController.navigate(Routes.COMMENTS) }
+                onCommentsClick = { reportId -> navController.navigate(Routes.comments(reportId)) }
             )
         }
 
-        composable(Routes.COMMENTS) {
+        composable(Routes.COMMENTS) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId")
+            val report = SampleReports.reports.firstOrNull { it.id == reportId }
+                ?: SampleReports.reports.first()
             CommentsScreen(
-                report = SampleReports.reports.first(),
+                report = report,
                 comments = SampleComments.comments,
                 currentUserId = SampleComments.CURRENT_USER_ID,
                 moderatorIds = SampleComments.moderatorIds,

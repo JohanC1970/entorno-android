@@ -39,20 +39,28 @@ fun LoginScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.loginResult) {
-        if (uiState.loginResult is RequestResult.Success) {
-            onLoginSuccess()
+        when (val result = uiState.loginResult) {
+            is RequestResult.Success -> onLoginSuccess()
+            is RequestResult.Failure -> {
+                snackbarHostState.showSnackbar(result.errorMessage)
+                viewModel.clearResult()
+            }
+            else -> Unit
         }
     }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Color.White
-    ) {
+    Scaffold(
+        containerColor = Color.White,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(innerPadding)
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp)
         ) {
@@ -163,27 +171,6 @@ fun LoginScreen(
                         color = Color.White
                     )
                 }
-            }
-
-            // Mostrar error de login si lo hay
-            when (val res = uiState.loginResult) {
-                is RequestResult.Failure -> {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Card(
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFCE8E6)),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = res.errorMessage,
-                            fontSize = 14.sp,
-                            color = Color(0xFFC5221F),
-                            modifier = Modifier.padding(16.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-                else -> {}
             }
 
             Spacer(modifier = Modifier.height(24.dp))

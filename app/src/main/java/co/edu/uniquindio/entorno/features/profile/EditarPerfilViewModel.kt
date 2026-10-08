@@ -68,6 +68,10 @@ class EditarPerfilViewModel : ViewModel() {
         _uiState.update { it.copy(guardando = false, guardadoExitoso = true) }
     }
 
+    fun mensajeMostrado() {
+        _uiState.update { it.copy(guardadoExitoso = false) }
+    }
+
     fun eliminarCuenta() {
         // En Fase 2 no se elimina realmente
     }

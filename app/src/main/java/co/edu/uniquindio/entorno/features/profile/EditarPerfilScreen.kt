@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -26,10 +27,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,9 +50,18 @@ fun EditarPerfilScreen(
     onBackClick: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.guardadoExitoso) {
+        if (state.guardadoExitoso) {
+            snackbarHostState.showSnackbar("Cambios guardados")
+            viewModel.mensajeMostrado()
+        }
+    }
 
     EditarPerfilContent(
         state = state,
+        snackbarHostState = snackbarHostState,
         onNombreChange = viewModel::actualizarNombre,
         onCorreoChange = viewModel::actualizarCorreo,
         onTelefonoChange = viewModel::actualizarTelefono,
@@ -60,6 +75,7 @@ fun EditarPerfilScreen(
 @Composable
 private fun EditarPerfilContent(
     state: EditarPerfilUiState,
+    snackbarHostState: SnackbarHostState,
     onNombreChange: (String) -> Unit,
     onCorreoChange: (String) -> Unit,
     onTelefonoChange: (String) -> Unit,
@@ -68,10 +84,15 @@ private fun EditarPerfilContent(
     onEliminarClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .padding(innerPadding),
         contentPadding = PaddingValues(bottom = 32.dp)
     ) {
         // Encabezado con flecha atrás y título
@@ -230,6 +251,7 @@ private fun EditarPerfilContent(
             }
         }
     }
+    }
 }
 
 @Composable
@@ -267,6 +289,7 @@ private fun CampoEditar(
 private fun EditarPerfilScreenPreview() {
     EntornoTheme {
         EditarPerfilContent(
+            snackbarHostState = remember { SnackbarHostState() },
             state = EditarPerfilUiState(
                 nombreCompleto = "Johan García",
                 correo = "johanc.garciag@uqvirtual.edu.co",
