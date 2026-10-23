@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Report
+import co.edu.uniquindio.entorno.domain.model.ReportStatus
+import co.edu.uniquindio.entorno.domain.model.UserRole
 import co.edu.uniquindio.entorno.domain.repository.ReportRepository
 import co.edu.uniquindio.entorno.domain.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +26,11 @@ data class ReportDetailUiState(
     val report: Report? = null,
     val isImportant: Boolean = false,
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    /** Mensaje informativo (por ejemplo, confirmación de una acción). */
+    val infoMessage: String? = null,
+    /** El autor o un moderador pueden marcar como resuelto un reporte verificado. */
+    val canResolve: Boolean = false
 )
 
 @HiltViewModel
@@ -51,7 +57,11 @@ class ReportDetailViewModel @Inject constructor(
                     _uiState.update { it.copy(isLoading = false, errorMessage = error.toUserMessage()) }
                 }
                 .collect { report ->
-                    _uiState.update { it.copy(report = report, isLoading = false) }
+                    val session = sessionRepository.session.first()
+                    val canResolve = report != null && session != null &&
+                        report.status == ReportStatus.VERIFIED &&
+                        (session.userId == report.ownerId || session.role == UserRole.MODERATOR)
+                    _uiState.update { it.copy(report = report, isLoading = false, canResolve = canResolve) }
                 }
         }
     }
@@ -82,5 +92,16 @@ class ReportDetailViewModel @Inject constructor(
         }
     }
 
+    fun markResolved() {
+        viewModelScope.launch {
+            val session = sessionRepository.session.first() ?: return@launch
+            reportRepository.markResolved(reportId, session.userId)
+                .onSuccess { _uiState.update { it.copy(infoMessage = "Reporte marcado como resuelto") } }
+                .onFailure { error -> _uiState.update { it.copy(errorMessage = error.toUserMessage()) } }
+        }
+    }
+
     fun clearError() = _uiState.update { it.copy(errorMessage = null) }
+
+    fun clearInfo() = _uiState.update { it.copy(infoMessage = null) }
 }

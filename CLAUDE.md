@@ -162,3 +162,20 @@ una interfaz de repositorio, se pide, no se cambia por cuenta propia.
 - Compilar después de cada cambio. En Windows/PowerShell: `.\gradlew.bat assembleDebug`
   (en Git Bash o macOS/Linux: `./gradlew assembleDebug`)
 - Trabajar siempre en una rama, nunca directo sobre `main`
+
+
+## Fase 2: datos en memoria (estado actual)
+
+- Todas las pantallas del prototipo están implementadas y conectadas. La navegación se decide por la
+  sesión (`AppNavigation` → `AuthNavigation` o `MainScreen` con barra inferior por rol).
+- Los repositorios se enlazan a `data/repository/memory/*` en `di/RepositoryModule.kt`. Las
+  implementaciones de Firebase (`data/repository/*Impl.kt`) se conservan para la Fase 3: **no
+  borrarlas**.
+- Las reglas de puntos, niveles, insignias y notificaciones viven en `MemoryRules.kt` mientras no
+  haya backend.
+- `Report` suma `neighborhood` y `createdAt`; `Comment` suma `authorRole`. `AuthRepository`,
+  `UserRepository` y `ReportRepository` tienen métodos nuevos con implementación por defecto para no
+  romper las implementaciones de Firebase.
+- `google-services.json` ya no es obligatorio para compilar (el plugin se aplica solo si el archivo existe).
+- Mapas: `features/map/MapSurface.kt` (mapa esquemático sin SDK). Si se integra un SDK real en la
+  Fase 3, reemplazar solo ese composable.

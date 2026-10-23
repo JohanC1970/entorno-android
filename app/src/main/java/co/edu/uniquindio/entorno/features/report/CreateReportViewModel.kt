@@ -1,8 +1,10 @@
 package co.edu.uniquindio.entorno.features.report
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.util.RequestResult
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Location
@@ -25,13 +27,18 @@ const val MAX_TITLE = 80
 const val MAX_DESCRIPTION = 500
 const val MAX_IMAGES = 3
 
+/** Clave con la que el selector de ubicación devuelve el punto elegido ("lat,lon"). */
+const val KEY_PICKED_LOCATION = "picked_location"
+
 data class CreateReportUiState(
     val category: ReportCategory? = null,
     val title: String = "",
     val description: String = "",
     val imageUris: List<Uri> = emptyList(),
+    val location: Location = Geo.ARMENIA_CENTER,
     val result: RequestResult? = null
 ) {
+    val neighborhood: String get() = Geo.nearestNeighborhood(location)
     val isLoading: Boolean get() = result is RequestResult.Loading
     val canPublish: Boolean
         get() = category != null && title.isNotBlank() && imageUris.isNotEmpty() && !isLoading
@@ -39,6 +46,7 @@ data class CreateReportUiState(
 
 @HiltViewModel
 class CreateReportViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val reportRepository: ReportRepository,
     private val imageRepository: ImageRepository,
     private val sessionRepository: SessionRepository,
@@ -48,8 +56,19 @@ class CreateReportViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CreateReportUiState())
     val uiState: StateFlow<CreateReportUiState> = _uiState.asStateFlow()
 
-    // TODO: reemplazar por la ubicación real cuando se integre el mapa
-    private val currentLocation = Location(latitude = 4.5339, longitude = -75.6811)
+    init {
+        // El selector de ubicación devuelve el punto en el SavedStateHandle de esta pantalla.
+        viewModelScope.launch {
+            savedStateHandle.getStateFlow<String?>(KEY_PICKED_LOCATION, null).collect { raw ->
+                val parts = raw?.split(",")
+                val lat = parts?.getOrNull(0)?.toDoubleOrNull()
+                val lon = parts?.getOrNull(1)?.toDoubleOrNull()
+                if (lat != null && lon != null) {
+                    _uiState.update { it.copy(location = Location(lat, lon)) }
+                }
+            }
+        }
+    }
 
     fun onCategoryChange(category: ReportCategory) =
         _uiState.update { it.copy(category = category) }
@@ -89,7 +108,8 @@ class CreateReportViewModel @Inject constructor(
                                     title = state.title.trim(),
                                     description = state.description.trim(),
                                     category = category,
-                                    location = currentLocation,
+                                    location = state.location,
+                                    neighborhood = Geo.nearestNeighborhood(state.location),
                                     imageUrls = urls,
                                     ownerId = session.userId,
                                     ownerName = ownerName

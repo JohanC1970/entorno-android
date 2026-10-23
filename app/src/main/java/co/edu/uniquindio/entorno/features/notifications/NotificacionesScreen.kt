@@ -51,11 +51,13 @@ import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.core.theme.*
 import co.edu.uniquindio.entorno.domain.model.AppNotification
 import co.edu.uniquindio.entorno.domain.model.NotificationType
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun NotificacionesScreen(
-    viewModel: NotificacionesViewModel,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onNotificationClick: (reportId: String) -> Unit = {},
+    viewModel: NotificacionesViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
@@ -63,7 +65,11 @@ fun NotificacionesScreen(
         state = state,
         onFiltroClick = viewModel::cambiarFiltro,
         onMarcarLeidas = viewModel::marcarTodasComoLeidas,
-        onBackClick = onBackClick
+        onBackClick = onBackClick,
+        onNotificacionClick = { notificacion ->
+            viewModel.marcarComoLeida(notificacion.id)
+            notificacion.reportId?.let(onNotificationClick)
+        }
     )
 }
 
@@ -72,7 +78,8 @@ private fun NotificacionesContent(
     state: NotificacionesUiState,
     onFiltroClick: (NotificationFilter) -> Unit,
     onMarcarLeidas: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onNotificacionClick: (AppNotification) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -168,9 +175,22 @@ private fun NotificacionesContent(
         }
 
         // Lista de notificaciones
+        if (state.notificacionesFiltradas.isEmpty()) {
+            item {
+                Text(
+                    text = if (state.filtroActual == NotificationFilter.SIN_LEER)
+                        "No tienes notificaciones sin leer." else "Aún no tienes notificaciones.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp)
+                )
+            }
+        }
+
         items(state.notificacionesFiltradas, key = { it.id }) { notificacion ->
             NotificacionCard(
                 notificacion = notificacion,
+                onClick = { onNotificacionClick(notificacion) },
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
             )
         }
@@ -180,9 +200,11 @@ private fun NotificacionesContent(
 @Composable
 private fun NotificacionCard(
     notificacion: AppNotification,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
@@ -313,7 +335,8 @@ private fun NotificacionesScreenPreview() {
             state = NotificacionesUiState(),
             onFiltroClick = {},
             onMarcarLeidas = {},
-            onBackClick = {}
+            onBackClick = {},
+            onNotificacionClick = {}
         )
     }
 }

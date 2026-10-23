@@ -1,14 +1,31 @@
 package co.edu.uniquindio.entorno.features.profile
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import co.edu.uniquindio.entorno.core.util.toRelativeTime
+import co.edu.uniquindio.entorno.domain.model.AppNotification
 import co.edu.uniquindio.entorno.domain.model.Badge
+import co.edu.uniquindio.entorno.domain.model.NotificationType
+import co.edu.uniquindio.entorno.domain.model.Report
+import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import co.edu.uniquindio.entorno.domain.model.User
 import co.edu.uniquindio.entorno.domain.model.UserLevel
 import co.edu.uniquindio.entorno.domain.model.UserRole
+import co.edu.uniquindio.entorno.domain.repository.NotificationRepository
+import co.edu.uniquindio.entorno.domain.repository.ReportRepository
+import co.edu.uniquindio.entorno.domain.repository.SessionRepository
+import co.edu.uniquindio.entorno.domain.repository.UserRepository
+import co.edu.uniquindio.entorno.domain.usecase.auth.observeCurrentUser
+import co.edu.uniquindio.entorno.domain.usecase.auth.withUserId
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /** Representa una actividad reciente en el perfil del usuario */
 data class ActividadReciente(
@@ -20,7 +37,12 @@ data class ActividadReciente(
 
 enum class ActividadTipo {
     REPORTE_VERIFICADO,
-    VOTOS_DADOS
+    VOTOS_DADOS,
+    COMENTARIO,
+    REPORTE_RECHAZADO,
+    REPORTE_RESUELTO,
+    INSIGNIA,
+    NIVEL
 }
 
 /** Insignias visibles en el perfil (incluye las bloqueadas) */
@@ -38,6 +60,8 @@ data class PerfilUiState(
     val insignias: List<InsigniaPerfil> = emptyList(),
     val actividadReciente: List<ActividadReciente> = emptyList()
 ) {
+    val esModerador: Boolean get() = usuario?.role == UserRole.MODERATOR
+
     val nivel: UserLevel get() = usuario?.level ?: UserLevel.NOVICE
 
     val puntosParaSiguienteNivel: Int
@@ -62,59 +86,58 @@ data class PerfilUiState(
         }
 }
 
-class PerfilViewModel : ViewModel() {
+private const val MAX_ACTIVIDAD = 4
+
+private fun AppNotification.toActividad() = ActividadReciente(
+    id = id,
+    icono = when (type) {
+        NotificationType.REPORT_VERIFIED -> ActividadTipo.REPORTE_VERIFICADO
+        NotificationType.REPORT_REJECTED -> ActividadTipo.REPORTE_RECHAZADO
+        NotificationType.REPORT_RESOLVED -> ActividadTipo.REPORTE_RESUELTO
+        NotificationType.NEW_COMMENT -> ActividadTipo.COMENTARIO
+        NotificationType.BADGE_EARNED -> ActividadTipo.INSIGNIA
+        NotificationType.LEVEL_UP -> ActividadTipo.NIVEL
+    },
+    texto = title.trimEnd('.'),
+    tiempo = createdAt.toRelativeTime()
+)
+
+fun buildBadgeList(user: User): List<InsigniaPerfil> =
+    Badge.entries.map { badge ->
+        InsigniaPerfil(nombre = badge.label, badge = badge, desbloqueada = badge in user.badges)
+    }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+@HiltViewModel
+class PerfilViewModel @Inject constructor(
+    private val sessionRepository: SessionRepository,
+    private val userRepository: UserRepository,
+    private val reportRepository: ReportRepository,
+    private val notificationRepository: NotificationRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(PerfilUiState())
     val uiState: StateFlow<PerfilUiState> = _uiState.asStateFlow()
 
     init {
-        cargarPerfil()
-    }
-
-    private fun cargarPerfil() {
-        val usuario = User(
-            id = "user1",
-            name = "Juan E. Cayón",
-            email = "juanc.cayon@uqvirtual.edu.co",
-            city = "Armenia",
-            address = "Barrio Fundadores",
-            phoneNumber = "+57 300 000 0000",
-            role = UserRole.USER,
-            points = 340,
-            badges = listOf(Badge.FIRST_REPORT, Badge.FIRST_COMMENT)
-        )
-
-        val insignias = listOf(
-            InsigniaPerfil(nombre = "Ojo de\nhalcón", badge = Badge.FIRST_REPORT, desbloqueada = true),
-            InsigniaPerfil(nombre = "Primer\nverificado", badge = Badge.FIRST_COMMENT, desbloqueada = true),
-            InsigniaPerfil(nombre = "100\nvotos", badge = Badge.TEN_VERIFIED_REPORTS, desbloqueada = true),
-            InsigniaPerfil(nombre = "Guardián\ndel barrio", badge = null, desbloqueada = false)
-        )
-
-        val actividad = listOf(
-            ActividadReciente(
-                id = "1",
-                icono = ActividadTipo.REPORTE_VERIFICADO,
-                texto = "Tu reporte del hueco fue verificado",
-                tiempo = "2 d"
-            ),
-            ActividadReciente(
-                id = "2",
-                icono = ActividadTipo.VOTOS_DADOS,
-                texto = "Marcaste 3 reportes como importantes",
-                tiempo = "4 d"
-            )
-        )
-
-        _uiState.update {
-            it.copy(
-                usuario = usuario,
-                reportesTotal = 12,
-                verificados = 8,
-                votosDados = 203,
-                insignias = insignias,
-                actividadReciente = actividad
-            )
+        viewModelScope.launch {
+            combine(
+                sessionRepository.observeCurrentUser(userRepository),
+                sessionRepository.withUserId(emptyList<Report>()) { reportRepository.observeUserReports(it) },
+                sessionRepository.withUserId(0) { reportRepository.observeVotesGiven(it) },
+                sessionRepository.withUserId(emptyList<AppNotification>()) { notificationRepository.observeNotifications(it) }
+            ) { user, reportes, votos, notificaciones ->
+                PerfilUiState(
+                    usuario = user,
+                    reportesTotal = reportes.size,
+                    verificados = reportes.count {
+                        it.status == ReportStatus.VERIFIED || it.status == ReportStatus.RESOLVED
+                    },
+                    votosDados = votos,
+                    insignias = user?.let { buildBadgeList(it) }.orEmpty(),
+                    actividadReciente = notificaciones.take(MAX_ACTIVIDAD).map { it.toActividad() }
+                )
+            }.collect { state -> _uiState.update { state } }
         }
     }
 }

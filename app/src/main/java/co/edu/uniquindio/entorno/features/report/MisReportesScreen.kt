@@ -48,11 +48,12 @@ import co.edu.uniquindio.entorno.domain.model.ReportCategory
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun MisReportesScreen(
-    viewModel: MisReportesViewModel,
-    onReporteClick: (String) -> Unit = {}
+    onReporteClick: (String) -> Unit = {},
+    viewModel: MisReportesViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 

@@ -39,6 +39,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextField
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -61,15 +65,6 @@ import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import java.time.LocalDate
-
-private data class BottomDestination(val label: String, val icon: ImageVector)
-
-private val bottomDestinations = listOf(
-    BottomDestination("Inicio", Icons.Default.Home),
-    BottomDestination("Mapa", Icons.Default.Place),
-    BottomDestination("Mis reportes", Icons.AutoMirrored.Filled.List),
-    BottomDestination("Perfil", Icons.Default.Person)
-)
 
 @Composable
 fun HomeScreen(
@@ -95,7 +90,9 @@ fun HomeScreen(
         onReportClick = onReportClick,
         onCreateClick = onCreateClick,
         onNotificationsClick = onNotificationsClick,
-        onMapClick = onMapClick
+        onMapClick = onMapClick,
+        onQueryChange = viewModel::onQueryChange,
+        onCategorySelected = viewModel::onCategorySelected
     )
 }
 
@@ -106,7 +103,9 @@ fun HomeContent(
     onReportClick: (Report) -> Unit = {},
     onCreateClick: () -> Unit = {},
     onNotificationsClick: () -> Unit = {},
-    onMapClick: () -> Unit = {}
+    onMapClick: () -> Unit = {},
+    onQueryChange: (String) -> Unit = {},
+    onCategorySelected: (ReportCategory?) -> Unit = {}
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -119,18 +118,6 @@ fun HomeContent(
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Crear reporte")
             }
-        },
-        bottomBar = {
-            NavigationBar {
-                bottomDestinations.forEachIndexed { index, destination ->
-                    NavigationBarItem(
-                        selected = index == 0,
-                        onClick = if (destination.label == "Mapa") onMapClick else ({}),
-                        icon = { Icon(destination.icon, contentDescription = null) },
-                        label = { Text(destination.label) }
-                    )
-                }
-            }
         }
     ) { innerPadding ->
         LazyColumn(
@@ -140,10 +127,20 @@ fun HomeContent(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item { Greeting(uiState.userName, onNotificationsClick) }
-            item { SearchBarPlaceholder() }
-            item { CategoryFilters() }
+            item { Greeting(uiState.userName, uiState.unreadCount, onNotificationsClick) }
+            item { SearchBar(uiState.query, onQueryChange) }
+            item { CategoryFilters(uiState.selectedCategory, onCategorySelected) }
             item { SectionHeader(onMapClick) }
+            if (uiState.radiusKm > 0) {
+                item {
+                    val hidden = if (uiState.hiddenByRadius > 0) " · ${uiState.hiddenByRadius} fuera del radio" else ""
+                    Text(
+                        text = "Mostrando reportes a menos de ${uiState.radiusKm} km$hidden",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             when {
                 uiState.isLoading -> item {
                     Box(
@@ -155,7 +152,9 @@ fun HomeContent(
                 }
                 uiState.reports.isEmpty() -> item {
                     Text(
-                        text = "Aún no hay reportes en tu zona",
+                        text = if (uiState.query.isNotBlank() || uiState.selectedCategory != null)
+                            "No encontramos reportes con esos filtros"
+                        else "Aún no hay reportes en tu zona",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -177,7 +176,13 @@ private fun initials(name: String): String =
         .joinToString("") { it.first().uppercase() }
 
 @Composable
-private fun Greeting(userName: String, onNotificationsClick: () -> Unit) {
+private fun Greeting(userName: String, unreadCount: Int, onNotificationsClick: () -> Unit) {
+    val hour = java.time.LocalTime.now().hour
+    val greeting = when {
+        hour < 12 -> "Buenos días"
+        hour < 19 -> "Buenas tardes"
+        else -> "Buenas noches"
+    }
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -198,7 +203,7 @@ private fun Greeting(userName: String, onNotificationsClick: () -> Unit) {
         Spacer(Modifier.width(12.dp))
         androidx.compose.foundation.layout.Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Buenos días",
+                text = greeting,
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -220,51 +225,53 @@ private fun Greeting(userName: String, onNotificationsClick: () -> Unit) {
                 contentDescription = "Notificaciones",
                 tint = MaterialTheme.colorScheme.onBackground
             )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 10.dp, end = 10.dp)
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.error)
-            )
+            if (unreadCount > 0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 10.dp, end = 10.dp)
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.error)
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun SearchBarPlaceholder() {
-    Surface(
+private fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
+    TextField(
+        value = query,
+        onValueChange = onQueryChange,
         modifier = Modifier.fillMaxWidth(),
+        placeholder = { Text("Buscar en tu zona") },
+        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(imageVector = Icons.Default.Close, contentDescription = "Borrar búsqueda")
+                }
+            }
+        },
+        singleLine = true,
         shape = RoundedCornerShape(50),
-        color = MaterialTheme.colorScheme.surfaceVariant
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = "Buscar en tu zona",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
+            unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+        )
+    )
 }
 
 @Composable
-private fun CategoryFilters() {
+private fun CategoryFilters(selected: ReportCategory?, onSelected: (ReportCategory?) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         item {
             FilterChip(
-                selected = true,
-                onClick = {},
+                selected = selected == null,
+                onClick = { onSelected(null) },
                 label = { Text("Todos") },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = MaterialTheme.colorScheme.primary,
@@ -275,8 +282,8 @@ private fun CategoryFilters() {
         items(ReportCategory.entries) { category ->
             val colors = categoryColors(category)
             FilterChip(
-                selected = false,
-                onClick = {},
+                selected = selected == category,
+                onClick = { onSelected(if (selected == category) null else category) },
                 label = { Text(category.label) },
                 leadingIcon = {
                     Icon(
@@ -288,7 +295,10 @@ private fun CategoryFilters() {
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = colors.chipBackground,
                     labelColor = colors.chipText,
-                    iconColor = colors.icon
+                    iconColor = colors.icon,
+                    selectedContainerColor = colors.icon,
+                    selectedLabelColor = colors.chipBackground,
+                    selectedLeadingIconColor = colors.chipBackground
                 ),
                 border = null
             )
