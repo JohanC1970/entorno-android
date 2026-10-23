@@ -4,6 +4,7 @@ import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 
 interface ReportRepository {
     /** Feed público: reportes PENDING o VERIFIED (no rechazados ni resueltos). */
@@ -34,4 +35,10 @@ interface ReportRepository {
     suspend fun verifyReport(reportId: String, moderatorId: String): Result<Unit>
     suspend fun rejectReport(reportId: String, moderatorId: String, reason: String): Result<Unit>
     suspend fun markResolved(reportId: String, actorId: String): Result<Unit>
+
+    /** Todos los reportes sin importar el estado: estadísticas y mapa de calor. */
+    fun observeAllReports(): Flow<List<Report>> = observeModerationQueue(null)
+
+    /** Cantidad de votos "Es importante" que ha dado el usuario. */
+    fun observeVotesGiven(userId: String): Flow<Int> = flowOf(0)
 }

@@ -22,6 +22,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
+import co.edu.uniquindio.entorno.core.util.initialsOf
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Comment
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Flag
 import androidx.compose.material.icons.outlined.Lock
@@ -51,21 +56,36 @@ import co.edu.uniquindio.entorno.core.theme.*
 
 @Composable
 fun PerfilScreen(
-    viewModel: PerfilViewModel,
-    onEditarClick: () -> Unit = {}
+    onEditarClick: () -> Unit = {},
+    onSettingsClick: () -> Unit = {},
+    onBadgesClick: () -> Unit = {},
+    onHeroesClick: () -> Unit = {},
+    onStatsClick: () -> Unit = {},
+    onModeratorClick: () -> Unit = {},
+    viewModel: PerfilViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
     PerfilContent(
         state = state,
-        onEditarClick = onEditarClick
+        onEditarClick = onEditarClick,
+        onSettingsClick = onSettingsClick,
+        onBadgesClick = onBadgesClick,
+        onHeroesClick = onHeroesClick,
+        onStatsClick = onStatsClick,
+        onModeratorClick = onModeratorClick
     )
 }
 
 @Composable
 private fun PerfilContent(
     state: PerfilUiState,
-    onEditarClick: () -> Unit
+    onEditarClick: () -> Unit,
+    onSettingsClick: () -> Unit = {},
+    onBadgesClick: () -> Unit = {},
+    onHeroesClick: () -> Unit = {},
+    onStatsClick: () -> Unit = {},
+    onModeratorClick: () -> Unit = {}
 ) {
     val usuario = state.usuario ?: return
 
@@ -92,10 +112,7 @@ private fun PerfilContent(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = usuario.name.split(" ")
-                            .take(2)
-                            .map { it.first().uppercaseChar() }
-                            .joinToString(""),
+                        text = initialsOf(usuario.name),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = PrimarioClaro
@@ -118,6 +135,13 @@ private fun PerfilContent(
                     )
                 }
 
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.Settings,
+                        contentDescription = "Configuración",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 IconButton(onClick = onEditarClick) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
@@ -254,13 +278,26 @@ private fun PerfilContent(
 
         // Insignias
         item {
-            Text(
-                text = "Insignias",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(start = 20.dp, bottom = 12.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, bottom = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Insignias",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Ver todas",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable(onClick = onBadgesClick)
+                )
+            }
         }
 
         item {
@@ -286,10 +323,64 @@ private fun PerfilContent(
             )
         }
 
+        if (state.actividadReciente.isEmpty()) {
+            item {
+                Text(
+                    text = "Cuando reportes o comentes, tu actividad aparecerá aquí.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
+                )
+            }
+        }
         items(state.actividadReciente, key = { it.id }) { actividad ->
             ActividadCard(
                 actividad = actividad,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
+            )
+        }
+
+        // Accesos a la comunidad
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "Comunidad",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(start = 20.dp, bottom = 12.dp)
+            )
+        }
+        item { AccesoCard("Héroes comunitarios", "Ranking de ciudadanos del mes", onHeroesClick) }
+        item { AccesoCard("Estadísticas", "Reportes por categoría y zona", onStatsClick) }
+        if (state.esModerador) {
+            item { AccesoCard("Panel de moderador", "Publicaciones pendientes de revisión", onModeratorClick) }
+        }
+    }
+}
+
+@Composable
+private fun AccesoCard(titulo: String, descripcion: String, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(modifier = Modifier.fillMaxWidth().padding(14.dp)) {
+            Text(
+                text = titulo,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = descripcion,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -427,6 +518,26 @@ private fun ActividadCard(
         )
         ActividadTipo.VOTOS_DADOS -> Triple(
             Icons.Outlined.Flag,
+            ContenedorPrimarioClaro,
+            PrimarioClaro
+        )
+        ActividadTipo.COMENTARIO -> Triple(
+            Icons.Outlined.Comment,
+            ContenedorPrimarioClaro,
+            PrimarioClaro
+        )
+        ActividadTipo.REPORTE_RECHAZADO -> Triple(
+            Icons.Outlined.Close,
+            FondoEstadoRechazado,
+            TextoEstadoRechazado
+        )
+        ActividadTipo.REPORTE_RESUELTO -> Triple(
+            Icons.Outlined.Check,
+            FondoEstadoResuelto,
+            TextoEstadoResuelto
+        )
+        ActividadTipo.INSIGNIA, ActividadTipo.NIVEL -> Triple(
+            Icons.Outlined.StarOutline,
             ContenedorPrimarioClaro,
             PrimarioClaro
         )

@@ -27,9 +27,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import co.edu.uniquindio.entorno.core.component.UriImage
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,21 +48,40 @@ import co.edu.uniquindio.entorno.core.theme.*
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 import co.edu.uniquindio.entorno.features.report.EstadoPill
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun RevisarPublicacionScreen(
-    viewModel: RevisarPublicacionViewModel,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    viewModel: RevisarPublicacionViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    RevisarPublicacionContent(
-        state = state,
-        onMotivoChange = viewModel::actualizarMotivo,
-        onVerificarClick = viewModel::verificar,
-        onRechazarClick = viewModel::rechazar,
-        onBackClick = onBackClick
-    )
+    LaunchedEffect(state.mensajeError) {
+        state.mensajeError?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.mensajeMostrado()
+        }
+    }
+    // Tras verificar o rechazar se vuelve al panel, donde el reporte ya no aparece.
+    LaunchedEffect(state.accionCompletada) {
+        if (state.accionCompletada) onBackClick()
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        RevisarPublicacionContent(
+            state = state,
+            onMotivoChange = viewModel::actualizarMotivo,
+            onVerificarClick = viewModel::verificar,
+            onRechazarClick = viewModel::rechazar,
+            onBackClick = onBackClick
+        )
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
+    }
 }
 
 @Composable
@@ -116,7 +140,11 @@ private fun RevisarPublicacionContent(
                             )
                         )
                     )
-            )
+            ) {
+                reporte.imageUrls.firstOrNull()?.let { url ->
+                    UriImage(uri = url, modifier = Modifier.fillMaxSize())
+                }
+            }
         }
 
         // Chips de categoría y estado

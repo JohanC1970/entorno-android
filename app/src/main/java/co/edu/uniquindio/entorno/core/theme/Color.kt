@@ -78,3 +78,9 @@ val TextoEstadoResuelto = Color(0xFF141B5E)
 val SeveridadAlta = Color(0xFFC0273B)
 val SeveridadMedia = Color(0xFFB26A00)
 val SeveridadBaja = Color(0xFF5A5C6E)
+
+// ---------- Mapa esquemático (Mapa, Mapa de calor y selector de ubicación) ----------
+val MapaParque = Color(0xFFCDE7D3)
+val MapaAgua = Color(0xFFCFE2F3)
+val MapaCalor = Color(0xFFD32F2F)
+val MapaUsuario = Color(0xFF1A73E8)

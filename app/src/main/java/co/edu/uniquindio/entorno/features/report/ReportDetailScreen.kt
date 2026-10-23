@@ -60,6 +60,7 @@ import co.edu.uniquindio.entorno.R
 import co.edu.uniquindio.entorno.core.component.CategoryChip
 import co.edu.uniquindio.entorno.core.component.SeverityBar
 import co.edu.uniquindio.entorno.core.component.StatusChip
+import co.edu.uniquindio.entorno.core.component.UriImage
 import co.edu.uniquindio.entorno.core.component.icon
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.core.theme.categoryColors
@@ -100,9 +101,9 @@ private fun Report.milestones(): List<Milestone> {
 @Composable
 fun ReportDetailScreen(
     onBack: () -> Unit = {},
-    onShare: () -> Unit = {},
+    onShare: (Report) -> Unit = {},
     onCommentsClick: (reportId: String) -> Unit = {},
-    onViewOnMap: () -> Unit = {},
+    onViewOnMap: (reportId: String) -> Unit = {},
     viewModel: ReportDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -112,6 +113,12 @@ fun ReportDetailScreen(
         uiState.errorMessage?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
+        }
+    }
+    LaunchedEffect(uiState.infoMessage) {
+        uiState.infoMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearInfo()
         }
     }
 
@@ -127,9 +134,11 @@ fun ReportDetailScreen(
             snackbarHostState = snackbarHostState,
             onBack = onBack,
             onToggleImportant = viewModel::toggleImportant,
-            onShare = onShare,
+            onShare = { onShare(report) },
             onCommentsClick = { onCommentsClick(report.id) },
-            onViewOnMap = onViewOnMap
+            onViewOnMap = { onViewOnMap(report.id) },
+            canResolve = uiState.canResolve,
+            onResolve = viewModel::markResolved
         )
     }
 }
@@ -177,6 +186,8 @@ fun ReportDetailContent(
     onShare: () -> Unit = {},
     onCommentsClick: () -> Unit = {},
     onViewOnMap: () -> Unit = {},
+    canResolve: Boolean = false,
+    onResolve: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -234,6 +245,16 @@ fun ReportDetailContent(
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
+                if (canResolve) {
+                    Button(
+                        onClick = onResolve,
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth().height(48.dp)
+                    ) {
+                        Text("Marcar como resuelto")
+                    }
+                }
+
                 LocationCard(location = report.location, onViewOnMap = onViewOnMap)
 
                 if (report.status == ReportStatus.REJECTED) {
@@ -254,7 +275,8 @@ fun ReportDetailContent(
 @Composable
 private fun ImageHeader(report: Report, onBack: () -> Unit) {
     val colors = categoryColors(report.category)
-    // TODO: cargar imagenUrls reales cuando se agregue Coil
+    // Las fotos locales se cargan con UriImage (sin librerías externas); si no hay foto
+    // o no se puede leer, queda el ícono de la categoría.
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -269,6 +291,9 @@ private fun ImageHeader(report: Report, onBack: () -> Unit) {
                 .align(Alignment.Center)
                 .size(96.dp)
         )
+        report.imageUrls.firstOrNull()?.let { url ->
+            UriImage(uri = url, modifier = Modifier.fillMaxSize())
+        }
 
         Box(
             modifier = Modifier

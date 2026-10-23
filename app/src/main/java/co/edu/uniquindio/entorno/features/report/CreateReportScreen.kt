@@ -66,6 +66,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.core.component.icon
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
+import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.theme.categoryColors
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 
@@ -207,7 +208,11 @@ private fun CreateReportContent(
 
             Spacer(Modifier.height(4.dp))
             SectionLabel("UBICACIÓN")
-            LocationCard(onChangeLocation = onChangeLocation)
+            LocationCard(
+                neighborhood = uiState.neighborhood,
+                coordinates = Geo.format(uiState.location),
+                onChangeLocation = onChangeLocation
+            )
         }
     }
 }
@@ -393,8 +398,8 @@ private fun AddPhotoBox(onClick: () -> Unit) {
 }
 
 @Composable
-private fun LocationCard(onChangeLocation: () -> Unit) {
-    // TODO: ubicación real cuando se integre el mapa
+private fun LocationCard(neighborhood: String, coordinates: String, onChangeLocation: () -> Unit) {
+    // La ubicación se elige en el mapa (selector de ubicación); por defecto, el centro de la ciudad.
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -414,11 +419,11 @@ private fun LocationCard(onChangeLocation: () -> Unit) {
                 .weight(1f)
                 .padding(horizontal = 12.dp)) {
                 Text(
-                    text = "Ubicación actual detectada",
+                    text = "Ubicación: $neighborhood",
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = "4.5339° N, 75.6811° W",
+                    text = coordinates,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

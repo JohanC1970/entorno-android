@@ -22,10 +22,12 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth){
     }
 
     suspend fun register(email: String, password: String): String =
-        auth.createUserWithEmailAndPassword(email,password).await().user!!.uid
+        auth.createUserWithEmailAndPassword(email, password).await().user?.uid
+            ?: error("Firebase no devolvió el usuario creado")
 
     suspend fun login(email: String, password: String): String =
-        auth.signInWithEmailAndPassword(email,password).await().user!!.uid
+        auth.signInWithEmailAndPassword(email, password).await().user?.uid
+            ?: error("Firebase no devolvió el usuario autenticado")
 
     suspend fun sendPasswordReset(email: String) {
         auth.sendPasswordResetEmail(email).await()

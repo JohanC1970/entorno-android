@@ -31,6 +31,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,8 +52,8 @@ import co.edu.uniquindio.entorno.core.theme.*
 
 @Composable
 fun EditarPerfilScreen(
-    viewModel: EditarPerfilViewModel,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    viewModel: EditarPerfilViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -55,6 +61,12 @@ fun EditarPerfilScreen(
     LaunchedEffect(state.guardadoExitoso) {
         if (state.guardadoExitoso) {
             snackbarHostState.showSnackbar("Cambios guardados")
+            viewModel.mensajeMostrado()
+        }
+    }
+    LaunchedEffect(state.mensajeError) {
+        state.mensajeError?.let {
+            snackbarHostState.showSnackbar(it)
             viewModel.mensajeMostrado()
         }
     }
@@ -67,7 +79,7 @@ fun EditarPerfilScreen(
         onTelefonoChange = viewModel::actualizarTelefono,
         onBarrioChange = viewModel::actualizarBarrio,
         onGuardarClick = viewModel::guardarCambios,
-        onEliminarClick = viewModel::eliminarCuenta,
+        onEliminarConfirmado = viewModel::eliminarCuenta,
         onBackClick = onBackClick
     )
 }
@@ -81,9 +93,48 @@ private fun EditarPerfilContent(
     onTelefonoChange: (String) -> Unit,
     onBarrioChange: (String) -> Unit,
     onGuardarClick: () -> Unit,
-    onEliminarClick: () -> Unit,
+    onEliminarConfirmado: (String) -> Unit,
     onBackClick: () -> Unit
 ) {
+    var mostrarDialogoEliminar by remember { mutableStateOf(false) }
+    var contrasenaEliminar by remember { mutableStateOf("") }
+
+    if (mostrarDialogoEliminar) {
+        AlertDialog(
+            onDismissRequest = { mostrarDialogoEliminar = false },
+            title = { Text("Eliminar mi cuenta") },
+            text = {
+                Column {
+                    Text("Esta acción no se puede deshacer. Escribe tu contraseña para confirmar.")
+                    Spacer(modifier = Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = contrasenaEliminar,
+                        onValueChange = { contrasenaEliminar = it },
+                        label = { Text("Contraseña") },
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        mostrarDialogoEliminar = false
+                        onEliminarConfirmado(contrasenaEliminar)
+                        contrasenaEliminar = ""
+                    },
+                    enabled = !state.eliminando
+                ) { Text("Eliminar", color = SeveridadAlta) }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    mostrarDialogoEliminar = false
+                    contrasenaEliminar = ""
+                }) { Text("Cancelar") }
+            }
+        )
+    }
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         contentWindowInsets = WindowInsets(0),
@@ -177,6 +228,7 @@ private fun EditarPerfilContent(
                 etiqueta = "Nombre completo",
                 valor = state.nombreCompleto,
                 onValueChange = onNombreChange,
+                error = state.nombreError,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
             )
         }
@@ -187,6 +239,7 @@ private fun EditarPerfilContent(
                 etiqueta = "Correo electrónico",
                 valor = state.correo,
                 onValueChange = onCorreoChange,
+                error = state.correoError,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
             )
         }
@@ -224,7 +277,7 @@ private fun EditarPerfilContent(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary
                 ),
-                enabled = !state.guardando
+                enabled = !state.guardando && !state.eliminando
             ) {
                 Text(
                     text = "Guardar cambios",
@@ -246,7 +299,7 @@ private fun EditarPerfilContent(
                     style = MaterialTheme.typography.titleSmall,
                     color = SeveridadAlta,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.clickable(onClick = onEliminarClick)
+                    modifier = Modifier.clickable { mostrarDialogoEliminar = true }
                 )
             }
         }
@@ -259,7 +312,8 @@ private fun CampoEditar(
     etiqueta: String,
     valor: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    error: String? = null
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -279,7 +333,9 @@ private fun CampoEditar(
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 focusedContainerColor = MaterialTheme.colorScheme.surface
             ),
-            singleLine = true
+            singleLine = true,
+            isError = error != null,
+            supportingText = { if (error != null) Text(error) }
         )
     }
 }
@@ -302,7 +358,7 @@ private fun EditarPerfilScreenPreview() {
             onTelefonoChange = {},
             onBarrioChange = {},
             onGuardarClick = {},
-            onEliminarClick = {},
+            onEliminarConfirmado = {},
             onBackClick = {}
         )
     }

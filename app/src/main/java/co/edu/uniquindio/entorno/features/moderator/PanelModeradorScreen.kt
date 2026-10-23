@@ -43,11 +43,12 @@ import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import co.edu.uniquindio.entorno.features.report.EstadoPill
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun PanelModeradorScreen(
-    viewModel: PanelModeradorViewModel,
-    onReporteClick: (String) -> Unit = {}
+    onReporteClick: (String) -> Unit = {},
+    viewModel: PanelModeradorViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 

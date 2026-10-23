@@ -1,82 +1,99 @@
 package co.edu.uniquindio.entorno.features.moderator
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import co.edu.uniquindio.entorno.domain.model.Location
+import androidx.lifecycle.viewModelScope
+import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Report
-import co.edu.uniquindio.entorno.domain.model.ReportCategory
-import co.edu.uniquindio.entorno.domain.model.ReportStatus
+import co.edu.uniquindio.entorno.domain.repository.ReportRepository
+import co.edu.uniquindio.entorno.domain.repository.SessionRepository
+import co.edu.uniquindio.entorno.domain.usecase.auth.requireModeratorId
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
-import java.time.LocalDate
+import kotlinx.coroutines.launch
 
 data class RevisarPublicacionUiState(
     val reporte: Report? = null,
     val motivoRechazo: String = "",
     val verificando: Boolean = false,
     val rechazando: Boolean = false,
-    val accionCompletada: Boolean = false
+    val accionCompletada: Boolean = false,
+    val mensajeError: String? = null,
+    /** Texto de confirmación que se muestra antes de volver al panel. */
+    val mensajeExito: String? = null
 )
 
-class RevisarPublicacionViewModel : ViewModel() {
+@HiltViewModel
+class RevisarPublicacionViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
+    private val reportRepository: ReportRepository,
+    private val sessionRepository: SessionRepository
+) : ViewModel() {
+
+    private val reportId: String = savedStateHandle.get<String>("reportId").orEmpty()
 
     private val _uiState = MutableStateFlow(RevisarPublicacionUiState())
     val uiState: StateFlow<RevisarPublicacionUiState> = _uiState.asStateFlow()
 
     init {
-        cargarReporte()
-    }
-
-    private fun cargarReporte() {
-        // Datos de prueba que coinciden con el mockup
-        val reporte = Report(
-            id = "mod1",
-            title = "Poste de luz averiado",
-            description = "El poste frente al número 45 lleva 3 días sin encender. La calle queda muy oscura de noche y ya hubo un intento de robo.",
-            category = ReportCategory.INFRASTRUCTURE,
-            location = Location(4.5339, -75.6811),
-            status = ReportStatus.PENDING,
-            imageUrls = listOf("https://ejemplo.com/poste.jpg"),
-            ownerId = "user2",
-            ownerName = "Carlos López",
-            date = LocalDate.now()
-        )
-
-        _uiState.update { it.copy(reporte = reporte) }
+        viewModelScope.launch {
+            // Se toma una sola vez: tras verificar o rechazar el reporte sale de la cola.
+            val reporte = reportRepository.findById(reportId).getOrNull()
+            _uiState.update { it.copy(reporte = reporte) }
+        }
     }
 
     fun actualizarMotivo(motivo: String) {
-        _uiState.update { it.copy(motivoRechazo = motivo) }
+        _uiState.update { it.copy(motivoRechazo = motivo, mensajeError = null) }
     }
 
     fun verificar() {
-        _uiState.update { it.copy(verificando = true) }
-        // Simulación: cambiar estado a verificado
-        _uiState.update { state ->
-            state.copy(
-                reporte = state.reporte?.copy(status = ReportStatus.VERIFIED),
-                verificando = false,
-                accionCompletada = true
-            )
+        if (_uiState.value.verificando || _uiState.value.rechazando) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(verificando = true) }
+            runCatching { sessionRepository.requireModeratorId() }
+                .mapCatching { moderatorId -> reportRepository.verifyReport(reportId, moderatorId).getOrThrow() }
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(verificando = false, accionCompletada = true, mensajeExito = "Reporte verificado")
+                    }
+                }
+                .onFailure { error ->
+                    _uiState.update { it.copy(verificando = false, mensajeError = error.toUserMessage()) }
+                }
         }
     }
 
     fun rechazar() {
         val motivo = _uiState.value.motivoRechazo
-        if (motivo.isBlank()) return
-
-        _uiState.update { it.copy(rechazando = true) }
-        // Simulación: cambiar estado a rechazado
-        _uiState.update { state ->
-            state.copy(
-                reporte = state.reporte?.copy(
-                    status = ReportStatus.REJECTED,
-                    rejectionReason = motivo
-                ),
-                rechazando = false,
-                accionCompletada = true
-            )
+        if (motivo.isBlank()) {
+            _uiState.update { it.copy(mensajeError = "Escribe el motivo del rechazo") }
+            return
         }
+        if (_uiState.value.verificando || _uiState.value.rechazando) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(rechazando = true) }
+            runCatching { sessionRepository.requireModeratorId() }
+                .mapCatching { moderatorId ->
+                    reportRepository.rejectReport(reportId, moderatorId, motivo).getOrThrow()
+                }
+                .onSuccess {
+                    _uiState.update {
+                        it.copy(rechazando = false, accionCompletada = true, mensajeExito = "Reporte rechazado")
+                    }
+                }
+                .onFailure { error ->
+                    _uiState.update { it.copy(rechazando = false, mensajeError = error.toUserMessage()) }
+                }
+        }
+    }
+
+    fun mensajeMostrado() {
+        _uiState.update { it.copy(mensajeError = null) }
     }
 }

@@ -3,9 +3,13 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+}
 
-    // plugin de Google Services
-    id("com.google.gms.google-services")
+// Google Services solo se aplica si existe google-services.json (no se versiona por tener
+// credenciales). La Fase 2 guarda los datos en memoria y no lo necesita para compilar;
+// en la Fase 3, al volver a Firebase, cada integrante coloca su copia en app/.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }
 
 android {

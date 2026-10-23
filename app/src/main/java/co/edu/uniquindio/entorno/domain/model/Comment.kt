@@ -8,5 +8,7 @@ data class Comment(
     val text: String,
     val createdAt: Long = 0L,
     /** null = comentario raíz; con valor = respuesta al comentario con ese id (un solo nivel). */
-    val parentCommentId: String? = null
+    val parentCommentId: String? = null,
+    /** Rol del autor al comentar; permite resaltar a los moderadores. */
+    val authorRole: UserRole = UserRole.USER
 )

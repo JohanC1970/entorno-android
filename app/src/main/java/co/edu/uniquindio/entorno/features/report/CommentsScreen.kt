@@ -54,6 +54,13 @@ import co.edu.uniquindio.entorno.core.component.labelForCitizen
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.core.theme.categoryColors
 import co.edu.uniquindio.entorno.domain.model.Comment
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.material.icons.filled.Close
+import androidx.hilt.navigation.compose.hiltViewModel
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.features.home.SampleReports
 
@@ -66,15 +73,29 @@ fun CommentsScreen(
     onBack: () -> Unit = {},
     onSend: (String) -> Unit = {},
     onViewReport: () -> Unit = {},
+    replyingTo: Comment? = null,
+    usefulIds: Set<String> = emptySet(),
+    onReply: (Comment) -> Unit = {},
+    onCancelReply: () -> Unit = {},
+    onUseful: (String) -> Unit = {},
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     modifier: Modifier = Modifier
 ) {
-    // "Más recientes": el comentario más nuevo va primero.
-    val sortedComments = remember(comments) { comments.sortedByDescending { it.createdAt } }
+    // "Más recientes": los hilos nuevos van primero; las respuestas, en orden bajo su comentario.
+    val sortedComments = remember(comments) {
+        val roots = comments
+            .filter { c -> c.parentCommentId == null || comments.none { it.id == c.parentCommentId } }
+            .sortedByDescending { it.createdAt }
+        roots.flatMap { root ->
+            listOf(root) + comments.filter { it.parentCommentId == root.id }.sortedBy { it.createdAt }
+        }
+    }
 
     Scaffold(
         modifier = modifier,
         containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets(0)
+        contentWindowInsets = WindowInsets(0),
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -119,13 +140,17 @@ fun CommentsScreen(
                         CommentItem(
                             comment = comment,
                             isCurrentUser = comment.authorId == currentUserId,
-                            isModerator = comment.authorId in moderatorIds
+                            isModerator = comment.authorId in moderatorIds,
+                            usefulCount = if (comment.id in usefulIds) 1 else 0,
+                            onReply = { onReply(comment) },
+                            onUseful = { onUseful(comment.id) },
+                            modifier = Modifier.padding(start = if (comment.parentCommentId != null) 28.dp else 0.dp)
                         )
                     }
                 }
             }
 
-            CommentInputBar(onSend = onSend)
+            CommentInputBar(onSend = onSend, replyingTo = replyingTo, onCancelReply = onCancelReply)
         }
     }
 }
@@ -250,56 +275,125 @@ private fun EmptyComments(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun CommentInputBar(onSend: (String) -> Unit) {
+private fun CommentInputBar(
+    onSend: (String) -> Unit,
+    replyingTo: Comment?,
+    onCancelReply: () -> Unit
+) {
     var text by remember { mutableStateOf("") }
     Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .navigationBarsPadding()
                 .imePadding()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Surface(
-                modifier = Modifier.size(40.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.primary
+            if (replyingTo != null) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 4.dp, top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Respondiendo a ${replyingTo.authorName}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = onCancelReply) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cancelar respuesta",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(contentAlignment = Alignment.Center) {
+                Surface(
+                    modifier = Modifier.size(40.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.primary
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    modifier = Modifier.weight(1f),
+                    placeholder = { Text(if (replyingTo != null) "Escribe tu respuesta…" else "Escribe un comentario…") },
+                    shape = RoundedCornerShape(24.dp),
+                    maxLines = 4
+                )
+                FilledIconButton(
+                    onClick = {
+                        onSend(text.trim())
+                        text = ""
+                    },
+                    enabled = text.isNotBlank()
+                ) {
                     Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.size(20.dp)
+                        imageVector = Icons.AutoMirrored.Filled.Send,
+                        contentDescription = "Enviar comentario"
                     )
                 }
             }
-            OutlinedTextField(
-                value = text,
-                onValueChange = { text = it },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Escribe un comentario…") },
-                shape = RoundedCornerShape(24.dp),
-                maxLines = 4
-            )
-            FilledIconButton(
-                onClick = {
-                    onSend(text.trim())
-                    text = ""
-                },
-                enabled = text.isNotBlank()
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Enviar comentario"
-                )
-            }
         }
+    }
+}
+
+/** Pantalla de comentarios conectada al ViewModel (usada desde la navegación). */
+@Composable
+fun CommentsRoute(
+    onBack: () -> Unit,
+    viewModel: CommentsViewModel = hiltViewModel()
+) {
+    val state by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(state.errorMessage) {
+        state.errorMessage?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearError()
+        }
+    }
+
+    val report = state.report
+    if (report == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    } else {
+        CommentsScreen(
+            report = report,
+            comments = state.comments,
+            currentUserId = state.currentUserId,
+            moderatorIds = state.moderatorIds,
+            onBack = onBack,
+            onSend = viewModel::send,
+            onViewReport = onBack,
+            replyingTo = state.replyingTo,
+            usefulIds = state.usefulIds,
+            onReply = viewModel::startReply,
+            onCancelReply = viewModel::cancelReply,
+            onUseful = viewModel::toggleUseful,
+            snackbarHostState = snackbarHostState
+        )
     }
 }
 

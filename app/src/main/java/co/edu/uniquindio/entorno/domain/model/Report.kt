@@ -24,7 +24,11 @@ data class Report(
     val date: LocalDate = LocalDate.now(),
     val rejectionReason: String? = null,
     val importantCount: Int = 0,
-    val commentCount: Int = 0
+    val commentCount: Int = 0,
+    /** Barrio o zona del reporte (estadísticas por zona). Vacío si no se conoce. */
+    val neighborhood: String = "",
+    /** Epoch en ms; da la hora del día para el mapa de calor. */
+    val createdAt: Long = System.currentTimeMillis()
 ){
     val severity: Severity get() = Severity.fromVotes(importantCount)
 }
