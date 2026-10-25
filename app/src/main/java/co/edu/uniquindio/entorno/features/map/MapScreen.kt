@@ -56,6 +56,7 @@ import com.mapbox.maps.extension.style.expressions.generated.Expression
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
+import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
 // Zooms de Mapbox (1 menos que los de Google Maps).
@@ -145,7 +146,8 @@ fun MapScreen(
     val markers = remember(state.reports, selected) {
         (state.reports + listOfNotNull(selected)).distinctBy { it.id }
     }
-    val heatJson = remember(state.reports) { state.reports.toHeatFeatures().toJson() }
+    val heatReports = state.heatReports
+    val heatJson = remember(heatReports) { heatReports.toHeatFeatures().toJson() }
     val radiusJson = remember(state.userLocation, state.radiusKm) {
         circlePolygon(state.userLocation, state.radiusKm * 1000.0).toJson()
     }
@@ -267,8 +269,13 @@ fun MapScreen(
                 onClick = { onReportClick(selected.id) },
                 modifier = Modifier.align(Alignment.BottomCenter).padding(start = 12.dp, end = 12.dp, bottom = 44.dp)
             )
-            state.showHeat -> HeatLegend(
-                total = state.reports.size,
+            state.showHeat -> HeatPanel(
+                total = heatReports.size,
+                allDay = state.allDay,
+                startHour = state.startHour,
+                windowLabel = state.windowLabel,
+                onAllDayChange = viewModel::onAllDayChange,
+                onStartHourChange = viewModel::onStartHourChange,
                 modifier = Modifier.align(Alignment.BottomCenter).padding(start = 12.dp, end = 12.dp, bottom = 44.dp)
             )
             else -> Text(
@@ -351,9 +358,15 @@ private fun SelectedReportCard(report: Report, onClick: () -> Unit, modifier: Mo
     }
 }
 
+/** Franja horaria (todo el día o 3 horas desde [startHour]) y leyenda del mapa de calor. */
 @Composable
-private fun HeatLegend(
+private fun HeatPanel(
     total: Int,
+    allDay: Boolean,
+    startHour: Int,
+    windowLabel: String,
+    onAllDayChange: (Boolean) -> Unit,
+    onStartHourChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -366,11 +379,43 @@ private fun HeatLegend(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Franja horaria",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = windowLabel,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                FilterChip(
+                    selected = allDay,
+                    onClick = { onAllDayChange(!allDay) },
+                    label = { Text("Todo el día") }
+                )
+                Slider(
+                    value = startHour.toFloat(),
+                    onValueChange = { onStartHourChange(it.roundToInt()) },
+                    valueRange = 0f..23f,
+                    steps = 22,
+                    enabled = !allDay,
+                    modifier = Modifier.weight(1f)
+                )
+            }
             Text(
                 text = "Mapa de calor · $total reportes",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Box(
                 modifier = Modifier
@@ -400,6 +445,13 @@ private fun HeatLegend(
                 Text(
                     text = "Alta densidad",
                     style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            if (total == 0) {
+                Text(
+                    text = "No hay reportes en esta franja. Prueba con otra hora o categoría.",
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }

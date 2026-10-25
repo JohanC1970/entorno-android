@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-private const val WINDOW_HOURS = 3
+internal const val WINDOW_HOURS = 3
 private const val PERIOD_DAYS = 30L
 private const val DAY_MS = 24 * 60 * 60 * 1000L
 
@@ -44,10 +44,10 @@ fun formatHour(hour: Int): String {
     return "$h12 $suffix"
 }
 
-private fun Report.hourOfDay(): Int =
+internal fun Report.hourOfDay(): Int =
     Instant.ofEpochMilli(createdAt).atZone(ZoneId.systemDefault()).hour
 
-private fun inWindow(hour: Int, start: Int): Boolean {
+internal fun inWindow(hour: Int, start: Int): Boolean {
     val offset = (hour - start + 24) % 24
     return offset < WINDOW_HOURS
 }
