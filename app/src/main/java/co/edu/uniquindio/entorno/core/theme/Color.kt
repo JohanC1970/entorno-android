@@ -79,6 +79,16 @@ val SeveridadAlta = Color(0xFFC0273B)
 val SeveridadMedia = Color(0xFFB26A00)
 val SeveridadBaja = Color(0xFF5A5C6E)
 
+// Estados y severidad en modo oscuro: texto claro; el fondo es ese mismo color con transparencia
+val TextoEstadoEnVerificacionOscuro = Color(0xFFFFD08A)
+val TextoEstadoVerificadoOscuro = Color(0xFF8FDCAF)
+val TextoEstadoRechazadoOscuro = Color(0xFFFFB3BC)
+val TextoEstadoResueltoOscuro = Color(0xFFB3BAFF)
+
+val SeveridadAltaOscura = Color(0xFFFF8A95)
+val SeveridadMediaOscura = Color(0xFFFFC067)
+val SeveridadBajaOscura = Color(0xFFA8AABC)
+
 // ---------- Mapa esquemático (Mapa, Mapa de calor y selector de ubicación) ----------
 val MapaParque = Color(0xFFCDE7D3)
 val MapaAgua = Color(0xFFCFE2F3)

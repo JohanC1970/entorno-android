@@ -124,11 +124,15 @@ fun CategoryChip(category: ReportCategory) {
 }
 
 @Composable
-fun StatusChip(status: ReportStatus) {
+fun StatusChip(
+    status: ReportStatus,
+    modifier: Modifier = Modifier,
+    label: String = status.labelForCitizen()
+) {
     val colors = statusColors(status)
-    Surface(shape = RoundedCornerShape(50), color = colors.background) {
+    Surface(shape = RoundedCornerShape(50), color = colors.background, modifier = modifier) {
         Text(
-            text = status.labelForCitizen(),
+            text = label,
             style = MaterialTheme.typography.labelMedium,
             color = colors.text,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)

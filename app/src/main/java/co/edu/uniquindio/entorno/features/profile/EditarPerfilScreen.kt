@@ -48,7 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.edu.uniquindio.entorno.core.theme.*
+import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 
 @Composable
 fun EditarPerfilScreen(
@@ -124,7 +124,7 @@ private fun EditarPerfilContent(
                         contrasenaEliminar = ""
                     },
                     enabled = !state.eliminando
-                ) { Text("Eliminar", color = SeveridadAlta) }
+                ) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = {
@@ -183,14 +183,14 @@ private fun EditarPerfilContent(
                         modifier = Modifier
                             .size(88.dp)
                             .clip(CircleShape)
-                            .background(ContenedorPrimarioClaro),
+                            .background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = state.iniciales,
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
-                            color = PrimarioClaro
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                     Box(
@@ -198,13 +198,13 @@ private fun EditarPerfilContent(
                             .size(28.dp)
                             .offset(x = (-2).dp, y = (-2).dp)
                             .clip(CircleShape)
-                            .background(PrimarioClaro),
+                            .background(MaterialTheme.colorScheme.primary),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.CameraAlt,
                             contentDescription = "Cambiar foto",
-                            tint = OnPrimarioClaro,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -215,7 +215,7 @@ private fun EditarPerfilContent(
                 Text(
                     text = "Cambiar foto",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = PrimarioClaro,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.clickable { /* Sin acción en Fase 2 */ }
                 )
@@ -297,7 +297,7 @@ private fun EditarPerfilContent(
                 Text(
                     text = "Eliminar mi cuenta",
                     style = MaterialTheme.typography.titleSmall,
-                    color = SeveridadAlta,
+                    color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.clickable { mostrarDialogoEliminar = true }
                 )

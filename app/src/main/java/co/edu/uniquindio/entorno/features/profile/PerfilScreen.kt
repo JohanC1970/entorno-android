@@ -53,6 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.edu.uniquindio.entorno.core.theme.*
+import co.edu.uniquindio.entorno.domain.model.Badge
+import co.edu.uniquindio.entorno.domain.model.ReportStatus
 
 @Composable
 fun PerfilScreen(
@@ -108,14 +110,14 @@ private fun PerfilContent(
                     modifier = Modifier
                         .size(64.dp)
                         .clip(CircleShape)
-                        .background(ContenedorPrimarioClaro),
+                        .background(MaterialTheme.colorScheme.primaryContainer),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = initialsOf(usuario.name),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
-                        color = PrimarioClaro
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
@@ -174,13 +176,13 @@ private fun PerfilContent(
                                 modifier = Modifier
                                     .size(44.dp)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(ContenedorPrimarioClaro),
+                                    .background(MaterialTheme.colorScheme.primaryContainer),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.StarOutline,
                                     contentDescription = "Nivel",
-                                    tint = PrimarioClaro,
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -205,7 +207,7 @@ private fun PerfilContent(
                                 text = "${usuario.points}",
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
-                                color = PrimarioClaro
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
                                 text = "puntos",
@@ -223,7 +225,7 @@ private fun PerfilContent(
                             .fillMaxWidth()
                             .height(8.dp)
                             .clip(RoundedCornerShape(4.dp)),
-                        color = PrimarioClaro,
+                        color = MaterialTheme.colorScheme.primary,
                         trackColor = MaterialTheme.colorScheme.outlineVariant,
                         strokeCap = StrokeCap.Round
                     )
@@ -427,41 +429,27 @@ private fun InsigniaItem(insignia: InsigniaPerfil) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.width(72.dp)
     ) {
-        val bgColor = if (insignia.desbloqueada) {
-            when (insignia.badge) {
-                co.edu.uniquindio.entorno.domain.model.Badge.FIRST_REPORT ->
-                    FondoEstadoEnVerificacion
-                co.edu.uniquindio.entorno.domain.model.Badge.FIRST_COMMENT ->
-                    FondoEstadoVerificado
-                co.edu.uniquindio.entorno.domain.model.Badge.TEN_VERIFIED_REPORTS ->
-                    ContenedorPrimarioClaro
-                else -> MaterialTheme.colorScheme.surfaceVariant
-            }
-        } else {
-            MaterialTheme.colorScheme.surface
-        }
+        val pending = statusColors(ReportStatus.PENDING)
+        val verified = statusColors(ReportStatus.VERIFIED)
+        val resolved = statusColors(ReportStatus.RESOLVED)
+        val scheme = MaterialTheme.colorScheme
 
-        val iconColor = if (insignia.desbloqueada) {
-            when (insignia.badge) {
-                co.edu.uniquindio.entorno.domain.model.Badge.FIRST_REPORT ->
-                    TextoEstadoEnVerificacion
-                co.edu.uniquindio.entorno.domain.model.Badge.FIRST_COMMENT ->
-                    TextoEstadoVerificado
-                co.edu.uniquindio.entorno.domain.model.Badge.TEN_VERIFIED_REPORTS ->
-                    PrimarioClaro
-                else -> MaterialTheme.colorScheme.onSurfaceVariant
-            }
-        } else {
-            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+        val (bgColor, iconColor) = if (!insignia.desbloqueada) {
+            scheme.surface to scheme.onSurfaceVariant.copy(alpha = 0.4f)
+        } else when (insignia.badge) {
+            Badge.FIRST_REPORT -> pending.background to pending.text
+            Badge.FIRST_COMMENT -> verified.background to verified.text
+            Badge.TEN_VERIFIED_REPORTS -> resolved.background to resolved.text
+            else -> scheme.surfaceVariant to scheme.onSurfaceVariant
         }
 
         val icon: ImageVector = if (insignia.desbloqueada) {
             when (insignia.badge) {
-                co.edu.uniquindio.entorno.domain.model.Badge.FIRST_REPORT ->
+                Badge.FIRST_REPORT ->
                     Icons.Outlined.Warning
-                co.edu.uniquindio.entorno.domain.model.Badge.FIRST_COMMENT ->
+                Badge.FIRST_COMMENT ->
                     Icons.Outlined.Check
-                co.edu.uniquindio.entorno.domain.model.Badge.TEN_VERIFIED_REPORTS ->
+                Badge.TEN_VERIFIED_REPORTS ->
                     Icons.Outlined.Flag
                 else -> Icons.Outlined.StarOutline
             }
@@ -510,37 +498,19 @@ private fun ActividadCard(
     actividad: ActividadReciente,
     modifier: Modifier = Modifier
 ) {
+    val verified = statusColors(ReportStatus.VERIFIED)
+    val rejected = statusColors(ReportStatus.REJECTED)
+    val resolved = statusColors(ReportStatus.RESOLVED)
+    val scheme = MaterialTheme.colorScheme
+
     val (icon, bgColor, iconColor) = when (actividad.icono) {
-        ActividadTipo.REPORTE_VERIFICADO -> Triple(
-            Icons.Outlined.Check,
-            FondoEstadoVerificado,
-            TextoEstadoVerificado
-        )
-        ActividadTipo.VOTOS_DADOS -> Triple(
-            Icons.Outlined.Flag,
-            ContenedorPrimarioClaro,
-            PrimarioClaro
-        )
-        ActividadTipo.COMENTARIO -> Triple(
-            Icons.Outlined.Comment,
-            ContenedorPrimarioClaro,
-            PrimarioClaro
-        )
-        ActividadTipo.REPORTE_RECHAZADO -> Triple(
-            Icons.Outlined.Close,
-            FondoEstadoRechazado,
-            TextoEstadoRechazado
-        )
-        ActividadTipo.REPORTE_RESUELTO -> Triple(
-            Icons.Outlined.Check,
-            FondoEstadoResuelto,
-            TextoEstadoResuelto
-        )
-        ActividadTipo.INSIGNIA, ActividadTipo.NIVEL -> Triple(
-            Icons.Outlined.StarOutline,
-            ContenedorPrimarioClaro,
-            PrimarioClaro
-        )
+        ActividadTipo.REPORTE_VERIFICADO -> Triple(Icons.Outlined.Check, verified.background, verified.text)
+        ActividadTipo.REPORTE_RECHAZADO -> Triple(Icons.Outlined.Close, rejected.background, rejected.text)
+        ActividadTipo.REPORTE_RESUELTO -> Triple(Icons.Outlined.Check, resolved.background, resolved.text)
+        ActividadTipo.VOTOS_DADOS -> Triple(Icons.Outlined.Flag, scheme.primaryContainer, scheme.primary)
+        ActividadTipo.COMENTARIO -> Triple(Icons.Outlined.Comment, scheme.primaryContainer, scheme.primary)
+        ActividadTipo.INSIGNIA, ActividadTipo.NIVEL ->
+            Triple(Icons.Outlined.StarOutline, scheme.primaryContainer, scheme.primary)
     }
 
     Card(
