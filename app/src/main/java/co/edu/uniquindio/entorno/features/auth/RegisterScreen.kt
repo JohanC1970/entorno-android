@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.LocationCity
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Visibility
@@ -24,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -35,6 +35,7 @@ import co.edu.uniquindio.entorno.core.component.AuthHeader
 import co.edu.uniquindio.entorno.core.component.AuthTab
 import co.edu.uniquindio.entorno.core.component.AuthTabSelector
 import co.edu.uniquindio.entorno.core.util.RequestResult
+import co.edu.uniquindio.entorno.features.map.LocationPickerDialog
 
 @Composable
 fun RegisterScreen(
@@ -47,13 +48,13 @@ fun RegisterScreen(
     val uiState by viewModel.uiState.collectAsState()
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var showLocationPicker by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(uiState.registerResult) {
         when (val result = uiState.registerResult) {
             is RequestResult.Success -> {
-                // Se muestra el mensaje antes de pasar a Login; si no, se perdería al navegar
                 snackbarHostState.showSnackbar(result.message)
                 viewModel.clearResult()
                 onRegisterSuccess()
@@ -134,6 +135,23 @@ fun RegisterScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 errorMessage = uiState.emailError
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Botón de ubicación
+            OutlinedButton(
+                onClick = { showLocationPicker = true },
+                modifier = Modifier.fillMaxWidth().height(54.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Icon(Icons.Default.MyLocation, contentDescription = null)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (uiState.location == null) "Elegir mi ubicación en el mapa"
+                    else "Ubicación elegida · Cambiar",
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -253,13 +271,8 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(28.dp))
 
             Button(
-                onClick = {
-                    if (uiState.location == null) {
-                        viewModel.onLocationSelected(4.53389, -75.68111)
-                    }
-                    viewModel.register()
-                },
-                enabled = uiState.registerResult !is RequestResult.Loading,
+                onClick = { viewModel.register() },
+                enabled = uiState.isFormValid && uiState.registerResult !is RequestResult.Loading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp),
@@ -282,6 +295,17 @@ fun RegisterScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+        }
+
+        if (showLocationPicker) {
+            LocationPickerDialog(
+                initial = uiState.location,
+                onDismiss = { showLocationPicker = false },
+                onConfirm = { place ->
+                    viewModel.onPlaceSelected(place)
+                    showLocationPicker = false
+                }
+            )
         }
     }
 }

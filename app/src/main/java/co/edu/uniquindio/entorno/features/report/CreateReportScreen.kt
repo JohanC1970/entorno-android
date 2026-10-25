@@ -38,18 +38,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.LaunchedEffect
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import co.edu.uniquindio.entorno.core.util.RequestResult
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,10 +61,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.edu.uniquindio.entorno.core.component.icon
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
-import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.theme.categoryColors
+import co.edu.uniquindio.entorno.core.util.Geo
+import co.edu.uniquindio.entorno.core.util.RequestResult
+import co.edu.uniquindio.entorno.domain.model.Location
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 
 @Composable
@@ -161,7 +162,10 @@ private fun CreateReportContent(
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .height(56.dp)
                 ) {
-                    Text(if (uiState.isLoading) "Publicando…" else "Publicar reporte", style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        if (uiState.isLoading) "Publicando…" else "Publicar reporte",
+                        style = MaterialTheme.typography.titleMedium
+                    )
                 }
             }
         }
@@ -209,8 +213,7 @@ private fun CreateReportContent(
             Spacer(Modifier.height(4.dp))
             SectionLabel("UBICACIÓN")
             LocationCard(
-                neighborhood = uiState.neighborhood,
-                coordinates = Geo.format(uiState.location),
+                location = uiState.location,
                 onChangeLocation = onChangeLocation
             )
         }
@@ -231,7 +234,6 @@ private fun CategoryGrid(
     selected: ReportCategory?,
     onSelect: (ReportCategory) -> Unit
 ) {
-    // Cuadrícula de 3 columnas dentro de un scroll vertical: filas manuales, sin lazy anidado.
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         ReportCategory.entries.chunked(3).forEach { rowItems ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -243,7 +245,9 @@ private fun CategoryGrid(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                repeat(3 - rowItems.size) { Spacer(Modifier.weight(1f)) }
+                repeat(3 - rowItems.size) {
+                    Spacer(Modifier.weight(1f))
+                }
             }
         }
     }
@@ -320,7 +324,6 @@ private fun PhotoRow(
 @Composable
 private fun PhotoThumbnail(uri: Uri, onRemove: () -> Unit) {
     val context = LocalContext.current
-    // TODO: simplificar con Coil AsyncImage cuando se agregue
     val bitmap = remember(uri) {
         context.contentResolver.openInputStream(uri)?.use {
             BitmapFactory.decodeStream(it)?.asImageBitmap()
@@ -398,8 +401,7 @@ private fun AddPhotoBox(onClick: () -> Unit) {
 }
 
 @Composable
-private fun LocationCard(neighborhood: String, coordinates: String, onChangeLocation: () -> Unit) {
-    // La ubicación se elige en el mapa (selector de ubicación); por defecto, el centro de la ciudad.
+private fun LocationCard(location: Location?, onChangeLocation: () -> Unit) {
     Card(
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -415,20 +417,24 @@ private fun LocationCard(neighborhood: String, coordinates: String, onChangeLoca
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
             )
-            Column(modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 12.dp)) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 12.dp)
+            ) {
                 Text(
-                    text = "Ubicación: $neighborhood",
+                    text = if (location == null) "Elige dónde ocurrió" else "Ubicación elegida",
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = coordinates,
+                    text = location?.let(Geo::format) ?: "Toca «Elegir» para abrir el mapa",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            TextButton(onClick = onChangeLocation) { Text("Cambiar") }
+            TextButton(onClick = onChangeLocation) {
+                Text(if (location == null) "Elegir" else "Cambiar")
+            }
         }
     }
 }
