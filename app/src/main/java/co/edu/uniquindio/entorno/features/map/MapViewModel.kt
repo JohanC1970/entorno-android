@@ -39,8 +39,18 @@ data class MapUiState(
     val radiusKm: Int = 2,
     val scope: LocationScope = LocationScope.ALL,
     val showHeat: Boolean = false,
+    val allDay: Boolean = true,
+    /** Hora de inicio (0 a 23) de la franja de 3 horas cuando no es "todo el día". */
+    val startHour: Int = 18,
     val errorMessage: String? = null
-)
+) {
+    /** Reportes que alimentan el mapa de calor: los del mapa, dentro de la franja elegida. */
+    val heatReports: List<Report>
+        get() = if (allDay) reports else reports.filter { inWindow(it.hourOfDay(), startHour) }
+
+    val windowLabel: String
+        get() = if (allDay) "Todo el día" else "${formatHour(startHour)} – ${formatHour((startHour + WINDOW_HOURS) % 24)}"
+}
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -57,6 +67,8 @@ class MapViewModel @Inject constructor(
     private val selectedId = MutableStateFlow(savedStateHandle.toRoute<MapRoute>().focus)
     private val scopeState = MutableStateFlow(LocationScope.ALL)
     private val showHeatState = MutableStateFlow(false)
+    private val allDayState = MutableStateFlow(true)
+    private val startHourState = MutableStateFlow(18)
 
     private val _uiState = MutableStateFlow(MapUiState())
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
@@ -69,7 +81,9 @@ class MapViewModel @Inject constructor(
                 sessionRepository.observeCurrentUser(userRepository),
                 settingsRepository.observeSettings(),
                 scopeState,
-                showHeatState
+                showHeatState,
+                allDayState,
+                startHourState
             ) { array ->
                 @Suppress("UNCHECKED_CAST")
                 val reports = array[0] as List<Report>
@@ -80,6 +94,8 @@ class MapViewModel @Inject constructor(
                 val settings = array[4] as AppSettings
                 val currentScope = array[5] as LocationScope
                 val heat = array[6] as Boolean
+                val allDay = array[7] as Boolean
+                val startHour = array[8] as Int
 
                 val userLoc = user?.location ?: Geo.ARMENIA_CENTER
                 val filteredReports = if (currentScope == LocationScope.NEARBY) {
@@ -95,7 +111,9 @@ class MapViewModel @Inject constructor(
                     userLocation = userLoc,
                     radiusKm = settings.alertRadiusKm,
                     scope = currentScope,
-                    showHeat = heat
+                    showHeat = heat,
+                    allDay = allDay,
+                    startHour = startHour
                 )
             }
                 .catch { error -> _uiState.update { it.copy(errorMessage = error.toUserMessage()) } }
@@ -118,6 +136,14 @@ class MapViewModel @Inject constructor(
 
     fun onHeatToggle() {
         showHeatState.value = !showHeatState.value
+    }
+
+    fun onAllDayChange(value: Boolean) {
+        allDayState.value = value
+    }
+
+    fun onStartHourChange(hour: Int) {
+        startHourState.value = hour.coerceIn(0, 23)
     }
 
     fun refreshDeviceLocation() {
