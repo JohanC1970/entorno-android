@@ -3,6 +3,8 @@ package co.edu.uniquindio.entorno.features.report
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import co.edu.uniquindio.entorno.core.navigation.Comments
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Comment
 import co.edu.uniquindio.entorno.domain.model.Report
@@ -43,7 +45,7 @@ class CommentsViewModel @Inject constructor(
     private val sessionRepository: SessionRepository
 ) : ViewModel() {
 
-    private val reportId: String = savedStateHandle.get<String>("reportId").orEmpty()
+    private val reportId: String = savedStateHandle.toRoute<Comments>().reportId
 
     private val _uiState = MutableStateFlow(CommentsUiState())
     val uiState: StateFlow<CommentsUiState> = _uiState.asStateFlow()

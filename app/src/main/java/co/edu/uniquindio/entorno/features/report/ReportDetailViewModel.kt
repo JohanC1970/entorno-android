@@ -3,6 +3,8 @@ package co.edu.uniquindio.entorno.features.report
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import co.edu.uniquindio.entorno.core.navigation.ReportDetail
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 data class ReportDetailUiState(
     val report: Report? = null,
     val isImportant: Boolean = false,
@@ -40,7 +43,7 @@ class ReportDetailViewModel @Inject constructor(
     private val sessionRepository: SessionRepository
 ) : ViewModel() {
 
-    private val reportId: String = savedStateHandle.get<String>("reportId").orEmpty()
+    private val reportId: String = savedStateHandle.toRoute<ReportDetail>().reportId
 
     private val _uiState = MutableStateFlow(ReportDetailUiState())
     val uiState: StateFlow<ReportDetailUiState> = _uiState.asStateFlow()
