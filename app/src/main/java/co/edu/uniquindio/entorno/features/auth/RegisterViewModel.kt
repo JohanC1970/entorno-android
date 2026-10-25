@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import jakarta.inject.Inject
-
+import co.edu.uniquindio.entorno.core.location.PickedPlace
 data class RegisterUiState(
     val name: String = "",
     val email: String = "",
@@ -73,9 +73,16 @@ class RegisterViewModel @Inject constructor(
     fun onAddressChange(v: String) =
         _uiState.update { it.copy(address = v, addressError = Validators.required(v, "La dirección")) }
 
-    /** Se llama desde el mapa (onMapClickListener) con el punto que eligió el usuario. */
-    fun onLocationSelected(latitude: Double, longitude: Double) =
-        _uiState.update { it.copy(location = Location(latitude, longitude)) }
+    /** Llega del selector de mapa: guarda las coordenadas y rellena ciudad y dirección. */
+    fun onPlaceSelected(place: PickedPlace) = _uiState.update {
+        it.copy(
+            location = place.location,
+            city = place.city.ifBlank { it.city },
+            address = place.address.ifBlank { it.address },
+            cityError = null,
+            addressError = null
+        )
+    }
 
     fun register() {
         val s = _uiState.value

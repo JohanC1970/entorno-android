@@ -35,13 +35,13 @@ data class CreateReportUiState(
     val title: String = "",
     val description: String = "",
     val imageUris: List<Uri> = emptyList(),
-    val location: Location = Geo.ARMENIA_CENTER,
+    val location: Location? = null,
     val result: RequestResult? = null
 ) {
-    val neighborhood: String get() = Geo.nearestNeighborhood(location)
     val isLoading: Boolean get() = result is RequestResult.Loading
     val canPublish: Boolean
-        get() = category != null && title.isNotBlank() && imageUris.isNotEmpty() && !isLoading
+        get() = category != null && title.isNotBlank() && imageUris.isNotEmpty() &&
+                location != null && !isLoading
 }
 
 @HiltViewModel
@@ -90,7 +90,8 @@ class CreateReportViewModel @Inject constructor(
     fun publish() {
         val state = _uiState.value
         val category = state.category
-        if (!state.canPublish || category == null) return
+        val location = state.location
+        if (!state.canPublish || category == null || location == null) return
 
         viewModelScope.launch {
             _uiState.update { it.copy(result = RequestResult.Loading) }
