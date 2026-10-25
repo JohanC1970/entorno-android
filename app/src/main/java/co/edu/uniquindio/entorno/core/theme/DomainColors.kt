@@ -17,40 +17,65 @@ data class StatusColors(
     val text: Color
 )
 
-// Por ahora los colores de dominio son iguales en modo claro y oscuro: en oscuro los
-// chips quedan claros sobre el fondo. Si se agregan variantes oscuras en Color.kt,
-// se selecciona aquí con isSystemInDarkTheme().
+private const val DARK_BACKGROUND_ALPHA = 0.2f
+
 @Composable
-fun categoryColors(category: ReportCategory): CategoryColors = when (category) {
-    ReportCategory.SECURITY -> CategoryColors(
-        IconoCategoriaSeguridad, FondoChipCategoriaSeguridad, TextoCategoriaSeguridad
-    )
-    ReportCategory.MEDICAL -> CategoryColors(
-        IconoCategoriaEmergencias, FondoChipCategoriaEmergencias, TextoCategoriaEmergencias
-    )
-    ReportCategory.INFRASTRUCTURE -> CategoryColors(
-        IconoCategoriaInfraestructura, FondoChipCategoriaInfraestructura, TextoCategoriaInfraestructura
-    )
-    ReportCategory.PETS -> CategoryColors(
-        IconoCategoriaMascotas, FondoChipCategoriaMascotas, TextoCategoriaMascotas
-    )
-    ReportCategory.COMMUNITY -> CategoryColors(
-        IconoCategoriaComunidad, FondoChipCategoriaComunidad, TextoCategoriaComunidad
-    )
+fun categoryColors(category: ReportCategory): CategoryColors {
+    if (!LocalDarkTheme.current) {
+        return when (category) {
+            ReportCategory.SECURITY -> CategoryColors(
+                IconoCategoriaSeguridad, FondoChipCategoriaSeguridad, TextoCategoriaSeguridad
+            )
+            ReportCategory.MEDICAL -> CategoryColors(
+                IconoCategoriaEmergencias, FondoChipCategoriaEmergencias, TextoCategoriaEmergencias
+            )
+            ReportCategory.INFRASTRUCTURE -> CategoryColors(
+                IconoCategoriaInfraestructura, FondoChipCategoriaInfraestructura, TextoCategoriaInfraestructura
+            )
+            ReportCategory.PETS -> CategoryColors(
+                IconoCategoriaMascotas, FondoChipCategoriaMascotas, TextoCategoriaMascotas
+            )
+            ReportCategory.COMMUNITY -> CategoryColors(
+                IconoCategoriaComunidad, FondoChipCategoriaComunidad, TextoCategoriaComunidad
+            )
+        }
+    }
+    val accent = when (category) {
+        ReportCategory.SECURITY -> IconoCategoriaSeguridadOscuro
+        ReportCategory.MEDICAL -> IconoCategoriaEmergenciasOscuro
+        ReportCategory.INFRASTRUCTURE -> IconoCategoriaInfraestructuraOscuro
+        ReportCategory.PETS -> IconoCategoriaMascotasOscuro
+        ReportCategory.COMMUNITY -> IconoCategoriaComunidadOscuro
+    }
+    return CategoryColors(icon = accent, chipBackground = accent.copy(alpha = DARK_BACKGROUND_ALPHA), chipText = accent)
 }
 
 // PENDING usa los colores de "En verificación" (la vista del ciudadano).
 @Composable
-fun statusColors(status: ReportStatus): StatusColors = when (status) {
-    ReportStatus.PENDING -> StatusColors(FondoEstadoEnVerificacion, TextoEstadoEnVerificacion)
-    ReportStatus.VERIFIED -> StatusColors(FondoEstadoVerificado, TextoEstadoVerificado)
-    ReportStatus.REJECTED -> StatusColors(FondoEstadoRechazado, TextoEstadoRechazado)
-    ReportStatus.RESOLVED -> StatusColors(FondoEstadoResuelto, TextoEstadoResuelto)
+fun statusColors(status: ReportStatus): StatusColors {
+    if (!LocalDarkTheme.current) {
+        return when (status) {
+            ReportStatus.PENDING -> StatusColors(FondoEstadoEnVerificacion, TextoEstadoEnVerificacion)
+            ReportStatus.VERIFIED -> StatusColors(FondoEstadoVerificado, TextoEstadoVerificado)
+            ReportStatus.REJECTED -> StatusColors(FondoEstadoRechazado, TextoEstadoRechazado)
+            ReportStatus.RESOLVED -> StatusColors(FondoEstadoResuelto, TextoEstadoResuelto)
+        }
+    }
+    val text = when (status) {
+        ReportStatus.PENDING -> TextoEstadoEnVerificacionOscuro
+        ReportStatus.VERIFIED -> TextoEstadoVerificadoOscuro
+        ReportStatus.REJECTED -> TextoEstadoRechazadoOscuro
+        ReportStatus.RESOLVED -> TextoEstadoResueltoOscuro
+    }
+    return StatusColors(background = text.copy(alpha = DARK_BACKGROUND_ALPHA), text = text)
 }
 
 @Composable
-fun severityColor(severity: Severity): Color = when (severity) {
-    Severity.LOW -> SeveridadBaja
-    Severity.MEDIUM -> SeveridadMedia
-    Severity.HIGH, Severity.CRITICAL -> SeveridadAlta
+fun severityColor(severity: Severity): Color {
+    val dark = LocalDarkTheme.current
+    return when (severity) {
+        Severity.LOW -> if (dark) SeveridadBajaOscura else SeveridadBaja
+        Severity.MEDIUM -> if (dark) SeveridadMediaOscura else SeveridadMedia
+        Severity.HIGH, Severity.CRITICAL -> if (dark) SeveridadAltaOscura else SeveridadAlta
+    }
 }

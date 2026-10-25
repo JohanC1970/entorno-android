@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.R
@@ -23,13 +23,13 @@ fun AppLogo(
         modifier = modifier
             .size(size.dp)
             .clip(RoundedCornerShape(28.dp))
-            .background(Color(0xFFE2E4FF)),
+            .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_app_logo),
             contentDescription = "Logo Entorno",
-            tint = Color(0xFF303CA2),
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size((size * 0.5).dp)
         )
     }

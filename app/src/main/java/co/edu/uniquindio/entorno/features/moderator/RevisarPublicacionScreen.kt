@@ -1,7 +1,7 @@
 package co.edu.uniquindio.entorno.features.moderator
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -33,20 +32,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import co.edu.uniquindio.entorno.core.component.UriImage
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import co.edu.uniquindio.entorno.core.theme.*
-import co.edu.uniquindio.entorno.domain.model.ReportCategory
-import co.edu.uniquindio.entorno.features.report.EstadoPill
+import co.edu.uniquindio.entorno.core.component.StatusChip
+import co.edu.uniquindio.entorno.core.component.UriImage
+import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -135,8 +132,8 @@ private fun RevisarPublicacionContent(
                     .background(
                         Brush.linearGradient(
                             colors = listOf(
-                                ContenedorPrimarioClaro,
-                                ContenedorPrimarioClaro.copy(alpha = 0.5f)
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                             )
                         )
                     )
@@ -169,7 +166,7 @@ private fun RevisarPublicacionContent(
                 }
 
                 // Estado pill
-                EstadoPill(reporte.status)
+                StatusChip(reporte.status)
             }
         }
 
@@ -275,11 +272,9 @@ private fun RevisarPublicacionContent(
                         .height(48.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = SeveridadAlta
+                        contentColor = MaterialTheme.colorScheme.error
                     ),
-                    border = ButtonDefaults.outlinedButtonBorder(enabled = true).copy(
-                        brush = Brush.linearGradient(listOf(SeveridadAlta, SeveridadAlta))
-                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
                     enabled = !state.rechazando && !state.verificando
                 ) {
                     Text(
@@ -295,15 +290,11 @@ private fun RevisarPublicacionContent(
                         .weight(1f)
                         .height(48.dp),
                     shape = RoundedCornerShape(24.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2E7D32)
-                    ),
                     enabled = !state.verificando && !state.rechazando
                 ) {
                     Text(
                         text = "Verificar",
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

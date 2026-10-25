@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -68,7 +67,7 @@ fun RegisterScreen(
     }
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         Column(
@@ -89,7 +88,7 @@ fun RegisterScreen(
                 text = "Crea tu cuenta",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF111318)
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(6.dp))
@@ -97,7 +96,7 @@ fun RegisterScreen(
             Text(
                 text = "Únete para reportar y seguir lo que pasa en tu zona.",
                 fontSize = 15.sp,
-                color = Color(0xFF5A5F73)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -194,7 +193,7 @@ fun RegisterScreen(
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                             contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                            tint = Color(0xFF74798D)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -217,7 +216,7 @@ fun RegisterScreen(
                         Icon(
                             imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                             contentDescription = if (confirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
-                            tint = Color(0xFF74798D)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -226,12 +225,13 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // Texto legal interactivo
+            val linkColor = MaterialTheme.colorScheme.primary
             val legalText = buildAnnotatedString {
                 append("Al registrarte aceptas los ")
                 pushStringAnnotation(tag = "terms", annotation = "terms")
                 withStyle(
                     style = SpanStyle(
-                        color = Color(0xFF303CA2),
+                        color = linkColor,
                         fontWeight = FontWeight.SemiBold,
                         textDecoration = TextDecoration.Underline
                     )
@@ -243,7 +243,7 @@ fun RegisterScreen(
                 pushStringAnnotation(tag = "privacy", annotation = "privacy")
                 withStyle(
                     style = SpanStyle(
-                        color = Color(0xFF303CA2),
+                        color = linkColor,
                         fontWeight = FontWeight.SemiBold,
                         textDecoration = TextDecoration.Underline
                     )
@@ -258,7 +258,7 @@ fun RegisterScreen(
                 text = legalText,
                 style = LocalTextStyle.current.copy(
                     fontSize = 13.sp,
-                    color = Color(0xFF5A5F73)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 ),
                 onClick = { offset ->
                     legalText.getStringAnnotations(tag = "terms", start = offset, end = offset)
@@ -276,20 +276,15 @@ fun RegisterScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(54.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF303CA2),
-                    disabledContainerColor = Color(0xFFD1D5DB)
-                )
+                shape = RoundedCornerShape(16.dp)
             ) {
                 if (uiState.registerResult is RequestResult.Loading) {
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
                 } else {
                     Text(
                         text = "Crear cuenta",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
             }

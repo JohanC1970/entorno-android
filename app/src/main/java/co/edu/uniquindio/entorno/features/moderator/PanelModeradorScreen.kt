@@ -31,8 +31,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,10 +38,11 @@ import co.edu.uniquindio.entorno.core.theme.*
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
-import co.edu.uniquindio.entorno.features.report.EstadoPill
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
+import co.edu.uniquindio.entorno.core.component.StatusChip
+import co.edu.uniquindio.entorno.core.component.labelForModerator
+import co.edu.uniquindio.entorno.core.util.toRelativeTime
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.edu.uniquindio.entorno.core.component.icon
 
 @Composable
 fun PanelModeradorScreen(
@@ -89,17 +88,18 @@ private fun PanelModeradorContent(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                val pendingColors = statusColors(ReportStatus.PENDING)
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
-                        .background(FondoEstadoEnVerificacion)
+                        .background(pendingColors.background)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = "${state.totalPendientes} pendientes",
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
-                        color = TextoEstadoEnVerificacion
+                        color = pendingColors.text
                     )
                 }
 
@@ -160,14 +160,14 @@ private fun ReportePendienteCard(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "${reporte.category.label} · ${formatearTiempoModerador(reporte.date)}",
+                    text = "${reporte.category.label} · ${reporte.createdAt.toRelativeTime()}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                EstadoPill(ReportStatus.PENDING)
+                StatusChip(ReportStatus.PENDING, label = ReportStatus.PENDING.labelForModerator())
             }
         }
     }
@@ -175,41 +175,15 @@ private fun ReportePendienteCard(
 
 @Composable
 private fun ThumbnailCategoria(category: ReportCategory) {
-    val gradientColors = when (category) {
-        ReportCategory.INFRASTRUCTURE -> listOf(
-            Color(0xFFD4B8FF), Color(0xFFA8E6CF)
-        )
-        ReportCategory.PETS -> listOf(
-            Color(0xFFFFD4A8), Color(0xFFFFA8C8)
-        )
-        ReportCategory.COMMUNITY -> listOf(
-            Color(0xFFA8E6CF), Color(0xFFD4FFB8)
-        )
-        ReportCategory.SECURITY -> listOf(
-            Color(0xFFFFB8A8), Color(0xFFFFA8D4)
-        )
-        ReportCategory.MEDICAL -> listOf(
-            Color(0xFFFFB8C8), Color(0xFFD4A8FF)
-        )
-    }
-
+    val colors = categoryColors(category)
     Box(
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(Brush.linearGradient(gradientColors))
-    )
-}
-
-private fun formatearTiempoModerador(date: LocalDate): String {
-    val dias = ChronoUnit.DAYS.between(date, LocalDate.now())
-    val minutos = dias * 24 * 60 // Approximation for display
-
-    return when {
-        dias == 0L -> "hace 12 min" // Datos de prueba
-        dias == 1L -> "ayer"
-        dias < 7 -> "hace $dias días"
-        else -> "hace ${dias / 7} semanas"
+            .background(colors.chipBackground),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(category.icon(), contentDescription = category.label, tint = colors.icon)
     }
 }
 

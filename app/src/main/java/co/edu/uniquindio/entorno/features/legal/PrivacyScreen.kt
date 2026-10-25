@@ -8,7 +8,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -26,7 +25,7 @@ fun PrivacyScreen(
                         text = "Política de Privacidad",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF111318)
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 navigationIcon = {
@@ -34,14 +33,14 @@ fun PrivacyScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver",
-                            tint = Color(0xFF111318)
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
-        containerColor = Color.White
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -54,7 +53,7 @@ fun PrivacyScreen(
                 text = "Política de Privacidad de Entorno",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF111318)
+                color = MaterialTheme.colorScheme.onBackground
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -62,7 +61,7 @@ fun PrivacyScreen(
             Text(
                 text = "Última actualización: " + java.time.LocalDate.now(),
                 fontSize = 13.sp,
-                color = Color(0xFF74798D)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(20.dp))
@@ -93,7 +92,7 @@ private fun SectionTitle(title: String) {
         text = title,
         fontSize = 16.sp,
         fontWeight = FontWeight.SemiBold,
-        color = Color(0xFF303CA2),
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(top = 16.dp, bottom = 6.dp)
     )
 }
@@ -103,7 +102,7 @@ private fun SectionText(text: String) {
     Text(
         text = text,
         fontSize = 14.sp,
-        color = Color(0xFF5A5F73),
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         lineHeight = 20.sp
     )
 }

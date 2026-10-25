@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -28,7 +27,7 @@ fun WelcomeScreen(
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.White
+        color = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -52,7 +51,7 @@ fun WelcomeScreen(
                     text = "Entorno",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF111318)
+                    color = MaterialTheme.colorScheme.onBackground
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -60,7 +59,7 @@ fun WelcomeScreen(
                 Text(
                     text = "Tu comunidad, más segura",
                     fontSize = 16.sp,
-                    color = Color(0xFF5A5F73)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -70,7 +69,7 @@ fun WelcomeScreen(
                     modifier = Modifier
                         .width(40.dp)
                         .height(2.dp)
-                        .background(Color(0xFFE2E4FF), RoundedCornerShape(1.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(1.dp))
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -78,7 +77,7 @@ fun WelcomeScreen(
                 Text(
                     text = "Reporta lo que pasa en tu barrio — desde un robo hasta un hueco en la vía — y sigue en qué va cada caso.",
                     fontSize = 15.sp,
-                    color = Color(0xFF5A5F73),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 16.dp),
                     lineHeight = 22.sp
@@ -95,16 +94,12 @@ fun WelcomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(54.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF303CA2)
-                    )
+                    shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
                         text = "Crear cuenta",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
 
@@ -112,11 +107,12 @@ fun WelcomeScreen(
 
                 // Enlace "¿Ya tienes cuenta? Inicia sesión"
                 TextButton(onClick = onNavigateToLogin) {
+                    val linkColor = MaterialTheme.colorScheme.primary
                     val loginText = buildAnnotatedString {
                         append("¿Ya tienes cuenta? ")
                         withStyle(
                             style = SpanStyle(
-                                color = Color(0xFF303CA2),
+                                color = linkColor,
                                 fontWeight = FontWeight.Bold
                             )
                         ) {
@@ -126,19 +122,20 @@ fun WelcomeScreen(
                     Text(
                         text = loginText,
                         fontSize = 14.sp,
-                        color = Color(0xFF5A5F73)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Texto legal de términos y privacidad interactivo
+                val linkColor = MaterialTheme.colorScheme.primary
                 val legalText = buildAnnotatedString {
                     append("Al registrarte, aceptas nuestros ")
                     pushStringAnnotation(tag = "terms", annotation = "terms")
                     withStyle(
                         style = SpanStyle(
-                            color = Color(0xFF303CA2),
+                            color = linkColor,
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline
                         )
@@ -150,7 +147,7 @@ fun WelcomeScreen(
                     pushStringAnnotation(tag = "privacy", annotation = "privacy")
                     withStyle(
                         style = SpanStyle(
-                            color = Color(0xFF303CA2),
+                            color = linkColor,
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline
                         )
@@ -165,7 +162,7 @@ fun WelcomeScreen(
                     text = legalText,
                     style = LocalTextStyle.current.copy(
                         fontSize = 12.sp,
-                        color = Color(0xFF74798D),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     ),
                     modifier = Modifier.padding(horizontal = 8.dp),

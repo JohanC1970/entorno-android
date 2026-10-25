@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.core.theme.*
 import co.edu.uniquindio.entorno.domain.model.AppNotification
 import co.edu.uniquindio.entorno.domain.model.NotificationType
+import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
@@ -261,36 +262,30 @@ private fun NotificacionCard(
 
 @Composable
 private fun NotificacionIcono(type: NotificationType) {
+    val verified = statusColors(ReportStatus.VERIFIED)
+    val rejected = statusColors(ReportStatus.REJECTED)
+    val resolved = statusColors(ReportStatus.RESOLVED)
+    val pending = statusColors(ReportStatus.PENDING)
+    val scheme = MaterialTheme.colorScheme
+
     val (icon: ImageVector, bgColor: Color, iconColor: Color) = when (type) {
-        NotificationType.REPORT_VERIFIED -> Triple(
-            Icons.Outlined.Check,
-            FondoEstadoVerificado,
-            TextoEstadoVerificado
-        )
-        NotificationType.REPORT_REJECTED -> Triple(
-            Icons.Outlined.Close,
-            FondoEstadoRechazado,
-            TextoEstadoRechazado
-        )
-        NotificationType.REPORT_RESOLVED -> Triple(
-            Icons.Outlined.Check,
-            FondoEstadoResuelto,
-            TextoEstadoResuelto
-        )
+        NotificationType.REPORT_VERIFIED -> Triple(Icons.Outlined.Check, verified.background, verified.text)
+        NotificationType.REPORT_REJECTED -> Triple(Icons.Outlined.Close, rejected.background, rejected.text)
+        NotificationType.REPORT_RESOLVED -> Triple(Icons.Outlined.Check, resolved.background, resolved.text)
         NotificationType.NEW_COMMENT -> Triple(
             Icons.Outlined.Comment,
-            MaterialTheme.colorScheme.surfaceVariant,
-            MaterialTheme.colorScheme.onSurfaceVariant
+            scheme.surfaceVariant,
+            scheme.onSurfaceVariant
         )
         NotificationType.BADGE_EARNED -> Triple(
             Icons.Outlined.Flag,
-            ContenedorPrimarioClaro,
-            PrimarioClaro
+            scheme.primaryContainer,
+            scheme.primary
         )
         NotificationType.LEVEL_UP -> Triple(
             Icons.Outlined.StarOutline,
-            FondoEstadoEnVerificacion,
-            TextoEstadoEnVerificacion
+            pending.background,
+            pending.text
         )
     }
 

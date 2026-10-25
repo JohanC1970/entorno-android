@@ -20,11 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Flag
-import androidx.compose.material.icons.outlined.HealthAndSafety
-import androidx.compose.material.icons.outlined.Pets
-import androidx.compose.material.icons.outlined.Groups
-import androidx.compose.material.icons.outlined.Construction
-import androidx.compose.material.icons.outlined.Shield
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
@@ -38,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,6 +43,8 @@ import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.edu.uniquindio.entorno.core.component.StatusChip
+import co.edu.uniquindio.entorno.core.component.icon
 
 @Composable
 fun MisReportesScreen(
@@ -190,7 +186,7 @@ private fun ReporteCard(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    EstadoPill(reporte.status)
+                    StatusChip(reporte.status)
 
                     if (reporte.status == ReportStatus.REJECTED && reporte.rejectionReason != null) {
                         Spacer(modifier = Modifier.width(8.dp))
@@ -222,70 +218,19 @@ private fun ReporteCard(
 
 @Composable
 private fun CategoriaIcono(category: ReportCategory) {
-    val (icon, bgColor, iconColor) = when (category) {
-        ReportCategory.INFRASTRUCTURE -> Triple(
-            Icons.Outlined.Construction,
-            FondoChipCategoriaInfraestructura,
-            IconoCategoriaInfraestructura
-        )
-        ReportCategory.SECURITY -> Triple(
-            Icons.Outlined.Shield,
-            FondoChipCategoriaSeguridad,
-            IconoCategoriaSeguridad
-        )
-        ReportCategory.COMMUNITY -> Triple(
-            Icons.Outlined.Groups,
-            FondoChipCategoriaComunidad,
-            IconoCategoriaComunidad
-        )
-        ReportCategory.PETS -> Triple(
-            Icons.Outlined.Pets,
-            FondoChipCategoriaMascotas,
-            IconoCategoriaMascotas
-        )
-        ReportCategory.MEDICAL -> Triple(
-            Icons.Outlined.HealthAndSafety,
-            FondoChipCategoriaEmergencias,
-            IconoCategoriaEmergencias
-        )
-    }
-
+    val colors = categoryColors(category)
     Box(
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(bgColor),
+            .background(colors.chipBackground),
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            imageVector = icon,
+            imageVector = category.icon(),
             contentDescription = category.label,
-            tint = iconColor,
+            tint = colors.icon,
             modifier = Modifier.size(28.dp)
-        )
-    }
-}
-
-@Composable
-fun EstadoPill(status: ReportStatus) {
-    val (text, bgColor, textColor) = when (status) {
-        ReportStatus.PENDING -> Triple("En verificación", FondoEstadoEnVerificacion, TextoEstadoEnVerificacion)
-        ReportStatus.VERIFIED -> Triple("Verificado", FondoEstadoVerificado, TextoEstadoVerificado)
-        ReportStatus.REJECTED -> Triple("Rechazado", FondoEstadoRechazado, TextoEstadoRechazado)
-        ReportStatus.RESOLVED -> Triple("Resuelto", FondoEstadoResuelto, TextoEstadoResuelto)
-    }
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(bgColor)
-            .padding(horizontal = 10.dp, vertical = 4.dp)
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.SemiBold,
-            color = textColor
         )
     }
 }
