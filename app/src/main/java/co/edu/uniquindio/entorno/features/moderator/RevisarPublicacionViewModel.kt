@@ -3,6 +3,8 @@ package co.edu.uniquindio.entorno.features.moderator
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import co.edu.uniquindio.entorno.core.navigation.ReviewReport
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.repository.ReportRepository
@@ -35,8 +37,7 @@ class RevisarPublicacionViewModel @Inject constructor(
     private val sessionRepository: SessionRepository
 ) : ViewModel() {
 
-    private val reportId: String = savedStateHandle.get<String>("reportId").orEmpty()
-
+    private val reportId: String = savedStateHandle.toRoute<ReviewReport>().reportId
     private val _uiState = MutableStateFlow(RevisarPublicacionUiState())
     val uiState: StateFlow<RevisarPublicacionUiState> = _uiState.asStateFlow()
 

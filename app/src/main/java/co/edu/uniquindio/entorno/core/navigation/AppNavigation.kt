@@ -35,47 +35,47 @@ fun AppNavigation(sessionViewModel: SessionViewModel = hiltViewModel()) {
 private fun AuthNavigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Routes.WELCOME) {
-        composable(Routes.WELCOME) {
+    NavHost(navController = navController, startDestination = Welcome) {
+        composable<Welcome> {
             WelcomeScreen(
-                onNavigateToRegister = { navController.navigate(Routes.REGISTER) },
-                onNavigateToLogin = { navController.navigate(Routes.LOGIN) },
-                onNavigateToTerms = { navController.navigate(Routes.TERMS) },
-                onNavigateToPrivacy = { navController.navigate(Routes.PRIVACY) }
+                onNavigateToRegister = { navController.navigate(Register) },
+                onNavigateToLogin = { navController.navigate(Login) },
+                onNavigateToTerms = { navController.navigate(Terms) },
+                onNavigateToPrivacy = { navController.navigate(Privacy) }
             )
         }
 
-        composable(Routes.LOGIN) {
+        composable<Login> {
             LoginScreen(
-                onNavigateToRegister = { navController.navigate(Routes.REGISTER) },
-                onNavigateToForgotPassword = { navController.navigate(Routes.FORGOT_PASSWORD) },
+                onNavigateToRegister = { navController.navigate(Register) },
+                onNavigateToForgotPassword = { navController.navigate(ForgotPassword) },
                 // Al guardarse la sesión, AppNavigation cambia sola a la app principal.
                 onLoginSuccess = { }
             )
         }
 
-        composable(Routes.REGISTER) {
+        composable<Register> {
             RegisterScreen(
-                onNavigateToLogin = { navController.navigate(Routes.LOGIN) },
+                onNavigateToLogin = { navController.navigate(Login) },
                 onRegisterSuccess = {
-                    navController.navigate(Routes.LOGIN) {
-                        popUpTo(Routes.REGISTER) { inclusive = true }
+                    navController.navigate(Login) {
+                        popUpTo<Register> { inclusive = true }
                     }
                 },
-                onNavigateToTerms = { navController.navigate(Routes.TERMS) },
-                onNavigateToPrivacy = { navController.navigate(Routes.PRIVACY) }
+                onNavigateToTerms = { navController.navigate(Terms) },
+                onNavigateToPrivacy = { navController.navigate(Privacy) }
             )
         }
 
-        composable(Routes.FORGOT_PASSWORD) {
+        composable<ForgotPassword> {
             ForgotPasswordScreen(onBackClick = { navController.popBackStack() })
         }
 
-        composable(Routes.TERMS) {
+        composable<Terms> {
             TermsScreen(onBackClick = { navController.popBackStack() })
         }
 
-        composable(Routes.PRIVACY) {
+        composable<Privacy> {
             PrivacyScreen(onBackClick = { navController.popBackStack() })
         }
     }

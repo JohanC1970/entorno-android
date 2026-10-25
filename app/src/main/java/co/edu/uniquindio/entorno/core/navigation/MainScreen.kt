@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -22,13 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import co.edu.uniquindio.entorno.domain.model.Location
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.UserRole
@@ -53,24 +53,25 @@ import co.edu.uniquindio.entorno.features.report.MisReportesScreen
 import co.edu.uniquindio.entorno.features.report.ReportDetailScreen
 import co.edu.uniquindio.entorno.features.settings.SettingsScreen
 import co.edu.uniquindio.entorno.features.stats.StatsScreen
+import kotlin.reflect.KClass
 
-/** Destino de la barra inferior. [pattern] es la ruta registrada en el NavHost. */
+/** Destino de la barra inferior: [route] es a donde se navega y [routeClass] sirve para saber si está activo. */
 private data class BottomDestination(
     val label: String,
-    val navigateRoute: String,
-    val pattern: String,
+    val route: Any,
+    val routeClass: KClass<*>,
     val icon: ImageVector
 )
 
 private val citizenDestinations = listOf(
-    BottomDestination("Inicio", Routes.HOME, Routes.HOME, Icons.Filled.Home),
-    BottomDestination("Mapa", Routes.MAP_BASE, Routes.MAP, Icons.Filled.Map),
-    BottomDestination("Mis reportes", Routes.MY_REPORTS, Routes.MY_REPORTS, Icons.Filled.Description),
-    BottomDestination("Perfil", Routes.PROFILE, Routes.PROFILE, Icons.Filled.Person)
+    BottomDestination("Inicio", Home, Home::class, Icons.Filled.Home),
+    BottomDestination("Mapa", MapRoute(), MapRoute::class, Icons.Filled.Map),
+    BottomDestination("Mis reportes", MyReports, MyReports::class, Icons.Filled.Description),
+    BottomDestination("Perfil", Profile, Profile::class, Icons.Filled.Person)
 )
 
 private val moderatorDestination =
-    BottomDestination("Moderación", Routes.MODERATOR_PANEL, Routes.MODERATOR_PANEL, Icons.Filled.AdminPanelSettings)
+    BottomDestination("Moderación", ModeratorPanel, ModeratorPanel::class, Icons.Filled.AdminPanelSettings)
 
 /**
  * App principal: barra inferior (Inicio, Mapa, Mis reportes, Perfil y, para moderadores,
@@ -80,14 +81,14 @@ private val moderatorDestination =
 fun MainScreen(session: UserSession) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = backStackEntry?.destination?.route
+    val currentDestination = backStackEntry?.destination
 
     val destinations = if (session.role == UserRole.MODERATOR) {
         citizenDestinations + moderatorDestination
     } else {
         citizenDestinations
     }
-    val showBottomBar = destinations.any { it.pattern == currentRoute }
+    val showBottomBar = destinations.any { currentDestination?.hasRoute(it.routeClass) == true }
 
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -98,10 +99,11 @@ fun MainScreen(session: UserSession) {
                 NavigationBar {
                     destinations.forEach { destination ->
                         NavigationBarItem(
-                            selected = destination.pattern == currentRoute,
+                            selected = currentDestination?.hierarchy
+                                ?.any { it.hasRoute(destination.routeClass) } == true,
                             onClick = {
-                                navController.navigate(destination.navigateRoute) {
-                                    popUpTo(Routes.HOME) { saveState = true }
+                                navController.navigate(destination.route) {
+                                    popUpTo<Home> { saveState = true }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -125,79 +127,70 @@ fun MainScreen(session: UserSession) {
 private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
     val context = LocalContext.current
 
-    NavHost(navController = navController, startDestination = Routes.HOME, modifier = modifier) {
+    NavHost(navController = navController, startDestination = Home, modifier = modifier) {
 
         // ---------------------------------------------------------- pestañas
-        composable(Routes.HOME) {
+        composable<Home> {
             HomeScreen(
-                onNotificationsClick = { navController.navigate(Routes.NOTIFICATIONS) },
-                onReportClick = { report -> navController.navigate(Routes.reportDetail(report.id)) },
-                onCreateClick = { navController.navigate(Routes.CREATE_REPORT) },
-                onMapClick = { navController.navigate(Routes.map()) }
+                onNotificationsClick = { navController.navigate(Notifications) },
+                onReportClick = { report -> navController.navigate(ReportDetail(report.id)) },
+                onCreateClick = { navController.navigate(CreateReport()) },
+                onMapClick = { navController.navigate(MapRoute()) }
             )
         }
 
-        composable(
-            route = Routes.MAP,
-            arguments = listOf(
-                navArgument("focus") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                }
-            )
-        ) {
+        composable<MapRoute> {
             MapScreen(
-                onReportClick = { id -> navController.navigate(Routes.reportDetail(id)) }
+                onReportClick = { id -> navController.navigate(ReportDetail(id)) }
             )
         }
 
-        composable(Routes.MY_REPORTS) {
+        composable<MyReports> {
             MisReportesScreen(
-                onReporteClick = { id -> navController.navigate(Routes.reportDetail(id)) }
+                onReporteClick = { id -> navController.navigate(ReportDetail(id)) }
             )
         }
 
-        composable(Routes.PROFILE) {
+        composable<Profile> {
             PerfilScreen(
-                onEditarClick = { navController.navigate(Routes.EDIT_PROFILE) },
-                onSettingsClick = { navController.navigate(Routes.SETTINGS) },
-                onBadgesClick = { navController.navigate(Routes.BADGES) },
-                onHeroesClick = { navController.navigate(Routes.HEROES) },
-                onStatsClick = { navController.navigate(Routes.STATS) },
-                onModeratorClick = { navController.navigate(Routes.MODERATOR_PANEL) }
+                onEditarClick = { navController.navigate(EditProfile) },
+                onSettingsClick = { navController.navigate(Settings) },
+                onBadgesClick = { navController.navigate(Badges) },
+                onHeroesClick = { navController.navigate(Heroes) },
+                onStatsClick = { navController.navigate(Stats) },
+                onModeratorClick = { navController.navigate(ModeratorPanel) }
             )
         }
 
-        composable(Routes.MODERATOR_PANEL) {
+        composable<ModeratorPanel> {
             PanelModeradorScreen(
-                onReporteClick = { id -> navController.navigate(Routes.reviewReport(id)) }
+                onReporteClick = { id -> navController.navigate(ReviewReport(id)) }
             )
         }
 
         // ---------------------------------------------------------- reportes
-        composable(Routes.REPORT_DETAIL) {
+        composable<ReportDetail> {
             ReportDetailScreen(
                 onBack = { navController.popBackStack() },
                 onShare = { report -> shareReport(context, report) },
-                onCommentsClick = { id -> navController.navigate(Routes.comments(id)) },
-                onViewOnMap = { id -> navController.navigate(Routes.map(id)) }
+                onCommentsClick = { id -> navController.navigate(Comments(id)) },
+                onViewOnMap = { id -> navController.navigate(MapRoute(focus = id)) }
             )
         }
 
-        composable(Routes.COMMENTS) {
+        composable<Comments> {
             CommentsRoute(onBack = { navController.popBackStack() })
         }
 
-        composable(Routes.CREATE_REPORT) {
+        composable<CreateReport> {
             CreateReportScreen(
                 onClose = { navController.popBackStack() },
                 onPublished = { navController.popBackStack() },
-                onChangeLocation = { navController.navigate(Routes.PICK_LOCATION) }
+                onChangeLocation = { navController.navigate(PickLocation) }
             )
         }
 
-        composable(Routes.PICK_LOCATION) {
+        composable<PickLocation> {
             // Punto ya elegido antes; null la primera vez, para que el selector use el GPS.
             val initial = navController.previousBackStackEntry
                 ?.savedStateHandle?.get<String>(KEY_PICKED_LOCATION)
@@ -219,42 +212,42 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
             )
         }
 
-        composable(Routes.REVIEW_REPORT) {
+        composable<ReviewReport> {
             RevisarPublicacionScreen(onBackClick = { navController.popBackStack() })
         }
 
         // ---------------------------------------------------------- cuenta y comunidad
-        composable(Routes.NOTIFICATIONS) {
+        composable<Notifications> {
             NotificacionesScreen(
                 onBackClick = { navController.popBackStack() },
-                onNotificationClick = { reportId -> navController.navigate(Routes.reportDetail(reportId)) }
+                onNotificationClick = { reportId -> navController.navigate(ReportDetail(reportId)) }
             )
         }
 
-        composable(Routes.EDIT_PROFILE) {
+        composable<EditProfile> {
             EditarPerfilScreen(onBackClick = { navController.popBackStack() })
         }
 
-        composable(Routes.SETTINGS) {
+        composable<Settings> {
             SettingsScreen(
                 onBack = { navController.popBackStack() },
-                onEditProfile = { navController.navigate(Routes.EDIT_PROFILE) },
-                onChangePassword = { navController.navigate(Routes.CHANGE_PASSWORD) },
-                onTerms = { navController.navigate(Routes.TERMS) },
-                onPrivacy = { navController.navigate(Routes.PRIVACY) }
+                onEditProfile = { navController.navigate(EditProfile) },
+                onChangePassword = { navController.navigate(ChangePassword) },
+                onTerms = { navController.navigate(Terms) },
+                onPrivacy = { navController.navigate(Privacy) }
             )
         }
 
-        composable(Routes.CHANGE_PASSWORD) {
+        composable<ChangePassword> {
             ChangePasswordScreen(onBack = { navController.popBackStack() })
         }
 
-        composable(Routes.HEROES) { HeroesScreen(onBack = { navController.popBackStack() }) }
-        composable(Routes.STATS) { StatsScreen(onBack = { navController.popBackStack() }) }
-        composable(Routes.BADGES) { InsigniasScreen(onBack = { navController.popBackStack() }) }
+        composable<Heroes> { HeroesScreen(onBack = { navController.popBackStack() }) }
+        composable<Stats> { StatsScreen(onBack = { navController.popBackStack() }) }
+        composable<Badges> { InsigniasScreen(onBack = { navController.popBackStack() }) }
 
-        composable(Routes.TERMS) { TermsScreen(onBackClick = { navController.popBackStack() }) }
-        composable(Routes.PRIVACY) { PrivacyScreen(onBackClick = { navController.popBackStack() }) }
+        composable<Terms> { TermsScreen(onBackClick = { navController.popBackStack() }) }
+        composable<Privacy> { PrivacyScreen(onBackClick = { navController.popBackStack() }) }
     }
 }
 

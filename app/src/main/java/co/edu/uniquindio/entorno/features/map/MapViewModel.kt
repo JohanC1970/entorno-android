@@ -3,8 +3,10 @@ package co.edu.uniquindio.entorno.features.map
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import co.edu.uniquindio.entorno.core.filter.LocationScope
 import co.edu.uniquindio.entorno.core.location.DeviceLocationClient
+import co.edu.uniquindio.entorno.core.navigation.MapRoute
 import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Location
@@ -52,7 +54,7 @@ class MapViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val category = MutableStateFlow<ReportCategory?>(null)
-    private val selectedId = MutableStateFlow(savedStateHandle.get<String>("focus"))
+    private val selectedId = MutableStateFlow(savedStateHandle.toRoute<MapRoute>().focus)
     private val scopeState = MutableStateFlow(LocationScope.ALL)
     private val showHeatState = MutableStateFlow(false)
 
