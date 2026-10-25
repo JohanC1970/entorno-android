@@ -1,7 +1,7 @@
 package co.edu.uniquindio.entorno.features.map
 
 import androidx.compose.runtime.Composable
-import androidx.compose.foundation.isSystemInDarkTheme
+import co.edu.uniquindio.entorno.core.theme.LocalDarkTheme
 import co.edu.uniquindio.entorno.domain.model.Location
 import com.mapbox.geojson.Point
 import com.mapbox.geojson.Polygon
@@ -21,7 +21,7 @@ fun Point.toLocation(): Location = Location(latitude = latitude(), longitude = l
 
 /** Calles con nombre en modo claro y estilo oscuro cuando la app está en oscuro. */
 @Composable
-fun mapStyleUri(): String = if (isSystemInDarkTheme()) Style.DARK else Style.MAPBOX_STREETS
+fun mapStyleUri(): String = if (LocalDarkTheme.current) Style.DARK else Style.MAPBOX_STREETS
 
 /** Polígono que aproxima un círculo de [radiusMeters] metros alrededor de [center]. */
 fun circlePolygon(center: Location, radiusMeters: Double, steps: Int = 64): Polygon {
