@@ -1,8 +1,18 @@
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    id("com.google.gms.google-services")
 }
 
 // Google Services solo se aplica si existe google-services.json (no se versiona por tener
@@ -24,6 +34,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // El SDK de Mapbox lee este recurso al crear el mapa.
+        resValue("string", "mapbox_access_token", localProperties.getProperty("MAPBOX_ACCESS_TOKEN", ""))
     }
 
     buildTypes {
@@ -41,6 +54,13 @@ android {
     }
     buildFeatures {
         compose = true
+        resValues = true
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        freeCompilerArgs.add("-Xskip-metadata-version-check")
     }
 }
 
@@ -59,7 +79,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
 
     // BoM de Firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation(platform("com.google.firebase:firebase-bom:35.1.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
@@ -70,6 +90,11 @@ dependencies {
 
     // Cloudinary
     implementation("com.cloudinary:cloudinary-android:3.1.2")
+
+    // Mapbox y ubicación
+    implementation(libs.mapbox.maps)
+    implementation(libs.mapbox.maps.compose)
+    implementation(libs.play.services.location) // GPS: no necesita API key
 
     // Hilt
     implementation(libs.hilt.android)

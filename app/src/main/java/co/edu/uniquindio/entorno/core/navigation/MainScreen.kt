@@ -38,7 +38,6 @@ import co.edu.uniquindio.entorno.features.community.HeroesScreen
 import co.edu.uniquindio.entorno.features.home.HomeScreen
 import co.edu.uniquindio.entorno.features.legal.PrivacyScreen
 import co.edu.uniquindio.entorno.features.legal.TermsScreen
-import co.edu.uniquindio.entorno.features.map.HeatMapScreen
 import co.edu.uniquindio.entorno.features.map.LocationPickerScreen
 import co.edu.uniquindio.entorno.features.map.MapScreen
 import co.edu.uniquindio.entorno.features.moderator.PanelModeradorScreen
@@ -149,8 +148,7 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
             )
         ) {
             MapScreen(
-                onReportClick = { id -> navController.navigate(Routes.reportDetail(id)) },
-                onHeatMapClick = { navController.navigate(Routes.HEAT_MAP) }
+                onReportClick = { id -> navController.navigate(Routes.reportDetail(id)) }
             )
         }
 
@@ -200,7 +198,7 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
         }
 
         composable(Routes.PICK_LOCATION) {
-            // El punto inicial es el que ya tenía el reporte (ubicación por defecto si no hay).
+            // Punto ya elegido antes; null la primera vez, para que el selector use el GPS.
             val initial = navController.previousBackStackEntry
                 ?.savedStateHandle?.get<String>(KEY_PICKED_LOCATION)
                 ?.split(",")
@@ -208,14 +206,14 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
                     val lat = parts.getOrNull(0)?.toDoubleOrNull()
                     val lon = parts.getOrNull(1)?.toDoubleOrNull()
                     if (lat != null && lon != null) Location(lat, lon) else null
-                } ?: co.edu.uniquindio.entorno.core.util.Geo.ARMENIA_CENTER
+                }
             LocationPickerScreen(
                 initial = initial,
                 onBack = { navController.popBackStack() },
-                onConfirm = { picked ->
+                onConfirm = { place ->
                     navController.previousBackStackEntry
                         ?.savedStateHandle
-                        ?.set(KEY_PICKED_LOCATION, "${picked.latitude},${picked.longitude}")
+                        ?.set(KEY_PICKED_LOCATION, "${place.location.latitude},${place.location.longitude}")
                     navController.popBackStack()
                 }
             )
@@ -254,7 +252,6 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
         composable(Routes.HEROES) { HeroesScreen(onBack = { navController.popBackStack() }) }
         composable(Routes.STATS) { StatsScreen(onBack = { navController.popBackStack() }) }
         composable(Routes.BADGES) { InsigniasScreen(onBack = { navController.popBackStack() }) }
-        composable(Routes.HEAT_MAP) { HeatMapScreen(onBack = { navController.popBackStack() }) }
 
         composable(Routes.TERMS) { TermsScreen(onBackClick = { navController.popBackStack() }) }
         composable(Routes.PRIVACY) { PrivacyScreen(onBackClick = { navController.popBackStack() }) }
