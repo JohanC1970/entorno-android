@@ -137,7 +137,7 @@ fun SettingsScreen(
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         ThemeMode.entries.forEach { mode ->
                             FilterChip(
-                                selected = settings.themeMode == mode,
+                                selected = state.themeMode == mode,
                                 onClick = { viewModel.onThemeChange(mode) },
                                 label = { Text(mode.label) }
                             )

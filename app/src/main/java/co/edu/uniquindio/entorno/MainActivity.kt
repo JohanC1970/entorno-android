@@ -26,15 +26,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val themeMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
+            val storedMode by themeViewModel.themeMode.collectAsStateWithLifecycle()
+            // Mientras se lee la preferencia no se dibuja nada, para evitar un destello de tema.
+            val themeMode = storedMode ?: return@setContent
             val darkTheme = when (themeMode) {
                 ThemeMode.SYSTEM -> isSystemInDarkTheme()
                 ThemeMode.LIGHT -> false
                 ThemeMode.DARK -> true
             }
 
-            // Los íconos de las barras del sistema siguen el tema elegido en Configuración,
-            // no solo el del sistema.
             DisposableEffect(darkTheme) {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { darkTheme },

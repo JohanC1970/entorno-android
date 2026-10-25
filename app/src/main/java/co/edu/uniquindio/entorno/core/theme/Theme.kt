@@ -10,6 +10,8 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimarioClaro,
@@ -41,6 +43,12 @@ private val DarkColorScheme = darkColorScheme(
     outlineVariant = ContornoVarianteOscuro
 )
 
+/**
+ * Indica si la app está en oscuro según el tema ELEGIDO, no el del sistema.
+ * isSystemInDarkTheme() no sirve para esto: ignora la preferencia del usuario.
+ */
+val LocalDarkTheme = staticCompositionLocalOf { false }
+
 @Composable
 fun EntornoTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -61,9 +69,12 @@ fun EntornoTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(LocalDarkTheme provides darkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
+
 }
