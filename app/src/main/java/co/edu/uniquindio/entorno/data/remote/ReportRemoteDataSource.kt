@@ -33,7 +33,7 @@ import jakarta.inject.Singleton
 class ReportRemoteDataSource @Inject constructor(private val db: FirebaseFirestore){
 
     private val reports = db.collection("reports")
-    private val notifications = db.collection("collections")
+    private val notifications = db.collection("notifications")
     private val publicStatuses = listOf(ReportStatus.PENDING.name, ReportStatus.VERIFIED.name)
 
 
@@ -89,7 +89,22 @@ class ReportRemoteDataSource @Inject constructor(private val db: FirebaseFiresto
             }
     }
 
+    suspend fun findComment(reportId: String, commentId: String): CommentDto? =
+        reports.document(reportId).collection("comments").document(commentId)
+            .get().await().toObject(CommentDto::class.java)
 
+
+    fun observeVotesGiven(userId: String): Flow<Int> = callbackFlow {
+        val registration = db.collectionGroup("votes").whereEqualTo("userId", userId)
+            .addSnapshotListener { snap, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                trySend(snap?.size() ?: 0)
+            }
+        awaitClose { registration.remove() }
+    }
 
     // -------------- ESCRITURA -------------------------
 
@@ -127,7 +142,7 @@ class ReportRemoteDataSource @Inject constructor(private val db: FirebaseFiresto
                 tx.update(reportRef, "importantCount", FieldValue.increment(-1))
                 false
             } else {
-                tx.set(voteRef, mapOf("createdAt" to FieldValue.serverTimestamp()))
+                tx.set(voteRef, mapOf("userId" to userId, "createdAt" to FieldValue.serverTimestamp()))
                 tx.update(reportRef, "importantCount", FieldValue.increment(1))
                 true
             }

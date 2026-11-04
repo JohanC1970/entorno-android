@@ -43,6 +43,12 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth){
         auth.currentUser?.delete()?.await()
     }
 
+    suspend fun changePassword(currentPassword: String, newPassword: String) {
+        reauthenticate(currentPassword)
+        val user = auth.currentUser ?: error("No hay sesión activa")
+        user.updatePassword(newPassword).await()
+    }
+
     fun logout() = auth.signOut()
 
 }

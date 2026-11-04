@@ -9,19 +9,25 @@ import jakarta.inject.Singleton
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import co.edu.uniquindio.entorno.R
 
 @Singleton
-class CloudinaryDataSource @Inject constructor() {
+class CloudinaryDataSource @Inject constructor(
+    @param:ApplicationContext private val context: Context
+) {
+
+    private val uploadPreset: String get() = context.getString(R.string.cloudinary_upload_preset)
 
     private companion object{
-        const val UPLOAD_PRESET = ""
         const val FOLDER = "entorno/reports"
     }
 
     suspend fun upload(localUri: String): String = suspendCancellableCoroutine { cont ->
         val requestId = MediaManager.get()
             .upload(Uri.parse(localUri))
-            .unsigned(UPLOAD_PRESET)
+            .unsigned(uploadPreset)
             .option("folder", FOLDER)
             .callback(object : UploadCallback {
                 override fun onStart(requestId: String) {}

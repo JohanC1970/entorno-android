@@ -48,7 +48,7 @@ import co.edu.uniquindio.entorno.features.profile.InsigniasScreen
 import co.edu.uniquindio.entorno.features.profile.PerfilScreen
 import co.edu.uniquindio.entorno.features.report.CommentsRoute
 import co.edu.uniquindio.entorno.features.report.CreateReportScreen
-import co.edu.uniquindio.entorno.features.report.KEY_PICKED_LOCATION
+import co.edu.uniquindio.entorno.features.report.LocationPickerHolder
 import co.edu.uniquindio.entorno.features.report.MisReportesScreen
 import co.edu.uniquindio.entorno.features.report.ReportDetailScreen
 import co.edu.uniquindio.entorno.features.settings.SettingsScreen
@@ -191,22 +191,15 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
         }
 
         composable<PickLocation> {
-            // Punto ya elegido antes; null la primera vez, para que el selector use el GPS.
-            val initial = navController.previousBackStackEntry
-                ?.savedStateHandle?.get<String>(KEY_PICKED_LOCATION)
-                ?.split(",")
-                ?.let { parts ->
-                    val lat = parts.getOrNull(0)?.toDoubleOrNull()
-                    val lon = parts.getOrNull(1)?.toDoubleOrNull()
-                    if (lat != null && lon != null) Location(lat, lon) else null
-                }
             LocationPickerScreen(
-                initial = initial,
-                onBack = { navController.popBackStack() },
+                initial = null,
+                onBack = { 
+                    LocationPickerHolder.onLocationPicked = null
+                    navController.popBackStack() 
+                },
                 onConfirm = { place ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set(KEY_PICKED_LOCATION, "${place.location.latitude},${place.location.longitude}")
+                    LocationPickerHolder.onLocationPicked?.invoke(place.location)
+                    LocationPickerHolder.onLocationPicked = null
                     navController.popBackStack()
                 }
             )

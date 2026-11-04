@@ -4,6 +4,7 @@ import co.edu.uniquindio.entorno.core.util.asFlow
 import co.edu.uniquindio.entorno.data.model.UserDto
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.tasks.await
 import jakarta.inject.Inject
@@ -39,5 +40,7 @@ class UserRemoteDataSource @Inject constructor(db: FirebaseFirestore){
         users.document(id).delete().await()
     }
 
+    fun observeRanking(limit: Long = 50): Flow<List<UserDto>> =
+        users.orderBy("points", Query.Direction.DESCENDING).limit(limit).asFlow<UserDto>()
 
 }

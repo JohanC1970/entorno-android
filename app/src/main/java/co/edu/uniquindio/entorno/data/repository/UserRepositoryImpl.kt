@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import kotlinx.coroutines.flow.catch
 
 @Singleton
 class UserRepositoryImpl @Inject constructor(
@@ -43,4 +44,11 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun awardBadge(userId: String, badge: Badge): Result<Unit> =
         safeCall { source.addBadge(userId, badge.name) }
+
+    override fun observeRanking(): Flow<List<User>> =
+        source.observeRanking()
+            .map { list -> list.map { it.toDomain() } }
+            .catch { emit(emptyList()) } // evita que un error de permisos tumbe la app
+
+
 }

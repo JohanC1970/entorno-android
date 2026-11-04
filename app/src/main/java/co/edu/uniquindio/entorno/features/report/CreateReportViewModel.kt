@@ -27,8 +27,9 @@ const val MAX_TITLE = 80
 const val MAX_DESCRIPTION = 500
 const val MAX_IMAGES = 3
 
-/** Clave con la que el selector de ubicación devuelve el punto elegido ("lat,lon"). */
-const val KEY_PICKED_LOCATION = "picked_location"
+object LocationPickerHolder {
+    var onLocationPicked: ((Location) -> Unit)? = null
+}
 
 data class CreateReportUiState(
     val category: ReportCategory? = null,
@@ -42,6 +43,15 @@ data class CreateReportUiState(
     val canPublish: Boolean
         get() = category != null && title.isNotBlank() && imageUris.isNotEmpty() &&
                 location != null && !isLoading
+
+    val missingRequirementMessage: String?
+        get() = when {
+            category == null -> "Selecciona una categoría"
+            title.isNotBlank() == false -> "Escribe un título para el reporte"
+            imageUris.isEmpty() -> "Añade al menos una foto"
+            location == null -> "Elige una ubicación en el mapa"
+            else -> null
+        }
 }
 
 @HiltViewModel
@@ -56,18 +66,8 @@ class CreateReportViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CreateReportUiState())
     val uiState: StateFlow<CreateReportUiState> = _uiState.asStateFlow()
 
-    init {
-        // El selector de ubicación devuelve el punto en el SavedStateHandle de esta pantalla.
-        viewModelScope.launch {
-            savedStateHandle.getStateFlow<String?>(KEY_PICKED_LOCATION, null).collect { raw ->
-                val parts = raw?.split(",")
-                val lat = parts?.getOrNull(0)?.toDoubleOrNull()
-                val lon = parts?.getOrNull(1)?.toDoubleOrNull()
-                if (lat != null && lon != null) {
-                    _uiState.update { it.copy(location = Location(lat, lon)) }
-                }
-            }
-        }
+    fun onLocationPicked(location: Location) {
+        _uiState.update { it.copy(location = location) }
     }
 
     fun onCategoryChange(category: ReportCategory) =

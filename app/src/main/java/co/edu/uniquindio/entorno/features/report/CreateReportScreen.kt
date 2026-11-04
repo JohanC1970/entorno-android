@@ -112,7 +112,10 @@ fun CreateReportScreen(
         onRemovePhoto = viewModel::onPhotoRemoved,
         onClose = onClose,
         onPublish = viewModel::publish,
-        onChangeLocation = onChangeLocation,
+        onChangeLocation = {
+            LocationPickerHolder.onLocationPicked = viewModel::onLocationPicked
+            onChangeLocation()
+        },
         modifier = modifier
     )
 }
@@ -153,19 +156,37 @@ private fun CreateReportContent(
         },
         bottomBar = {
             Surface(color = MaterialTheme.colorScheme.background, tonalElevation = 2.dp) {
-                Button(
-                    onClick = onPublish,
-                    enabled = uiState.canPublish,
-                    shape = RoundedCornerShape(12.dp),
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .height(56.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        if (uiState.isLoading) "Publicando…" else "Publicar reporte",
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    if (!uiState.canPublish && !uiState.isLoading) {
+                        uiState.missingRequirementMessage?.let { msg ->
+                            Text(
+                                text = "⚠️ $msg",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+
+                    Button(
+                        onClick = onPublish,
+                        enabled = uiState.canPublish,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                    ) {
+                        Text(
+                            if (uiState.isLoading) "Publicando…" else "Publicar reporte",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
             }
         }

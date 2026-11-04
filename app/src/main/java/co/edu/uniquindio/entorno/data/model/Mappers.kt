@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.data.model
 
+import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.util.toEnumOrDefault
 import co.edu.uniquindio.entorno.domain.model.*
 import com.firebase.geofire.GeoFireUtils
@@ -32,15 +33,19 @@ fun ReportDto.toDomain() = Report(
     imageUrls = imageUrls, ownerId = ownerId, ownerName = ownerName,
     date = createdAt.toLocalDate(),
     rejectionReason = rejectionReason,
-    importantCount = importantCount, commentCount = commentCount
+    importantCount = importantCount, commentCount = commentCount,
+    // Los reportes viejos no tienen barrio guardado: se calcula desde las coordenadas.
+    neighborhood = neighborhood.ifBlank { Geo.nearestNeighborhood(Location(latitude, longitude)) },
+    // null = el timestamp del servidor aún no llega (escritura local pendiente).
+    createdAt = createdAt?.time ?: System.currentTimeMillis()
 )
 
-/** Solo al crear: el reporte siempre se crea en estado PENDING y sin votos. */
 fun Report.toNewDto() = ReportDto(
     ownerId = ownerId, ownerName = ownerName, title = title.trim(),
     category = category.name, description = description.trim(),
     latitude = location.latitude, longitude = location.longitude,
     geohash = GeoFireUtils.getGeoHashForLocation(GeoLocation(location.latitude, location.longitude)),
+    neighborhood = neighborhood.ifBlank { Geo.nearestNeighborhood(location) },
     imageUrls = imageUrls,
     status = ReportStatus.PENDING.name
 )
@@ -48,11 +53,15 @@ fun Report.toNewDto() = ReportDto(
 // Comment
 fun CommentDto.toDomain() = Comment(
     id = id, reportId = reportId, authorId = authorId, authorName = authorName,
-    text = text, createdAt = createdAt?.time ?: 0L
+    text = text, createdAt = createdAt?.time ?: 0L,
+    parentCommentId = parentCommentId,
+    authorRole = authorRole.toEnumOrDefault(UserRole.USER)
 )
 
 fun Comment.toDto() = CommentDto(
-    reportId = reportId, authorId = authorId, authorName = authorName, text = text.trim()
+    reportId = reportId, authorId = authorId, authorName = authorName,
+    authorRole = authorRole.name, text = text.trim(),
+    parentCommentId = parentCommentId
 )
 
 // Notification

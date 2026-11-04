@@ -87,6 +87,16 @@ class AuthRepositoryImpl @Inject constructor(
         authSource.deleteCurrentUser()
     }
 
+    override suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> = safeCall {
+        try {
+            authSource.changePassword(currentPassword, newPassword)
+        } catch (e: FirebaseAuthInvalidCredentialsException) {
+            throw IllegalArgumentException("La contraseña actual es incorrecta")
+        } catch (e: FirebaseAuthWeakPasswordException) {
+            throw WeakPasswordException()
+        }
+    }
+
     override fun logout() = authSource.logout()
 
 }

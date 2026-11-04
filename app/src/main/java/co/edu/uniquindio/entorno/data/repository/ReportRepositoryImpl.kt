@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.data.repository
 
+import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.util.safeCall
 import co.edu.uniquindio.entorno.data.model.toDomain
 import co.edu.uniquindio.entorno.data.model.toNewDto
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import kotlinx.coroutines.flow.catch
 
 @Singleton
 class ReportRepositoryImpl @Inject constructor(
@@ -34,6 +36,9 @@ class ReportRepositoryImpl @Inject constructor(
 
     override fun observeModerationQueue(status: ReportStatus?): Flow<List<Report>> =
         source.observeByStatus(status).map { list -> list.map { it.toDomain() } }
+
+    override fun observeVotesGiven(userId: String): Flow<Int> =
+        source.observeVotesGiven(userId).catch { emit(0) }
 
     override suspend fun getNearbyReports(
         latitude: Double, longitude: Double, radiusMeters: Double, category: ReportCategory?
@@ -61,6 +66,7 @@ class ReportRepositoryImpl @Inject constructor(
                 "geohash" to GeoFireUtils.getGeoHashForLocation(
                     GeoLocation(report.location.latitude, report.location.longitude)
                 ),
+                "neighborhood" to Geo.nearestNeighborhood(report.location),
                 "imageUrls" to report.imageUrls
             )
         )
