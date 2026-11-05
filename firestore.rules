@@ -20,6 +20,16 @@ service cloud.firestore {
     function changedKeys() {
       return request.resource.data.diff(resource.data).affectedKeys();
     }
+    function gamificationUpdate() {
+      return signedIn()
+        && changedKeys().hasOnly(['points', 'badges'])
+        && request.resource.data.points is int
+        && request.resource.data.points >= 0
+        && request.resource.data.points - resource.data.points <= 15
+        && request.resource.data.points - resource.data.points >= -15
+        && request.resource.data.badges.hasAll(resource.data.badges)
+        && request.resource.data.badges.size() <= resource.data.badges.size() + 1;
+    }
 
     // ---------- Usuarios ----------
     match /users/{userId} {
@@ -32,12 +42,12 @@ service cloud.firestore {
         && request.resource.data.points == 0
         && request.resource.data.badges.size() == 0;
 
-      // Solo campos editables del perfil: nunca role, points, badges ni email
-      allow update: if isOwner(userId)
-        && changedKeys().hasOnly([
+      // Solo campos editables del perfil o actualización por gamificación
+      allow update: if (isOwner(userId) && changedKeys().hasOnly([
           'name', 'city', 'address', 'latitude', 'longitude',
           'phoneNumber', 'profilePictureUrl'
-        ]);
+        ]))
+        || gamificationUpdate();
 
       allow delete: if isOwner(userId);
     }
@@ -170,11 +180,15 @@ service cloud.firestore {
     match /notifications/{notificationId} {
       allow read: if signedIn() && resource.data.userId == request.auth.uid;
 
-      // Comentarios: cualquiera. Verificado/rechazado/resuelto: solo un moderador.
+      // Comentarios, nivel e insignia o moderador
       allow create: if signedIn()
         && request.resource.data.read == false
-        && request.resource.data.userId != request.auth.uid
-        && (request.resource.data.type == 'NEW_COMMENT' || isModerator());
+        && (
+          (request.resource.data.type == 'NEW_COMMENT'
+            && request.resource.data.userId != request.auth.uid)
+          || request.resource.data.type in ['LEVEL_UP', 'BADGE_EARNED']
+          || isModerator()
+        );
 
       // Solo se puede marcar leída / no leída
       allow update: if signedIn()
