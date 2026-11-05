@@ -2,6 +2,8 @@ package co.edu.uniquindio.entorno.features.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.edu.uniquindio.entorno.core.filter.LocationScope
+import co.edu.uniquindio.entorno.core.filter.filterBy
 import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.Report
@@ -34,11 +36,12 @@ data class HomeUiState(
     val errorMessage: String? = null,
     val query: String = "",
     val selectedCategory: ReportCategory? = null,
+    val scope: LocationScope = LocationScope.NEARBY,
     val unreadCount: Int = 0,
-    /** Radio de alertas configurado (km); 0 cuando aún no se carga. */
     val radiusKm: Int = 0,
-    /** Reportes del feed que quedan fuera del radio de alertas. */
-    val hiddenByRadius: Int = 0
+    val neighborhood: String = "",
+    /** Reportes del feed que quedan fuera del alcance elegido. */
+    val hiddenByScope: Int = 0
 )
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -63,23 +66,30 @@ class HomeViewModel @Inject constructor(
         observeFeed()
     }
 
+    private val scope = MutableStateFlow(LocationScope.NEARBY)
+
     private fun observeFeed() {
         val feed = category.flatMapLatest { reportRepository.observeFeed(it) }
         val unread = currentUser.flatMapLatest { user ->
             if (user == null) flowOf(0) else notificationRepository.observeUnreadCount(user.id)
         }
+        val filters = combine(query, scope) { text, currentScope -> text to currentScope }
         viewModelScope.launch {
-            combine(feed, query, settingsRepository.observeSettings(), currentUser, unread) {
-                reports, text, settings, user, unreadCount ->
+            combine(feed, filters, settingsRepository.observeSettings(), currentUser, unread) {
+                    reports, (text, currentScope), settings, user, unreadCount ->
                 val center = user?.location ?: Geo.ARMENIA_CENTER
-                val inRadius = reports.filter {
-                    Geo.distanceMeters(center, it.location) <= settings.alertRadiusKm * 1000.0
-                }
-                val matching = inRadius.filter { it.matches(text) }
+                val inScope = currentScope.filterBy(reports, center, settings.alertRadiusKm)
                 HomeUiState(
-                    userName = user?.name.orEmpty(), reports = matching, isLoading = false,
-                    query = text, selectedCategory = category.value, unreadCount = unreadCount,
-                    radiusKm = settings.alertRadiusKm, hiddenByRadius = reports.size - inRadius.size
+                    userName = user?.name.orEmpty(),
+                    reports = inScope.filter { it.matches(text) },
+                    isLoading = false,
+                    query = text,
+                    selectedCategory = category.value,
+                    scope = currentScope,
+                    unreadCount = unreadCount,
+                    radiusKm = settings.alertRadiusKm,
+                    neighborhood = Geo.nearestNeighborhood(center),
+                    hiddenByScope = reports.size - inScope.size
                 )
             }
                 .catch { error ->
@@ -87,6 +97,10 @@ class HomeViewModel @Inject constructor(
                 }
                 .collect { state -> _uiState.update { state.copy(errorMessage = it.errorMessage) } }
         }
+    }
+
+    fun onScopeSelected(selected: LocationScope) {
+        scope.value = selected
     }
 
     private fun Report.matches(text: String): Boolean {

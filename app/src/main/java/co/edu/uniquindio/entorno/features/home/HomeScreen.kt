@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,47 +20,43 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextField
-import androidx.compose.material3.IconButton
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.edu.uniquindio.entorno.core.component.ReportCard
+import co.edu.uniquindio.entorno.core.component.ScopeFilterRow
 import co.edu.uniquindio.entorno.core.component.icon
+import co.edu.uniquindio.entorno.core.filter.LocationScope
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.core.theme.categoryColors
+import co.edu.uniquindio.entorno.core.util.initialsOf
 import co.edu.uniquindio.entorno.domain.model.Location
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
@@ -92,7 +89,8 @@ fun HomeScreen(
         onNotificationsClick = onNotificationsClick,
         onMapClick = onMapClick,
         onQueryChange = viewModel::onQueryChange,
-        onCategorySelected = viewModel::onCategorySelected
+        onCategorySelected = viewModel::onCategorySelected,
+        onScopeSelected = viewModel::onScopeSelected
     )
 }
 
@@ -105,7 +103,8 @@ fun HomeContent(
     onNotificationsClick: () -> Unit = {},
     onMapClick: () -> Unit = {},
     onQueryChange: (String) -> Unit = {},
-    onCategorySelected: (ReportCategory?) -> Unit = {}
+    onCategorySelected: (ReportCategory?) -> Unit = {},
+    onScopeSelected: (LocationScope) -> Unit = {}
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -130,17 +129,30 @@ fun HomeContent(
             item { Greeting(uiState.userName, uiState.unreadCount, onNotificationsClick) }
             item { SearchBar(uiState.query, onQueryChange) }
             item { CategoryFilters(uiState.selectedCategory, onCategorySelected) }
+            item { ScopeFilterRow(selected = uiState.scope, onSelected = onScopeSelected) }
             item { SectionHeader(onMapClick) }
-            if (uiState.radiusKm > 0) {
-                item {
-                    val hidden = if (uiState.hiddenByRadius > 0) " · ${uiState.hiddenByRadius} fuera del radio" else ""
+
+            when (uiState.scope) {
+                LocationScope.NEARBY -> if (uiState.radiusKm > 0) {
+                    item {
+                        val hidden = if (uiState.hiddenByScope > 0) " · ${uiState.hiddenByScope} fuera del radio" else ""
+                        Text(
+                            text = "Mostrando reportes a menos de ${uiState.radiusKm} km$hidden",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                LocationScope.NEIGHBORHOOD -> item {
                     Text(
-                        text = "Mostrando reportes a menos de ${uiState.radiusKm} km$hidden",
+                        text = "Mostrando reportes de ${uiState.neighborhood}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                LocationScope.ALL -> Unit
             }
+
             when {
                 uiState.isLoading -> item {
                     Box(
@@ -152,9 +164,15 @@ fun HomeContent(
                 }
                 uiState.reports.isEmpty() -> item {
                     Text(
-                        text = if (uiState.query.isNotBlank() || uiState.selectedCategory != null)
-                            "No encontramos reportes con esos filtros"
-                        else "Aún no hay reportes en tu zona",
+                        text = when {
+                            uiState.query.isNotBlank() || uiState.selectedCategory != null ->
+                                "No encontramos reportes con esos filtros"
+                            uiState.scope == LocationScope.NEIGHBORHOOD ->
+                                "Aún no hay reportes en tu barrio"
+                            uiState.scope == LocationScope.NEARBY ->
+                                "Aún no hay reportes cerca de ti"
+                            else -> "Aún no hay reportes en la ciudad"
+                        },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
@@ -168,12 +186,6 @@ fun HomeContent(
         }
     }
 }
-
-private fun initials(name: String): String =
-    name.split(" ")
-        .filter { it.isNotBlank() }
-        .take(2)
-        .joinToString("") { it.first().uppercase() }
 
 @Composable
 private fun Greeting(userName: String, unreadCount: Int, onNotificationsClick: () -> Unit) {
@@ -195,13 +207,13 @@ private fun Greeting(userName: String, unreadCount: Int, onNotificationsClick: (
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = initials(userName),
+                text = initialsOf(userName),
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
         Spacer(Modifier.width(12.dp))
-        androidx.compose.foundation.layout.Column(modifier = Modifier.weight(1f)) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = greeting,
                 style = MaterialTheme.typography.bodySmall,
@@ -259,8 +271,8 @@ private fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
             unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-            unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
         )
     )
 }
@@ -386,9 +398,12 @@ object SampleReports {
 }
 
 private val previewState = HomeUiState(
-    userName = "",
+    userName = "Juan Cayón",
     reports = SampleReports.reports,
-    isLoading = false
+    isLoading = false,
+    scope = LocationScope.NEARBY,
+    radiusKm = 2,
+    neighborhood = "Centro"
 )
 
 @Preview(showBackground = true)

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import co.edu.uniquindio.entorno.core.filter.LocationScope
+import co.edu.uniquindio.entorno.core.filter.filterBy
 import co.edu.uniquindio.entorno.core.location.DeviceLocationClient
 import co.edu.uniquindio.entorno.core.navigation.MapRoute
 import co.edu.uniquindio.entorno.core.util.Geo
@@ -98,12 +99,7 @@ class MapViewModel @Inject constructor(
                 val startHour = array[8] as Int
 
                 val userLoc = user?.location ?: Geo.ARMENIA_CENTER
-                val filteredReports = if (currentScope == LocationScope.NEARBY) {
-                    val radiusMeters = settings.alertRadiusKm * 1000.0
-                    reports.filter { Geo.distanceMeters(userLoc, it.location) <= radiusMeters }
-                } else {
-                    reports
-                }
+                val filteredReports = currentScope.filterBy(reports, userLoc, settings.alertRadiusKm)
                 MapUiState(
                     reports = filteredReports,
                     selectedCategory = selectedCategory,
