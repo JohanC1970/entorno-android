@@ -1,0 +1,187 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Helpers ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
+    }
+    function isModerator() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && userDoc(request.auth.uid).data.role == 'MODERATOR';
+    }
+    function changedKeys() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // ---------- Usuarios ----------
+    match /users/{userId} {
+      // Cualquier usuario autenticado (el ranking de Héroes lee a todos)
+      allow read: if signedIn();
+
+      // El registro: solo tu propio documento, siempre USER y sin puntos
+      allow create: if isOwner(userId)
+        && request.resource.data.role == 'USER'
+        && request.resource.data.points == 0
+        && request.resource.data.badges.size() == 0;
+
+      // Solo campos editables del perfil: nunca role, points, badges ni email
+      allow update: if isOwner(userId)
+        && changedKeys().hasOnly([
+          'name', 'city', 'address', 'latitude', 'longitude',
+          'phoneNumber', 'profilePictureUrl'
+        ]);
+
+      allow delete: if isOwner(userId);
+    }
+
+    // ---------- Reportes ----------
+    match /reports/{reportId} {
+
+      function validContent(d) {
+        return d.title is string && d.title.size() > 0 && d.title.size() <= 80
+          && d.description is string && d.description.size() <= 500
+          && d.category in ['SECURITY', 'MEDICAL', 'INFRASTRUCTURE', 'PETS', 'COMMUNITY']
+          && d.imageUrls is list && d.imageUrls.size() >= 1 && d.imageUrls.size() <= 3
+          && d.latitude is number && d.longitude is number;
+      }
+
+      function votePath() {
+        return /databases/$(database)/documents/reports/$(reportId)/votes/$(request.auth.uid);
+      }
+
+      // El autor edita su contenido mientras el reporte siga activo
+      function ownerEdit() {
+        return isOwner(resource.data.ownerId)
+          && resource.data.status in ['PENDING', 'VERIFIED']
+          && changedKeys().hasOnly([
+            'title', 'category', 'description', 'latitude', 'longitude',
+            'geohash', 'neighborhood', 'imageUrls', 'updatedAt'
+          ])
+          && validContent(request.resource.data);
+      }
+
+      // El autor marca como resuelto
+      function ownerResolve() {
+        return isOwner(resource.data.ownerId)
+          && resource.data.status in ['PENDING', 'VERIFIED']
+          && changedKeys().hasOnly(['status', 'updatedAt'])
+          && request.resource.data.status == 'RESOLVED';
+      }
+
+      // El moderador verifica, rechaza (con motivo) o resuelve
+      function moderatorReview() {
+        return isModerator()
+          && changedKeys().hasOnly(['status', 'rejectionReason', 'updatedAt'])
+          && request.resource.data.status in ['VERIFIED', 'REJECTED', 'RESOLVED']
+          && (request.resource.data.status != 'REJECTED'
+              || (request.resource.data.rejectionReason is string
+                  && request.resource.data.rejectionReason.size() > 0));
+      }
+
+      // Voto "Es importante": ±1, atado a la creación/borrado del doc de voto
+      function voteChange() {
+        return signedIn()
+          && changedKeys().hasOnly(['importantCount'])
+          && (
+            (request.resource.data.importantCount == resource.data.importantCount + 1
+              && !exists(votePath()) && existsAfter(votePath()))
+            ||
+            (request.resource.data.importantCount == resource.data.importantCount - 1
+              && exists(votePath()) && !existsAfter(votePath()))
+          );
+      }
+
+      // Un comentario nuevo suma exactamente 1 al contador
+      function commentCountChange() {
+        return signedIn()
+          && changedKeys().hasOnly(['commentCount'])
+          && request.resource.data.commentCount == resource.data.commentCount + 1;
+      }
+
+      // Se lee todo porque Estadísticas y "cercanos" consultan sin filtrar por estado;
+      // ocultar los rechazados del feed lo hace la consulta, no la regla.
+      allow read: if signedIn();
+
+      // Todo reporte nace PENDING, sin votos ni comentarios y a nombre de quien lo crea
+      allow create: if isOwner(request.resource.data.ownerId)
+        && request.resource.data.status == 'PENDING'
+        && request.resource.data.importantCount == 0
+        && request.resource.data.commentCount == 0
+        && request.resource.data.rejectionReason == null
+        && validContent(request.resource.data);
+
+      allow update: if signedIn()
+        && (ownerEdit() || ownerResolve() || moderatorReview()
+            || voteChange() || commentCountChange());
+
+      allow delete: if isOwner(resource.data.ownerId) || isModerator();
+
+      // ----- Votos -----
+      match /votes/{voteId} {
+        allow get: if signedIn() && voteId == request.auth.uid;
+
+        // El borrado del reporte lista los votos para eliminarlos
+        allow list: if signedIn()
+          && (isOwner(get(/databases/$(database)/documents/reports/$(reportId)).data.ownerId)
+              || isModerator());
+
+        allow create: if isOwner(voteId)
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.keys().hasOnly(['userId', 'createdAt']);
+
+        allow delete: if isOwner(voteId)
+          || isOwner(get(/databases/$(database)/documents/reports/$(reportId)).data.ownerId)
+          || isModerator();
+      }
+
+      // ----- Comentarios -----
+      match /comments/{commentId} {
+        allow read: if signedIn();
+
+        // Nombre y rol deben coincidir con los del perfil: nadie se hace pasar por moderador
+        allow create: if isOwner(request.resource.data.authorId)
+          && request.resource.data.reportId == reportId
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 1000
+          && request.resource.data.authorRole == userDoc(request.auth.uid).data.role
+          && request.resource.data.authorName == userDoc(request.auth.uid).data.name;
+
+        allow delete: if isOwner(resource.data.authorId)
+          || isOwner(get(/databases/$(database)/documents/reports/$(reportId)).data.ownerId)
+          || isModerator();
+      }
+    }
+
+    // Consulta collectionGroup("votes") para "Votos dados" (requiere rules_version 2)
+    match /{path=**}/votes/{voteId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // ---------- Notificaciones ----------
+    match /notifications/{notificationId} {
+      allow read: if signedIn() && resource.data.userId == request.auth.uid;
+
+      // Comentarios: cualquiera. Verificado/rechazado/resuelto: solo un moderador.
+      allow create: if signedIn()
+        && request.resource.data.read == false
+        && request.resource.data.userId != request.auth.uid
+        && (request.resource.data.type == 'NEW_COMMENT' || isModerator());
+
+      // Solo se puede marcar leída / no leída
+      allow update: if signedIn()
+        && resource.data.userId == request.auth.uid
+        && changedKeys().hasOnly(['read']);
+
+      allow delete: if signedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}
