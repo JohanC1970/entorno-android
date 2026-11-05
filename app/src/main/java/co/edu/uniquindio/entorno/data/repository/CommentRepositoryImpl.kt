@@ -4,9 +4,12 @@ import co.edu.uniquindio.entorno.core.util.safeCall
 import co.edu.uniquindio.entorno.core.util.toEnumOrDefault
 import co.edu.uniquindio.entorno.data.model.toDomain
 import co.edu.uniquindio.entorno.data.model.toDto
+import co.edu.uniquindio.entorno.data.remote.GamificationRemoteDataSource
 import co.edu.uniquindio.entorno.data.remote.ReportRemoteDataSource
 import co.edu.uniquindio.entorno.data.remote.UserRemoteDataSource
+import co.edu.uniquindio.entorno.domain.model.Badge
 import co.edu.uniquindio.entorno.domain.model.Comment
+import co.edu.uniquindio.entorno.domain.model.PointsRule
 import co.edu.uniquindio.entorno.domain.model.UserRole
 import co.edu.uniquindio.entorno.domain.repository.CommentRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +21,8 @@ import jakarta.inject.Singleton
 @Singleton
 class CommentRepositoryImpl @Inject constructor(
     private val source: ReportRemoteDataSource,
-    private val users: UserRemoteDataSource
+    private val users: UserRemoteDataSource,
+    private val gamification: GamificationRemoteDataSource
 ) : CommentRepository {
 
     override fun observeComments(reportId: String): Flow<List<Comment>> =
@@ -40,5 +44,9 @@ class CommentRepositoryImpl @Inject constructor(
                 parentCommentId = rootId
             ).toDto()
         )
+
+        safeCall { gamification.apply(author.id, PointsRule.COMMENT, Badge.FIRST_COMMENT) }
     }
+
+
 }
