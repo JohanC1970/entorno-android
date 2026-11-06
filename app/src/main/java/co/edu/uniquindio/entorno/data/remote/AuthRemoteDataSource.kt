@@ -16,6 +16,7 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth){
     val currentUserId: String? get() = auth.currentUser?.uid
 
     fun observeAuthState(): Flow<String?> = callbackFlow {
+        trySend(auth.currentUser?.uid)
         val listener = FirebaseAuth.AuthStateListener{ trySend(it.currentUser?.uid) }
         auth.addAuthStateListener(listener)
         awaitClose { auth.removeAuthStateListener(listener) }

@@ -28,9 +28,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,7 +42,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.material3.Icon
@@ -49,6 +55,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -104,6 +111,7 @@ fun ReportDetailScreen(
     onShare: (Report) -> Unit = {},
     onCommentsClick: (reportId: String) -> Unit = {},
     onViewOnMap: (reportId: String) -> Unit = {},
+    onEdit: (String) -> Unit = {},
     viewModel: ReportDetailViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -121,6 +129,7 @@ fun ReportDetailScreen(
             viewModel.clearInfo()
         }
     }
+    LaunchedEffect(uiState.deleted) { if (uiState.deleted) onBack() }
 
     when (val report = uiState.report) {
         null -> ReportDetailPlaceholder(
@@ -138,7 +147,11 @@ fun ReportDetailScreen(
             onCommentsClick = { onCommentsClick(report.id) },
             onViewOnMap = { onViewOnMap(report.id) },
             canResolve = uiState.canResolve,
-            onResolve = viewModel::markResolved
+            onResolve = viewModel::markResolved,
+            canEdit = uiState.canEdit,
+            canDelete = uiState.canDelete,
+            onEdit = { onEdit(report.id) },
+            onDelete = viewModel::deleteReport
         )
     }
 }
@@ -188,6 +201,10 @@ fun ReportDetailContent(
     onViewOnMap: () -> Unit = {},
     canResolve: Boolean = false,
     onResolve: () -> Unit = {},
+    canEdit: Boolean = false,
+    canDelete: Boolean = false,
+    onEdit: () -> Unit = {},
+    onDelete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -253,6 +270,54 @@ fun ReportDetailContent(
                     ) {
                         Text("Marcar como resuelto")
                     }
+                }
+
+                var confirmDelete by remember { mutableStateOf(false) }
+
+                if (canEdit || canDelete) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (canEdit) {
+                            OutlinedButton(
+                                onClick = onEdit,
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.weight(1f).height(48.dp)
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text("Editar")
+                            }
+                        }
+                        if (canDelete) {
+                            OutlinedButton(
+                                onClick = { confirmDelete = true },
+                                shape = RoundedCornerShape(16.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.error),
+                                modifier = Modifier.weight(1f).height(48.dp)
+                            ) {
+                                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text("Eliminar")
+                            }
+                        }
+                    }
+                }
+
+                if (confirmDelete) {
+                    AlertDialog(
+                        onDismissRequest = { confirmDelete = false },
+                        title = { Text("Eliminar reporte") },
+                        text = { Text("Se borrarán también sus comentarios y votos. Esta acción no se puede deshacer.") },
+                        confirmButton = {
+                            TextButton(onClick = { confirmDelete = false; onDelete() }) {
+                                Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                            }
+                        },
+                        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancelar") } }
+                    )
                 }
 
                 LocationCard(location = report.location, onViewOnMap = onViewOnMap)

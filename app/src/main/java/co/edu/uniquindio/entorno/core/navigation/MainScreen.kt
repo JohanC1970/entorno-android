@@ -48,7 +48,7 @@ import co.edu.uniquindio.entorno.features.profile.InsigniasScreen
 import co.edu.uniquindio.entorno.features.profile.PerfilScreen
 import co.edu.uniquindio.entorno.features.report.CommentsRoute
 import co.edu.uniquindio.entorno.features.report.CreateReportScreen
-import co.edu.uniquindio.entorno.features.report.LocationPickerHolder
+import co.edu.uniquindio.entorno.features.report.KEY_PICKED_LOCATION
 import co.edu.uniquindio.entorno.features.report.MisReportesScreen
 import co.edu.uniquindio.entorno.features.report.ReportDetailScreen
 import co.edu.uniquindio.entorno.features.settings.SettingsScreen
@@ -174,7 +174,8 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
                 onBack = { navController.popBackStack() },
                 onShare = { report -> shareReport(context, report) },
                 onCommentsClick = { id -> navController.navigate(Comments(id)) },
-                onViewOnMap = { id -> navController.navigate(MapRoute(focus = id)) }
+                onViewOnMap = { id -> navController.navigate(MapRoute(focus = id)) },
+                onEdit = { id -> navController.navigate(CreateReport(id)) }
             )
         }
 
@@ -186,20 +187,19 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
             CreateReportScreen(
                 onClose = { navController.popBackStack() },
                 onPublished = { navController.popBackStack() },
-                onChangeLocation = { navController.navigate(PickLocation) }
+                onChangeLocation = { navController.navigate(PickLocation) },
+                onViewReport = { id -> navController.navigate(ReportDetail(id)) }
             )
         }
 
         composable<PickLocation> {
             LocationPickerScreen(
                 initial = null,
-                onBack = { 
-                    LocationPickerHolder.onLocationPicked = null
-                    navController.popBackStack() 
-                },
+                onBack = { navController.popBackStack() },
                 onConfirm = { place ->
-                    LocationPickerHolder.onLocationPicked?.invoke(place.location)
-                    LocationPickerHolder.onLocationPicked = null
+                    navController.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set(KEY_PICKED_LOCATION, "${place.location.latitude},${place.location.longitude}")
                     navController.popBackStack()
                 }
             )

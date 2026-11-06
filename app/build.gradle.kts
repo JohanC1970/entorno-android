@@ -43,6 +43,8 @@ android {
         resValue("string", "cloudinary_cloud_name", localProperties.getProperty("CLOUDINARY_CLOUD_NAME", ""))
         resValue("string", "cloudinary_upload_preset", localProperties.getProperty("CLOUDINARY_UPLOAD_PRESET", ""))
 
+        //API KEY - GEMINI
+        resValue("string", "gemini_api_key", localProperties.getProperty("GEMINI_API_KEY", ""))
     }
 
     buildTypes {
