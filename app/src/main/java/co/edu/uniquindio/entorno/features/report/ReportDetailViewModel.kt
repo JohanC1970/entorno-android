@@ -33,7 +33,11 @@ data class ReportDetailUiState(
     /** Mensaje informativo (por ejemplo, confirmación de una acción). */
     val infoMessage: String? = null,
     /** El autor o un moderador pueden marcar como resuelto un reporte verificado. */
-    val canResolve: Boolean = false
+    val canResolve: Boolean = false,
+    /** Solo el autor edita, y solo mientras el reporte siga activo */
+    val canEdit: Boolean = false,
+    val canDelete: Boolean = false,
+    val deleted: Boolean = false
 )
 
 @HiltViewModel
@@ -65,6 +69,12 @@ class ReportDetailViewModel @Inject constructor(
                         report.status == ReportStatus.VERIFIED &&
                         (session.userId == report.ownerId || session.role == UserRole.MODERATOR)
                     _uiState.update { it.copy(report = report, isLoading = false, canResolve = canResolve) }
+                    val isOwner = report != null && session?.userId == report.ownerId
+                    val canEdit = isOwner && (report?.status == ReportStatus.PENDING || report?.status == ReportStatus.VERIFIED)
+                    _uiState.update {
+                        it.copy(report = report, isLoading = false, canResolve = canResolve, canEdit = canEdit, canDelete = isOwner)
+                    }
+
                 }
         }
     }
@@ -107,4 +117,12 @@ class ReportDetailViewModel @Inject constructor(
     fun clearError() = _uiState.update { it.copy(errorMessage = null) }
 
     fun clearInfo() = _uiState.update { it.copy(infoMessage = null) }
+
+    fun deleteReport() {
+        viewModelScope.launch {
+            reportRepository.deleteReport(reportId)
+                .onSuccess { _uiState.update { it.copy(deleted = true) } }
+                .onFailure { error -> _uiState.update { it.copy(errorMessage = error.toUserMessage()) } }
+        }
+    }
 }

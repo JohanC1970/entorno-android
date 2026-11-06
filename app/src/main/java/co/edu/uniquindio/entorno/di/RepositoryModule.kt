@@ -1,13 +1,14 @@
 package co.edu.uniquindio.entorno.di
 
-import co.edu.uniquindio.entorno.data.repository.memory.InMemoryAuthRepository
-import co.edu.uniquindio.entorno.data.repository.memory.InMemoryCommentRepository
-import co.edu.uniquindio.entorno.data.repository.memory.InMemoryImageRepository
-import co.edu.uniquindio.entorno.data.repository.memory.InMemoryNotificationRepository
-import co.edu.uniquindio.entorno.data.repository.memory.InMemoryReportRepository
-import co.edu.uniquindio.entorno.data.repository.memory.InMemorySessionRepository
+import co.edu.uniquindio.entorno.data.repository.DuplicateDetectorImpl
+import co.edu.uniquindio.entorno.data.repository.AuthRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.CommentRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.ImageRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.NotificationRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.ReportRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.SessionRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.UserRepositoryImpl
 import co.edu.uniquindio.entorno.data.repository.memory.InMemorySettingsRepository
-import co.edu.uniquindio.entorno.data.repository.memory.InMemoryUserRepository
 import co.edu.uniquindio.entorno.domain.repository.*
 import dagger.Binds
 import dagger.Module
@@ -30,33 +31,38 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindAuthRepository(impl: InMemoryAuthRepository): AuthRepository
+    abstract fun bindAuthRepository(impl: AuthRepositoryImpl): AuthRepository
 
     @Binds
     @Singleton
-    abstract fun bindUserRepository(impl: InMemoryUserRepository): UserRepository
+    abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
 
     @Binds
     @Singleton
-    abstract fun bindReportRepository(impl: InMemoryReportRepository): ReportRepository
+    abstract fun bindReportRepository(impl: ReportRepositoryImpl): ReportRepository
 
     @Binds
     @Singleton
-    abstract fun bindCommentRepository(impl: InMemoryCommentRepository): CommentRepository
+    abstract fun bindCommentRepository(impl: CommentRepositoryImpl): CommentRepository
 
     @Binds
     @Singleton
-    abstract fun bindNotificationRepository(impl: InMemoryNotificationRepository): NotificationRepository
+    abstract fun bindNotificationRepository(impl: NotificationRepositoryImpl): NotificationRepository
 
     @Binds
     @Singleton
-    abstract fun bindSessionRepository(impl: InMemorySessionRepository): SessionRepository
+    abstract fun bindSessionRepository(impl: SessionRepositoryImpl): SessionRepository
 
     @Binds
     @Singleton
-    abstract fun bindImageRepository(impl: InMemoryImageRepository): ImageRepository
+    abstract fun bindImageRepository(impl: ImageRepositoryImpl): ImageRepository
 
     @Binds
     @Singleton
     abstract fun bindSettingsRepository(impl: InMemorySettingsRepository): SettingsRepository
+    
+    @Binds
+    @Singleton
+    abstract fun bindDuplicateDetector(impl: DuplicateDetectorImpl): DuplicateDetector
+
 }

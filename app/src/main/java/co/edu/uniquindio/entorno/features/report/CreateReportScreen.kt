@@ -1,12 +1,10 @@
 package co.edu.uniquindio.entorno.features.report
 
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -29,6 +27,7 @@ import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -54,21 +53,21 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import co.edu.uniquindio.entorno.core.component.UriImage
 import co.edu.uniquindio.entorno.core.component.icon
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.core.theme.categoryColors
 import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.core.util.RequestResult
 import co.edu.uniquindio.entorno.domain.model.Location
+import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
 
 @Composable
@@ -76,6 +75,7 @@ fun CreateReportScreen(
     onClose: () -> Unit = {},
     onPublished: () -> Unit = {},
     onChangeLocation: () -> Unit = {},
+    onViewReport: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: CreateReportViewModel = hiltViewModel()
 ) {
@@ -98,6 +98,15 @@ fun CreateReportScreen(
         }
     }
 
+    if (uiState.duplicates.isNotEmpty()) {
+        DuplicatesDialog(
+            duplicates = uiState.duplicates,
+            onView = onViewReport,
+            onPublishAnyway = viewModel::publishAnyway,
+            onDismiss = viewModel::dismissDuplicates
+        )
+    }
+
     CreateReportContent(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
@@ -109,14 +118,54 @@ fun CreateReportScreen(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
             )
         },
-        onRemovePhoto = viewModel::onPhotoRemoved,
+        onRemoveUrl = viewModel::onExistingPhotoRemoved,
+        onRemoveUri = viewModel::onPhotoRemoved,
         onClose = onClose,
         onPublish = viewModel::publish,
-        onChangeLocation = {
-            LocationPickerHolder.onLocationPicked = viewModel::onLocationPicked
-            onChangeLocation()
-        },
+        onChangeLocation = onChangeLocation,
         modifier = modifier
+    )
+}
+
+@Composable
+private fun DuplicatesDialog(
+    duplicates: List<Report>,
+    onView: (String) -> Unit,
+    onPublishAnyway: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("¿Ya lo reportaron?") },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    "Estos reportes cercanos parecen ser el mismo evento. Marcarlo como importante o " +
+                        "comentar ayuda más que crear uno nuevo.",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                duplicates.forEach { report ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                report.title,
+                                style = MaterialTheme.typography.titleSmall,
+                                maxLines = 2,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                            )
+                            Text(
+                                "${report.category.label} · ${report.neighborhood}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        TextButton(onClick = { onView(report.id) }) { Text("Ver") }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onPublishAnyway) { Text("Publicar de todos modos") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Seguir editando") } }
     )
 }
 
@@ -129,7 +178,8 @@ private fun CreateReportContent(
     onTitleChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onAddPhotos: () -> Unit,
-    onRemovePhoto: (Uri) -> Unit,
+    onRemoveUrl: (String) -> Unit,
+    onRemoveUri: (Uri) -> Unit,
     onClose: () -> Unit,
     onPublish: () -> Unit,
     onChangeLocation: () -> Unit,
@@ -146,7 +196,7 @@ private fun CreateReportContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Crear reporte", style = MaterialTheme.typography.titleLarge) },
+                title = { Text(if (uiState.isEditing) "Editar reporte" else "Crear reporte", style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
                         Icon(Icons.Default.Close, contentDescription = "Cerrar")
@@ -162,18 +212,6 @@ private fun CreateReportContent(
                         .padding(horizontal = 16.dp, vertical = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    if (!uiState.canPublish && !uiState.isLoading) {
-                        uiState.missingRequirementMessage?.let { msg ->
-                            Text(
-                                text = "⚠️ $msg",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
-
                     Button(
                         onClick = onPublish,
                         enabled = uiState.canPublish,
@@ -183,7 +221,11 @@ private fun CreateReportContent(
                             .height(56.dp)
                     ) {
                         Text(
-                            if (uiState.isLoading) "Publicando…" else "Publicar reporte",
+                            when {
+                                uiState.isLoading -> if (uiState.isEditing) "Guardando…" else "Publicando…"
+                                uiState.isEditing -> "Guardar cambios"
+                                else -> "Publicar reporte"
+                            },
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -229,7 +271,13 @@ private fun CreateReportContent(
 
             Spacer(Modifier.height(4.dp))
             SectionLabel("FOTOS · MÍNIMO UNA")
-            PhotoRow(uris = imageUris, onAdd = onAddPhotos, onRemove = onRemovePhoto)
+            PhotoRow(
+                urls = uiState.existingImageUrls,
+                uris = imageUris,
+                onAdd = onAddPhotos,
+                onRemoveUrl = onRemoveUrl,
+                onRemoveUri = onRemoveUri
+            )
 
             Spacer(Modifier.height(4.dp))
             SectionLabel("UBICACIÓN")
@@ -328,47 +376,29 @@ private fun CategoryCell(
 
 @Composable
 private fun PhotoRow(
+    urls: List<String>,
     uris: List<Uri>,
     onAdd: () -> Unit,
-    onRemove: (Uri) -> Unit
+    onRemoveUrl: (String) -> Unit,
+    onRemoveUri: (Uri) -> Unit
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        uris.forEach { uri ->
-            PhotoThumbnail(uri = uri, onRemove = { onRemove(uri) })
-        }
-        if (uris.size < MAX_IMAGES) {
-            AddPhotoBox(onClick = onAdd)
-        }
+        urls.forEach { url -> PhotoThumbnail(model = url, onRemove = { onRemoveUrl(url) }) }
+        uris.forEach { uri -> PhotoThumbnail(model = uri.toString(), onRemove = { onRemoveUri(uri) }) }
+        if (urls.size + uris.size < MAX_IMAGES) AddPhotoBox(onClick = onAdd)
     }
 }
 
 @Composable
-private fun PhotoThumbnail(uri: Uri, onRemove: () -> Unit) {
-    val context = LocalContext.current
-    val bitmap = remember(uri) {
-        context.contentResolver.openInputStream(uri)?.use {
-            BitmapFactory.decodeStream(it)?.asImageBitmap()
-        }
-    }
-    val shape = RoundedCornerShape(12.dp)
-
+private fun PhotoThumbnail(model: String, onRemove: () -> Unit) {
     Box(modifier = Modifier.size(80.dp)) {
-        Box(
+        UriImage(
+            uri = model,
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(shape)
+                .matchParentSize()
+                .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
-        ) {
-            bitmap?.let {
-                Image(
-                    bitmap = it,
-                    contentDescription = "Foto del reporte",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize()
-                )
-            }
-        }
+        )
         IconButton(
             onClick = onRemove,
             modifier = Modifier
@@ -472,7 +502,8 @@ private fun PreviewContent(uiState: CreateReportUiState) {
             onTitleChange = {},
             onDescriptionChange = {},
             onAddPhotos = {},
-            onRemovePhoto = {},
+            onRemoveUrl = {},
+            onRemoveUri = {},
             onClose = {},
             onPublish = {},
             onChangeLocation = {}
