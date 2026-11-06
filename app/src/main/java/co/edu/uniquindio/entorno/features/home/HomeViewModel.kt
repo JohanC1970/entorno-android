@@ -59,14 +59,13 @@ class HomeViewModel @Inject constructor(
 
     private val query = MutableStateFlow("")
     private val category = MutableStateFlow<ReportCategory?>(null)
+    private val scope = MutableStateFlow(LocationScope.NEARBY)
 
     private val currentUser: Flow<User?> = sessionRepository.observeCurrentUser(userRepository)
 
     init {
         observeFeed()
     }
-
-    private val scope = MutableStateFlow(LocationScope.NEARBY)
 
     private fun observeFeed() {
         val feed = category.flatMapLatest { reportRepository.observeFeed(it) }
@@ -93,6 +92,7 @@ class HomeViewModel @Inject constructor(
                 )
             }
                 .catch { error ->
+                    android.util.Log.e("HomeVM", "Falló el feed", error)
                     _uiState.update { it.copy(isLoading = false, errorMessage = error.toUserMessage()) }
                 }
                 .collect { state -> _uiState.update { state.copy(errorMessage = it.errorMessage) } }
