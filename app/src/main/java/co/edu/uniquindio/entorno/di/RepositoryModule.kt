@@ -1,14 +1,14 @@
 package co.edu.uniquindio.entorno.di
 
-import co.edu.uniquindio.entorno.data.repository.DuplicateDetectorImpl
 import co.edu.uniquindio.entorno.data.repository.AuthRepositoryImpl
 import co.edu.uniquindio.entorno.data.repository.CommentRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.DuplicateDetectorImpl
 import co.edu.uniquindio.entorno.data.repository.ImageRepositoryImpl
 import co.edu.uniquindio.entorno.data.repository.NotificationRepositoryImpl
 import co.edu.uniquindio.entorno.data.repository.ReportRepositoryImpl
 import co.edu.uniquindio.entorno.data.repository.SessionRepositoryImpl
+import co.edu.uniquindio.entorno.data.repository.SettingsRepositoryImpl
 import co.edu.uniquindio.entorno.data.repository.UserRepositoryImpl
-import co.edu.uniquindio.entorno.data.repository.memory.InMemorySettingsRepository
 import co.edu.uniquindio.entorno.domain.repository.*
 import dagger.Binds
 import dagger.Module
@@ -59,8 +59,8 @@ abstract class RepositoryModule {
 
     @Binds
     @Singleton
-    abstract fun bindSettingsRepository(impl: InMemorySettingsRepository): SettingsRepository
-    
+    abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
     @Binds
     @Singleton
     abstract fun bindDuplicateDetector(impl: DuplicateDetectorImpl): DuplicateDetector

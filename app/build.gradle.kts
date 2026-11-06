@@ -13,7 +13,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.serialization)
-    id("com.google.gms.google-services")
+
 }
 
 // Google Services solo se aplica si existe google-services.json (no se versiona por tener
@@ -91,7 +91,6 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-storage")
     
     // GeoFire
     implementation("com.firebase:geofire-android:3.2.0")

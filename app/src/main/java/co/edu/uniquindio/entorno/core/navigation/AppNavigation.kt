@@ -1,7 +1,14 @@
 package co.edu.uniquindio.entorno.core.navigation
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
@@ -21,13 +28,15 @@ import co.edu.uniquindio.entorno.features.welcome.WelcomeScreen
  */
 @Composable
 fun AppNavigation(sessionViewModel: SessionViewModel = hiltViewModel()) {
-    val session by sessionViewModel.session.collectAsStateWithLifecycle()
-    val current = session
+    val state by sessionViewModel.state.collectAsStateWithLifecycle()
 
-    if (current == null) {
-        AuthNavigation()
-    } else {
-        MainScreen(session = current)
+    when (val current = state) {
+        SessionState.Loading -> Box(
+            modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.Center
+        ) { CircularProgressIndicator() }
+        SessionState.SignedOut -> AuthNavigation()
+        is SessionState.Active -> MainScreen(session = current.session)
     }
 }
 
