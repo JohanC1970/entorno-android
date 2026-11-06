@@ -72,6 +72,7 @@ import co.edu.uniquindio.entorno.core.component.icon
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.core.theme.categoryColors
 import co.edu.uniquindio.entorno.core.theme.statusColors
+import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.domain.model.Location
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
@@ -82,9 +83,6 @@ import java.util.Locale
 private val dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("es"))
 
 private data class Milestone(val label: String, val reached: Boolean, val date: String? = null)
-
-private fun Location.formatted(): String =
-    String.format(Locale.US, "%.4f, %.4f", latitude, longitude)
 
 private fun Report.milestones(): List<Milestone> {
     val reachedCount = when (status) {
@@ -320,7 +318,7 @@ fun ReportDetailContent(
                     )
                 }
 
-                LocationCard(location = report.location, onViewOnMap = onViewOnMap)
+                LocationCard(report = report, onViewOnMap = onViewOnMap)
 
                 if (report.status == ReportStatus.REJECTED) {
                     report.rejectionReason?.let { reason -> RejectionCard(reason) }
@@ -481,7 +479,7 @@ private fun ActionsRow(
 }
 
 @Composable
-private fun LocationCard(location: Location, onViewOnMap: () -> Unit) {
+private fun LocationCard(report: Report, onViewOnMap: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -500,9 +498,8 @@ private fun LocationCard(location: Location, onViewOnMap: () -> Unit) {
                 tint = MaterialTheme.colorScheme.primary
             )
             Spacer(Modifier.width(12.dp))
-            // TODO: mostrar la dirección cuando Report tenga ese campo
             Text(
-                text = location.formatted(),
+                text = "${report.neighborhood} · ${Geo.format(report.location)}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f)

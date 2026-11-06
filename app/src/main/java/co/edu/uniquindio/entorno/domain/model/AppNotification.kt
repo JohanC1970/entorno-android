@@ -1,6 +1,6 @@
 package co.edu.uniquindio.entorno.domain.model
 
-enum class NotificationType{
+enum class NotificationType {
     NEW_COMMENT, REPORT_VERIFIED, REPORT_REJECTED, REPORT_RESOLVED, BADGE_EARNED, LEVEL_UP
 }
 

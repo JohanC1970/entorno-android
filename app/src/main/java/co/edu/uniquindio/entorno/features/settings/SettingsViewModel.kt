@@ -49,8 +49,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onNotifyNearbyChange(value: Boolean) = settingsRepository.update { it.copy(notifyNearbyReports = value) }
-
     fun onNotifyCommentsChange(value: Boolean) =
         settingsRepository.update { it.copy(notifyCommentsOnMyReports = value) }
 

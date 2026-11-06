@@ -3,6 +3,7 @@ package co.edu.uniquindio.entorno.features.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.Validators
+import co.edu.uniquindio.entorno.core.util.initialsOf
 import co.edu.uniquindio.entorno.core.util.toUserMessage
 import co.edu.uniquindio.entorno.domain.model.User
 import co.edu.uniquindio.entorno.domain.repository.SessionRepository
@@ -26,17 +27,9 @@ data class EditarPerfilUiState(
     val guardando: Boolean = false,
     val guardadoExitoso: Boolean = false,
     val nombreError: String? = null,
-    val correoError: String? = null,
     val mensajeError: String? = null,
     val eliminando: Boolean = false
 )
-
-private fun initialsOf(name: String): String =
-    name.split(" ")
-        .filter { it.isNotBlank() }
-        .take(2)
-        .map { it.first().uppercaseChar() }
-        .joinToString("")
 
 @HiltViewModel
 class EditarPerfilViewModel @Inject constructor(
@@ -76,10 +69,6 @@ class EditarPerfilViewModel @Inject constructor(
         _uiState.update { it.copy(nombreCompleto = nombre, iniciales = initialsOf(nombre), nombreError = null) }
     }
 
-    fun actualizarCorreo(correo: String) {
-        _uiState.update { it.copy(correo = correo, correoError = null) }
-    }
-
     fun actualizarTelefono(telefono: String) {
         _uiState.update { it.copy(telefono = telefono) }
     }
@@ -92,24 +81,20 @@ class EditarPerfilViewModel @Inject constructor(
         val state = _uiState.value
         val base = original ?: return
         val nombreError = Validators.required(state.nombreCompleto, "El nombre")
-        val correoError = Validators.email(state.correo)
-        if (nombreError != null || correoError != null) {
-            _uiState.update { it.copy(nombreError = nombreError, correoError = correoError) }
+        if (nombreError != null) {
+            _uiState.update { it.copy(nombreError = nombreError) }
             return
         }
         viewModelScope.launch {
             _uiState.update { it.copy(guardando = true) }
-            userRepository.update(
-                base.copy(
-                    name = state.nombreCompleto, email = state.correo,
-                    phoneNumber = state.telefono, address = state.barrio
-                )
+            val updated = base.copy(
+                name = state.nombreCompleto.trim(),
+                phoneNumber = state.telefono.trim(),
+                address = state.barrio.trim()
             )
+            userRepository.update(updated)
                 .onSuccess {
-                    original = base.copy(
-                        name = state.nombreCompleto.trim(), email = state.correo.trim(),
-                        phoneNumber = state.telefono.trim(), address = state.barrio.trim()
-                    )
+                    original = updated
                     _uiState.update { it.copy(guardando = false, guardadoExitoso = true) }
                 }
                 .onFailure { error ->

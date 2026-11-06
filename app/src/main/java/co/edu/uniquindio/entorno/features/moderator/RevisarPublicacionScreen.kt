@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.core.component.StatusChip
 import co.edu.uniquindio.entorno.core.component.UriImage
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
+import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -211,7 +212,7 @@ private fun RevisarPublicacionContent(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Cra. 14 #12-30, Armenia · ${reporte.location.latitude}, ${reporte.location.longitude}",
+                        text = "${reporte.neighborhood} · ${Geo.format(reporte.location)}",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

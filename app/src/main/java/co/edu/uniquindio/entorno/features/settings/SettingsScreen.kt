@@ -92,8 +92,6 @@ fun SettingsScreen(
 
             SectionLabel("NOTIFICACIONES")
             SettingsCard {
-                SwitchRow("Reportes cerca de mí", settings.notifyNearbyReports, viewModel::onNotifyNearbyChange)
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 SwitchRow("Comentarios en mis reportes", settings.notifyCommentsOnMyReports, viewModel::onNotifyCommentsChange)
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 SwitchRow("Cambios de nivel e insignias", settings.notifyLevelAndBadges, viewModel::onNotifyLevelChange)

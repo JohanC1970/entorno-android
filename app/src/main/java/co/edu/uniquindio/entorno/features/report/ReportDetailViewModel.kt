@@ -40,6 +40,8 @@ data class ReportDetailUiState(
     val deleted: Boolean = false
 )
 
+private val RESOLVABLE = setOf(ReportStatus.PENDING, ReportStatus.VERIFIED)
+
 @HiltViewModel
 class ReportDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
@@ -66,15 +68,13 @@ class ReportDetailViewModel @Inject constructor(
                 .collect { report ->
                     val session = sessionRepository.session.first()
                     val canResolve = report != null && session != null &&
-                        report.status == ReportStatus.VERIFIED &&
+                        report.status in RESOLVABLE &&
                         (session.userId == report.ownerId || session.role == UserRole.MODERATOR)
-                    _uiState.update { it.copy(report = report, isLoading = false, canResolve = canResolve) }
                     val isOwner = report != null && session?.userId == report.ownerId
                     val canEdit = isOwner && (report?.status == ReportStatus.PENDING || report?.status == ReportStatus.VERIFIED)
                     _uiState.update {
                         it.copy(report = report, isLoading = false, canResolve = canResolve, canEdit = canEdit, canDelete = isOwner)
                     }
-
                 }
         }
     }

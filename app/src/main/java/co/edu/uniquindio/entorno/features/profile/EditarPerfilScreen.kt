@@ -75,7 +75,6 @@ fun EditarPerfilScreen(
         state = state,
         snackbarHostState = snackbarHostState,
         onNombreChange = viewModel::actualizarNombre,
-        onCorreoChange = viewModel::actualizarCorreo,
         onTelefonoChange = viewModel::actualizarTelefono,
         onBarrioChange = viewModel::actualizarBarrio,
         onGuardarClick = viewModel::guardarCambios,
@@ -89,7 +88,6 @@ private fun EditarPerfilContent(
     state: EditarPerfilUiState,
     snackbarHostState: SnackbarHostState,
     onNombreChange: (String) -> Unit,
-    onCorreoChange: (String) -> Unit,
     onTelefonoChange: (String) -> Unit,
     onBarrioChange: (String) -> Unit,
     onGuardarClick: () -> Unit,
@@ -227,19 +225,19 @@ private fun EditarPerfilContent(
             CampoEditar(
                 etiqueta = "Nombre completo",
                 valor = state.nombreCompleto,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
                 onValueChange = onNombreChange,
-                error = state.nombreError,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                error = state.nombreError
             )
         }
 
-        // Campo: Correo electrónico
+        // Campo: Correo electrónico (no editable)
         item {
             CampoEditar(
-                etiqueta = "Correo electrónico",
+                etiqueta = "Correo electrónico (no editable)",
                 valor = state.correo,
-                onValueChange = onCorreoChange,
-                error = state.correoError,
+                onValueChange = {},
+                enabled = false,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
             )
         }
@@ -249,8 +247,8 @@ private fun EditarPerfilContent(
             CampoEditar(
                 etiqueta = "Teléfono",
                 valor = state.telefono,
-                onValueChange = onTelefonoChange,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
+                onValueChange = onTelefonoChange
             )
         }
 
@@ -259,8 +257,8 @@ private fun EditarPerfilContent(
             CampoEditar(
                 etiqueta = "Barrio / zona",
                 valor = state.barrio,
-                onValueChange = onBarrioChange,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp)
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
+                onValueChange = onBarrioChange
             )
         }
 
@@ -311,9 +309,10 @@ private fun EditarPerfilContent(
 private fun CampoEditar(
     etiqueta: String,
     valor: String,
-    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    error: String? = null
+    onValueChange: (String) -> Unit = {},
+    error: String? = null,
+    enabled: Boolean = true
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -334,6 +333,7 @@ private fun CampoEditar(
                 focusedContainerColor = MaterialTheme.colorScheme.surface
             ),
             singleLine = true,
+            enabled = enabled,
             isError = error != null,
             supportingText = { if (error != null) Text(error) }
         )
@@ -342,7 +342,7 @@ private fun CampoEditar(
 
 @Preview(showBackground = true)
 @Composable
-private fun EditarPerfilScreenPreview() {
+private fun EditarPerfilScreenScreenPreview() {
     EntornoTheme {
         EditarPerfilContent(
             snackbarHostState = remember { SnackbarHostState() },
@@ -354,7 +354,6 @@ private fun EditarPerfilScreenPreview() {
                 iniciales = "JG"
             ),
             onNombreChange = {},
-            onCorreoChange = {},
             onTelefonoChange = {},
             onBarrioChange = {},
             onGuardarClick = {},
