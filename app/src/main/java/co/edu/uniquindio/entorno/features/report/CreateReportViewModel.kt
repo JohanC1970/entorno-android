@@ -124,6 +124,8 @@ class CreateReportViewModel @Inject constructor(
 
     fun onCategoryChange(category: ReportCategory) = _uiState.update { it.copy(category = category) }
 
+    fun onLocationSelected(location: Location) = _uiState.update { it.copy(location = location) }
+
     fun onTitleChange(value: String) = _uiState.update { it.copy(title = value.take(MAX_TITLE)) }
 
     fun onDescriptionChange(value: String) =

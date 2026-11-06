@@ -18,10 +18,13 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
@@ -48,6 +51,7 @@ import co.edu.uniquindio.entorno.features.profile.InsigniasScreen
 import co.edu.uniquindio.entorno.features.profile.PerfilScreen
 import co.edu.uniquindio.entorno.features.report.CommentsRoute
 import co.edu.uniquindio.entorno.features.report.CreateReportScreen
+import co.edu.uniquindio.entorno.features.report.CreateReportViewModel
 import co.edu.uniquindio.entorno.features.report.KEY_PICKED_LOCATION
 import co.edu.uniquindio.entorno.features.report.MisReportesScreen
 import co.edu.uniquindio.entorno.features.report.ReportDetailScreen
@@ -183,12 +187,29 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
             CommentsRoute(onBack = { navController.popBackStack() })
         }
 
-        composable<CreateReport> {
+        composable<CreateReport> { backStackEntry ->
+            val savedStateHandle = backStackEntry.savedStateHandle
+            val pickedLocationStr by savedStateHandle.getStateFlow<String?>(KEY_PICKED_LOCATION, null).collectAsStateWithLifecycle()
+            val viewModel: CreateReportViewModel = hiltViewModel()
+
+            LaunchedEffect(pickedLocationStr) {
+                pickedLocationStr?.let { raw ->
+                    savedStateHandle.remove<String>(KEY_PICKED_LOCATION)
+                    val parts = raw.split(",")
+                    val lat = parts.getOrNull(0)?.toDoubleOrNull()
+                    val lon = parts.getOrNull(1)?.toDoubleOrNull()
+                    if (lat != null && lon != null) {
+                        viewModel.onLocationSelected(Location(lat, lon))
+                    }
+                }
+            }
+
             CreateReportScreen(
                 onClose = { navController.popBackStack() },
                 onPublished = { navController.popBackStack() },
                 onChangeLocation = { navController.navigate(PickLocation) },
-                onViewReport = { id -> navController.navigate(ReportDetail(id)) }
+                onViewReport = { id -> navController.navigate(ReportDetail(id)) },
+                viewModel = viewModel
             )
         }
 
@@ -197,9 +218,8 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
                 initial = null,
                 onBack = { navController.popBackStack() },
                 onConfirm = { place ->
-                    navController.previousBackStackEntry
-                        ?.savedStateHandle
-                        ?.set(KEY_PICKED_LOCATION, "${place.location.latitude},${place.location.longitude}")
+                    navController.getBackStackEntry<CreateReport>().savedStateHandle[KEY_PICKED_LOCATION] =
+                        "${place.location.latitude},${place.location.longitude}"
                     navController.popBackStack()
                 }
             )
