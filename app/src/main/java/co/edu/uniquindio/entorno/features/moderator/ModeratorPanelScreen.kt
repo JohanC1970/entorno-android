@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,21 +46,21 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.edu.uniquindio.entorno.core.component.icon
 
 @Composable
-fun PanelModeradorScreen(
+fun ModeratorPanelScreen(
     onReporteClick: (String) -> Unit = {},
-    viewModel: PanelModeradorViewModel = hiltViewModel()
+    viewModel: ModeratorPanelViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    PanelModeradorContent(
+    ModeratorPanelContent(
         state = state,
         onReporteClick = onReporteClick
     )
 }
 
 @Composable
-private fun PanelModeradorContent(
-    state: PanelModeradorUiState,
+private fun ModeratorPanelContent(
+    state: ModeratorPanelUiState,
     onReporteClick: (String) -> Unit
 ) {
     LazyColumn(
@@ -75,7 +76,7 @@ private fun PanelModeradorContent(
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 48.dp, bottom = 12.dp)
+                modifier = Modifier.statusBarsPadding().padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 12.dp)
             )
         }
 
@@ -189,10 +190,10 @@ private fun ThumbnailCategoria(category: ReportCategory) {
 
 @Preview(showBackground = true)
 @Composable
-private fun PanelModeradorScreenPreview() {
+private fun ModeratorPanelScreenPreview() {
     EntornoTheme {
-        PanelModeradorContent(
-            state = PanelModeradorUiState(totalPendientes = 7),
+        ModeratorPanelContent(
+            state = ModeratorPanelUiState(totalPendientes = 7),
             onReporteClick = {}
         )
     }

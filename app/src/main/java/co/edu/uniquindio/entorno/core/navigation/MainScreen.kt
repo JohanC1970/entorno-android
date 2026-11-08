@@ -43,17 +43,17 @@ import co.edu.uniquindio.entorno.features.legal.PrivacyScreen
 import co.edu.uniquindio.entorno.features.legal.TermsScreen
 import co.edu.uniquindio.entorno.features.map.LocationPickerScreen
 import co.edu.uniquindio.entorno.features.map.MapScreen
-import co.edu.uniquindio.entorno.features.moderator.PanelModeradorScreen
-import co.edu.uniquindio.entorno.features.moderator.RevisarPublicacionScreen
-import co.edu.uniquindio.entorno.features.notifications.NotificacionesScreen
-import co.edu.uniquindio.entorno.features.profile.EditarPerfilScreen
+import co.edu.uniquindio.entorno.features.moderator.ModeratorPanelScreen
+import co.edu.uniquindio.entorno.features.moderator.ReviewReportScreen
+import co.edu.uniquindio.entorno.features.notifications.NotificationsScreen
+import co.edu.uniquindio.entorno.features.profile.EditProfileScreen
 import co.edu.uniquindio.entorno.features.profile.InsigniasScreen
-import co.edu.uniquindio.entorno.features.profile.PerfilScreen
+import co.edu.uniquindio.entorno.features.profile.ProfileScreen
 import co.edu.uniquindio.entorno.features.report.CommentsRoute
 import co.edu.uniquindio.entorno.features.report.CreateReportScreen
 import co.edu.uniquindio.entorno.features.report.CreateReportViewModel
 import co.edu.uniquindio.entorno.features.report.KEY_PICKED_LOCATION
-import co.edu.uniquindio.entorno.features.report.MisReportesScreen
+import co.edu.uniquindio.entorno.features.report.MyReportsScreen
 import co.edu.uniquindio.entorno.features.report.ReportDetailScreen
 import co.edu.uniquindio.entorno.features.settings.SettingsScreen
 import co.edu.uniquindio.entorno.features.stats.StatsScreen
@@ -150,13 +150,13 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
         }
 
         composable<MyReports> {
-            MisReportesScreen(
+            MyReportsScreen(
                 onReporteClick = { id -> navController.navigate(ReportDetail(id)) }
             )
         }
 
         composable<Profile> {
-            PerfilScreen(
+            ProfileScreen(
                 onEditarClick = { navController.navigate(EditProfile) },
                 onSettingsClick = { navController.navigate(Settings) },
                 onBadgesClick = { navController.navigate(Badges) },
@@ -167,7 +167,7 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
         }
 
         composable<ModeratorPanel> {
-            PanelModeradorScreen(
+            ModeratorPanelScreen(
                 onReporteClick = { id -> navController.navigate(ReviewReport(id)) }
             )
         }
@@ -226,19 +226,19 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
         }
 
         composable<ReviewReport> {
-            RevisarPublicacionScreen(onBackClick = { navController.popBackStack() })
+            ReviewReportScreen(onBackClick = { navController.popBackStack() })
         }
 
         // ---------------------------------------------------------- cuenta y comunidad
         composable<Notifications> {
-            NotificacionesScreen(
+            NotificationsScreen(
                 onBackClick = { navController.popBackStack() },
                 onNotificationClick = { reportId -> navController.navigate(ReportDetail(reportId)) }
             )
         }
 
         composable<EditProfile> {
-            EditarPerfilScreen(onBackClick = { navController.popBackStack() })
+            EditProfileScreen(onBackClick = { navController.popBackStack() })
         }
 
         composable<Settings> {

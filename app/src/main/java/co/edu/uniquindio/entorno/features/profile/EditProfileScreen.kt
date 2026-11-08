@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
@@ -51,9 +52,9 @@ import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 
 @Composable
-fun EditarPerfilScreen(
+fun EditProfileScreen(
     onBackClick: () -> Unit = {},
-    viewModel: EditarPerfilViewModel = hiltViewModel()
+    viewModel: EditProfileViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -71,7 +72,7 @@ fun EditarPerfilScreen(
         }
     }
 
-    EditarPerfilContent(
+    EditProfileContent(
         state = state,
         snackbarHostState = snackbarHostState,
         onNombreChange = viewModel::actualizarNombre,
@@ -84,8 +85,8 @@ fun EditarPerfilScreen(
 }
 
 @Composable
-private fun EditarPerfilContent(
-    state: EditarPerfilUiState,
+private fun EditProfileContent(
+    state: EditProfileUiState,
     snackbarHostState: SnackbarHostState,
     onNombreChange: (String) -> Unit,
     onTelefonoChange: (String) -> Unit,
@@ -149,7 +150,8 @@ private fun EditarPerfilContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 20.dp, top = 40.dp, bottom = 8.dp),
+                    .statusBarsPadding()
+                    .padding(start = 8.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
@@ -342,11 +344,11 @@ private fun CampoEditar(
 
 @Preview(showBackground = true)
 @Composable
-private fun EditarPerfilScreenScreenPreview() {
+private fun EditProfileScreenPreview() {
     EntornoTheme {
-        EditarPerfilContent(
+        EditProfileContent(
             snackbarHostState = remember { SnackbarHostState() },
-            state = EditarPerfilUiState(
+            state = EditProfileUiState(
                 nombreCompleto = "Johan García",
                 correo = "johanc.garciag@uqvirtual.edu.co",
                 telefono = "+57 300 000 0000",

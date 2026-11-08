@@ -32,6 +32,8 @@ import co.edu.uniquindio.entorno.core.component.StatusChip
 import co.edu.uniquindio.entorno.core.filter.LocationScope
 import co.edu.uniquindio.entorno.core.location.LOCATION_PERMISSIONS
 import co.edu.uniquindio.entorno.core.location.hasLocationPermission
+import co.edu.uniquindio.entorno.core.theme.MapaCalor
+import co.edu.uniquindio.entorno.core.theme.MapaCalorIntenso
 import co.edu.uniquindio.entorno.core.theme.categoryColors
 import co.edu.uniquindio.entorno.core.util.Geo
 import co.edu.uniquindio.entorno.domain.model.Location
@@ -70,7 +72,7 @@ private const val PIN_TAP_GUARD_MS = 300L
 private const val HEAT_RADIUS_MIN_PX = 18.0
 private const val HEAT_RADIUS_MAX_PX = 48.0
 
-/** Un solo tono: el de MapaCalor (0xFFD32F2F = 211, 47, 47), de transparente a intenso. */
+/** Un solo tono: el de MapaCalor (211, 47, 47), de transparente a intenso. */
 private val heatColor: Expression = interpolate {
     linear()
     heatmapDensity()
@@ -424,10 +426,10 @@ private fun HeatPanel(
                     .background(
                         Brush.horizontalGradient(
                             listOf(
-                                Color(0x00D32F2F),
-                                Color(0x59D32F2F),
-                                Color(0xB3D32F2F),
-                                Color(0xF3B71C1C)
+                                MapaCalor.copy(alpha = 0f),
+                                MapaCalor.copy(alpha = 0.35f),
+                                MapaCalor.copy(alpha = 0.7f),
+                                MapaCalorIntenso.copy(alpha = 0.95f)
                             )
                         ),
                         shape = RoundedCornerShape(50)

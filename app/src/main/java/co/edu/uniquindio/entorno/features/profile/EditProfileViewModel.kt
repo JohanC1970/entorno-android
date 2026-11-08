@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class EditarPerfilUiState(
+data class EditProfileUiState(
     val nombreCompleto: String = "",
     val correo: String = "",
     val telefono: String = "",
@@ -32,14 +32,14 @@ data class EditarPerfilUiState(
 )
 
 @HiltViewModel
-class EditarPerfilViewModel @Inject constructor(
+class EditProfileViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val userRepository: UserRepository,
     private val deleteAccountUseCase: DeleteAccountUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(EditarPerfilUiState())
-    val uiState: StateFlow<EditarPerfilUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(EditProfileUiState())
+    val uiState: StateFlow<EditProfileUiState> = _uiState.asStateFlow()
 
     private var original: User? = null
 

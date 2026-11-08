@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -57,18 +58,18 @@ import co.edu.uniquindio.entorno.domain.model.Badge
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 
 @Composable
-fun PerfilScreen(
+fun ProfileScreen(
     onEditarClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {},
     onBadgesClick: () -> Unit = {},
     onHeroesClick: () -> Unit = {},
     onStatsClick: () -> Unit = {},
     onModeratorClick: () -> Unit = {},
-    viewModel: PerfilViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    PerfilContent(
+    ProfileContent(
         state = state,
         onEditarClick = onEditarClick,
         onSettingsClick = onSettingsClick,
@@ -80,8 +81,8 @@ fun PerfilScreen(
 }
 
 @Composable
-private fun PerfilContent(
-    state: PerfilUiState,
+private fun ProfileContent(
+    state: ProfileUiState,
     onEditarClick: () -> Unit,
     onSettingsClick: () -> Unit = {},
     onBadgesClick: () -> Unit = {},
@@ -102,7 +103,8 @@ private fun PerfilContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 48.dp, bottom = 16.dp),
+                    .statusBarsPadding()
+                    .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 // Avatar circular con iniciales
@@ -562,10 +564,10 @@ private fun ActividadCard(
 
 @Preview(showBackground = true)
 @Composable
-private fun PerfilScreenPreview() {
+private fun ProfileScreenPreview() {
     EntornoTheme {
-        PerfilContent(
-            state = PerfilUiState(),
+        ProfileContent(
+            state = ProfileUiState(),
             onEditarClick = {}
         )
     }

@@ -22,7 +22,7 @@ enum class ReportFilter(val label: String) {
     RECHAZADOS("Rechazados")
 }
 
-data class MisReportesUiState(
+data class MyReportsUiState(
     val reportes: List<Report> = emptyList(),
     val filtroActual: ReportFilter = ReportFilter.TODOS,
     val totalReportes: Int = 0
@@ -39,13 +39,13 @@ data class MisReportesUiState(
 }
 
 @HiltViewModel
-class MisReportesViewModel @Inject constructor(
+class MyReportsViewModel @Inject constructor(
     private val reportRepository: ReportRepository,
     private val sessionRepository: SessionRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MisReportesUiState())
-    val uiState: StateFlow<MisReportesUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(MyReportsUiState())
+    val uiState: StateFlow<MyReportsUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

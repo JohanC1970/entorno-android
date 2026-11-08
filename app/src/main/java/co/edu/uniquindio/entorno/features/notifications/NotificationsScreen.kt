@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,20 +50,21 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import co.edu.uniquindio.entorno.core.theme.*
+import co.edu.uniquindio.entorno.core.util.toRelativeTime
 import co.edu.uniquindio.entorno.domain.model.AppNotification
 import co.edu.uniquindio.entorno.domain.model.NotificationType
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun NotificacionesScreen(
+fun NotificationsScreen(
     onBackClick: () -> Unit = {},
     onNotificationClick: (reportId: String) -> Unit = {},
-    viewModel: NotificacionesViewModel = hiltViewModel()
+    viewModel: NotificationsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    NotificacionesContent(
+    NotificationsContent(
         state = state,
         onFiltroClick = viewModel::cambiarFiltro,
         onMarcarLeidas = viewModel::marcarTodasComoLeidas,
@@ -75,8 +77,8 @@ fun NotificacionesScreen(
 }
 
 @Composable
-private fun NotificacionesContent(
-    state: NotificacionesUiState,
+private fun NotificationsContent(
+    state: NotificationsUiState,
     onFiltroClick: (NotificationFilter) -> Unit,
     onMarcarLeidas: () -> Unit,
     onBackClick: () -> Unit,
@@ -93,7 +95,8 @@ private fun NotificacionesContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 20.dp, top = 40.dp, bottom = 8.dp),
+                    .statusBarsPadding()
+                    .padding(start = 8.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
@@ -240,7 +243,7 @@ private fun NotificacionCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = formatearTiempoNotificacion(notificacion.createdAt),
+                    text = notificacion.createdAt.toRelativeTime(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -305,29 +308,12 @@ private fun NotificacionIcono(type: NotificationType) {
     }
 }
 
-private fun formatearTiempoNotificacion(createdAt: Long): String {
-    val diff = System.currentTimeMillis() - createdAt
-    val minutos = diff / (60 * 1000)
-    val horas = diff / (60 * 60 * 1000)
-    val dias = diff / (24 * 60 * 60 * 1000)
-    val semanas = dias / 7
-
-    return when {
-        minutos < 60 -> "hace $minutos min"
-        horas < 24 -> "hace $horas h"
-        dias == 1L -> "ayer"
-        dias < 7 -> "hace $dias días"
-        semanas < 4 -> "hace $semanas semanas"
-        else -> "hace ${dias / 30} meses"
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
-private fun NotificacionesScreenPreview() {
+private fun NotificationsScreenPreview() {
     EntornoTheme {
-        NotificacionesContent(
-            state = NotificacionesUiState(),
+        NotificationsContent(
+            state = NotificationsUiState(),
             onFiltroClick = {},
             onMarcarLeidas = {},
             onBackClick = {},
