@@ -89,8 +89,6 @@ val SeveridadAltaOscura = Color(0xFFFF8A95)
 val SeveridadMediaOscura = Color(0xFFFFC067)
 val SeveridadBajaOscura = Color(0xFFA8AABC)
 
-// ---------- Mapa esquemático (Mapa, Mapa de calor y selector de ubicación) ----------
-val MapaParque = Color(0xFFCDE7D3)
-val MapaAgua = Color(0xFFCFE2F3)
+// ---------- Mapa de calor (un solo tono, de transparente a intenso) ----------
 val MapaCalor = Color(0xFFD32F2F)
-val MapaUsuario = Color(0xFF1A73E8)
+val MapaCalorIntenso = Color(0xFFB71C1C)

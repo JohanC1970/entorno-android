@@ -36,4 +36,3 @@ import kotlinx.serialization.Serializable
 @Serializable data object Heroes
 @Serializable data object Stats
 @Serializable data object Badges
-@Serializable data object HeatMap

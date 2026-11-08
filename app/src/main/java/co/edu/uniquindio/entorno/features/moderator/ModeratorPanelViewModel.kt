@@ -13,18 +13,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class PanelModeradorUiState(
+data class ModeratorPanelUiState(
     val reportesPendientes: List<Report> = emptyList(),
     val totalPendientes: Int = 0
 )
 
 @HiltViewModel
-class PanelModeradorViewModel @Inject constructor(
+class ModeratorPanelViewModel @Inject constructor(
     private val reportRepository: ReportRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(PanelModeradorUiState())
-    val uiState: StateFlow<PanelModeradorUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ModeratorPanelUiState())
+    val uiState: StateFlow<ModeratorPanelUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

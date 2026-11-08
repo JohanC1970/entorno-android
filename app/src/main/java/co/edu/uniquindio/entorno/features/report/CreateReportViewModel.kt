@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.features.report
 
+import android.util.Log
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -34,6 +35,7 @@ const val MAX_IMAGES = 3
 /** Clave con la que el selector de ubicación devuelve el punto elegido ("lat,lon"). */
 const val KEY_PICKED_LOCATION = "picked_location"
 
+private const val TAG = "CreateReport"
 private const val DUPLICATE_RADIUS_METERS = 500.0
 private const val MAX_CANDIDATES = 15
 private val EDITABLE_STATUSES = setOf(ReportStatus.PENDING, ReportStatus.VERIFIED)
@@ -231,12 +233,16 @@ class CreateReportViewModel @Inject constructor(
     private suspend fun findDuplicates(state: CreateReportUiState, location: Location): List<Report> {
         val nearby = reportRepository
             .getNearbyReports(location.latitude, location.longitude, DUPLICATE_RADIUS_METERS)
+            .onFailure { Log.w(TAG, "Duplicados: falló la búsqueda de cercanos", it) }
             .getOrNull().orEmpty()
             .sortedBy { Geo.distanceMeters(location, it.location) }
             .take(MAX_CANDIDATES)
+        Log.d(TAG, "Duplicados: ${nearby.size} reportes cercanos enviados a Gemini")
         if (nearby.isEmpty()) return emptyList()
         return duplicateDetector
             .findDuplicates(state.title.trim(), state.description.trim(), nearby)
+            .onFailure { Log.w(TAG, "Duplicados: falló Gemini", it) }
+            .onSuccess { Log.d(TAG, "Duplicados: Gemini marcó ${it.size}") }
             .getOrDefault(emptyList())
     }
 }

@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-data class RevisarPublicacionUiState(
+data class ReviewReportUiState(
     val reporte: Report? = null,
     val motivoRechazo: String = "",
     val verificando: Boolean = false,
@@ -31,15 +31,15 @@ data class RevisarPublicacionUiState(
 )
 
 @HiltViewModel
-class RevisarPublicacionViewModel @Inject constructor(
+class ReviewReportViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val reportRepository: ReportRepository,
     private val sessionRepository: SessionRepository
 ) : ViewModel() {
 
     private val reportId: String = savedStateHandle.toRoute<ReviewReport>().reportId
-    private val _uiState = MutableStateFlow(RevisarPublicacionUiState())
-    val uiState: StateFlow<RevisarPublicacionUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ReviewReportUiState())
+    val uiState: StateFlow<ReviewReportUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

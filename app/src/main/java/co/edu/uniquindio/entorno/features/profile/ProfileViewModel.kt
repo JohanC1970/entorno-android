@@ -52,7 +52,7 @@ data class InsigniaPerfil(
     val desbloqueada: Boolean = true
 )
 
-data class PerfilUiState(
+data class ProfileUiState(
     val usuario: User? = null,
     val reportesTotal: Int = 0,
     val verificados: Int = 0,
@@ -109,15 +109,15 @@ fun buildBadgeList(user: User): List<InsigniaPerfil> =
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class PerfilViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val sessionRepository: SessionRepository,
     private val userRepository: UserRepository,
     private val reportRepository: ReportRepository,
     private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(PerfilUiState())
-    val uiState: StateFlow<PerfilUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(ProfileUiState())
+    val uiState: StateFlow<ProfileUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -127,7 +127,7 @@ class PerfilViewModel @Inject constructor(
                 sessionRepository.withUserId(0) { reportRepository.observeVotesGiven(it) },
                 sessionRepository.withUserId(emptyList<AppNotification>()) { notificationRepository.observeNotifications(it) }
             ) { user, reportes, votos, notificaciones ->
-                PerfilUiState(
+                ProfileUiState(
                     usuario = user,
                     reportesTotal = reportes.size,
                     verificados = reportes.count {

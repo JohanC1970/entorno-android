@@ -20,7 +20,7 @@ enum class NotificationFilter(val label: String) {
     SIN_LEER("Sin leer")
 }
 
-data class NotificacionesUiState(
+data class NotificationsUiState(
     val notificaciones: List<AppNotification> = emptyList(),
     val filtroActual: NotificationFilter = NotificationFilter.TODAS
 ) {
@@ -35,13 +35,13 @@ data class NotificacionesUiState(
 }
 
 @HiltViewModel
-class NotificacionesViewModel @Inject constructor(
+class NotificationsViewModel @Inject constructor(
     private val notificationRepository: NotificationRepository,
     private val sessionRepository: SessionRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NotificacionesUiState())
-    val uiState: StateFlow<NotificacionesUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(NotificationsUiState())
+    val uiState: StateFlow<NotificationsUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

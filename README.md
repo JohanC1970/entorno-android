@@ -3,21 +3,12 @@
 App Android de reportes ciudadanos — Jetpack Compose + Kotlin.
 Universidad del Quindío · Construcción de Aplicaciones Móviles.
 
-## Estado: Fase 2 (funcionalidades básicas)
+## Estado
 
-Las 20 pantallas del prototipo de la Fase 1 están implementadas, conectadas entre sí y
-funcionales. **Los datos viven solo en memoria**: al cerrar la app se reinician con los datos de
-demostración (la persistencia es de la Fase 3). No hace falta `google-services.json` para compilar.
-
-### Cuentas de demostración (contraseña `123456`)
-
-| Correo | Rol |
-|---|---|
-| `juan.cayon@uqvirtual.edu.co` | Ciudadano (con reportes, comentarios y notificaciones) |
-| `johanc.garciag@uqvirtual.edu.co` | Ciudadano |
-| `moderador@entorno.co` | Moderador (ve la pestaña **Moderación** y puede verificar/rechazar) |
-
-También se puede crear una cuenta nueva desde **Crear cuenta**.
+Las pantallas del prototipo están implementadas y conectadas a Firebase (Auth, Firestore),
+Cloudinary (imágenes), GeoFire (consultas por ubicación), DataStore (sesión y ajustes) y Mapbox
+(mapas). La detección de reportes duplicados usa Gemini. Las claves van en `local.properties`
+(ver el final de este archivo).
 
 ### Mapa de navegación
 
@@ -29,33 +20,18 @@ También se puede crear una cuenta nueva desde **Crear cuenta**.
   - Moderación: cola de publicaciones pendientes → revisar → verificar o rechazar con motivo.
 - Cerrar sesión o eliminar la cuenta devuelve solo a la Bienvenida (la navegación depende de la sesión).
 
-### Qué es "en memoria"
-
-`data/repository/memory/` contiene una implementación en memoria de cada repositorio del dominio
-(`InMemoryAuthRepository`, `InMemoryReportRepository`, …) sobre una única `MemoryDatabase` con datos
-de demostración (`MemorySeed`). Las reglas de puntos, niveles, insignias y notificaciones
-(`MemoryRules`) se aplican ahí en cada acción. `di/RepositoryModule` enlaza las interfaces del dominio
-con estas implementaciones.
-
-El mapa es **esquemático** (calles, parques y río dibujados en Compose, con zoom y desplazamiento):
-no usa un SDK de mapas ni claves de API.
-
-### Pasar a Firebase (Fase 3)
-
-Las implementaciones de Firebase/DataStore/Cloudinary siguen en `data/repository/*Impl.kt`.
-Basta con volver a enlazar cada interfaz en `di/RepositoryModule.kt` y colocar el
-`google-services.json` en `app/`. Las pantallas y ViewModels no cambian: solo conocen las interfaces
-del dominio.
-
 ### Pruebas
 
 ```
 ./gradlew test
 ```
 
-`InMemoryRepositoriesTest` cubre autenticación, reportes, moderación, votos, comentarios,
-notificaciones, ajustes, perfil y ranking.
+Las pruebas unitarias están en `app/src/test`. `data/repository/memory/` (en `test/`) es una
+implementación **falsa en memoria** de los repositorios, usada como *fake* en
+`InMemoryRepositoriesTest`; la app real no la usa. También hay pruebas de `Severity`, `UserLevel`,
+`Geo` y del peso del mapa de calor (`heatWeight`).
 
 ### Credenciales y archivos que no se versionan
 
-`app/google-services.json` (solo necesario desde la Fase 3).
+- `app/google-services.json` (Firebase).
+- `local.properties`: `MAPBOX_ACCESS_TOKEN`, `GEMINI_API_KEY` y las claves de Cloudinary.

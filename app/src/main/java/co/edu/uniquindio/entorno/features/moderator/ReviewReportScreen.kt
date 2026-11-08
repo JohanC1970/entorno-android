@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -49,9 +50,9 @@ import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
-fun RevisarPublicacionScreen(
+fun ReviewReportScreen(
     onBackClick: () -> Unit = {},
-    viewModel: RevisarPublicacionViewModel = hiltViewModel()
+    viewModel: ReviewReportViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -68,7 +69,7 @@ fun RevisarPublicacionScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        RevisarPublicacionContent(
+        ReviewReportContent(
             state = state,
             onMotivoChange = viewModel::actualizarMotivo,
             onVerificarClick = viewModel::verificar,
@@ -83,8 +84,8 @@ fun RevisarPublicacionScreen(
 }
 
 @Composable
-private fun RevisarPublicacionContent(
-    state: RevisarPublicacionUiState,
+private fun ReviewReportContent(
+    state: ReviewReportUiState,
     onMotivoChange: (String) -> Unit,
     onVerificarClick: () -> Unit,
     onRechazarClick: () -> Unit,
@@ -103,7 +104,8 @@ private fun RevisarPublicacionContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 20.dp, top = 40.dp, bottom = 8.dp),
+                    .statusBarsPadding()
+                    .padding(start = 8.dp, end = 20.dp, top = 8.dp, bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
@@ -305,10 +307,10 @@ private fun RevisarPublicacionContent(
 
 @Preview(showBackground = true)
 @Composable
-private fun RevisarPublicacionScreenPreview() {
+private fun ReviewReportScreenPreview() {
     EntornoTheme {
-        RevisarPublicacionContent(
-            state = RevisarPublicacionUiState(),
+        ReviewReportContent(
+            state = ReviewReportUiState(),
             onMotivoChange = {},
             onVerificarClick = {},
             onRechazarClick = {},

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -47,13 +48,13 @@ import co.edu.uniquindio.entorno.core.component.StatusChip
 import co.edu.uniquindio.entorno.core.component.icon
 
 @Composable
-fun MisReportesScreen(
+fun MyReportsScreen(
     onReporteClick: (String) -> Unit = {},
-    viewModel: MisReportesViewModel = hiltViewModel()
+    viewModel: MyReportsViewModel = hiltViewModel()
 ) {
     val state by viewModel.uiState.collectAsState()
 
-    MisReportesContent(
+    MyReportsContent(
         state = state,
         onFiltroClick = viewModel::cambiarFiltro,
         onReporteClick = onReporteClick
@@ -61,8 +62,8 @@ fun MisReportesScreen(
 }
 
 @Composable
-private fun MisReportesContent(
-    state: MisReportesUiState,
+private fun MyReportsContent(
+    state: MyReportsUiState,
     onFiltroClick: (ReportFilter) -> Unit,
     onReporteClick: (String) -> Unit
 ) {
@@ -77,7 +78,8 @@ private fun MisReportesContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 48.dp, bottom = 12.dp),
+                    .statusBarsPadding()
+                    .padding(start = 20.dp, end = 20.dp, top = 8.dp, bottom = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Bottom
             ) {
@@ -248,10 +250,10 @@ private fun formatearTiempo(date: LocalDate): String {
 
 @Preview(showBackground = true)
 @Composable
-private fun MisReportesScreenPreview() {
+private fun MyReportsScreenPreview() {
     EntornoTheme {
-        MisReportesContent(
-            state = MisReportesUiState(
+        MyReportsContent(
+            state = MyReportsUiState(
                 totalReportes = 12,
                 filtroActual = ReportFilter.TODOS,
                 reportes = emptyList()
