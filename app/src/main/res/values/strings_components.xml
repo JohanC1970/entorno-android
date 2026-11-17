@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="report_important_count">Es importante · %1$d</string>
+    <string name="comment_you">Tú · %1$s</string>
+    <string name="comment_useful">Útil · %1$d</string>
+    <string name="comment_reply">Responder</string>
+    <string name="comment_moderator_tag">MODERADOR</string>
+    <string name="auth_tab_login">Iniciar sesión</string>
+    <string name="auth_tab_register">Registrarse</string>
+    <string name="severity_title">SEVERIDAD</string>
+    <string name="app_logo_description">Logo Entorno</string>
+    <string name="nav_home">Inicio</string>
+    <string name="nav_map">Mapa</string>
+    <string name="nav_my_reports">Mis reportes</string>
+    <string name="nav_profile">Perfil</string>
+    <string name="nav_moderation">Moderación</string>
+    <string name="share_report_title">Reporte en Entorno: %1$s</string>
+    <string name="share_report_zone">Zona: %1$s</string>
+    <string name="share_report_chooser">Compartir reporte</string>
+</resources>

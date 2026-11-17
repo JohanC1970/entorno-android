@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.features.home
 
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.filter.LocationScope
@@ -33,7 +34,7 @@ data class HomeUiState(
     val userName: String = "",
     val reports: List<Report> = emptyList(),
     val isLoading: Boolean = true,
-    val errorMessage: String? = null,
+    val errorMessage: UiText? = null,
     val query: String = "",
     val selectedCategory: ReportCategory? = null,
     val scope: LocationScope = LocationScope.NEARBY,

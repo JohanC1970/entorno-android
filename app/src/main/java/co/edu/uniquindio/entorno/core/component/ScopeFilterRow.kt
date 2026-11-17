@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.core.component
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -23,7 +24,7 @@ fun ScopeFilterRow(
             FilterChip(
                 selected = selected == scope,
                 onClick = { onSelected(scope) },
-                label = { Text(scope.label) },
+                label = { Text(stringResource(scope.label)) },
                 colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }

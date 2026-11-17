@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.report
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import android.util.Log
 import android.net.Uri
 import androidx.lifecycle.SavedStateHandle
@@ -104,7 +106,7 @@ class CreateReportViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoadingReport = false,
-                        result = RequestResult.Failure("No puedes editar este reporte")
+                        result = RequestResult.Failure(UiText(R.string.create_cannot_edit))
                     )
                 }
                 return@launch
@@ -162,7 +164,7 @@ class CreateReportViewModel @Inject constructor(
 
             val session = sessionRepository.session.first()
             if (session == null) {
-                _uiState.update { it.copy(result = RequestResult.Failure("Debes iniciar sesión para publicar")) }
+                _uiState.update { it.copy(result = RequestResult.Failure(UiText(R.string.create_login_required))) }
                 return@launch
             }
 
@@ -208,7 +210,7 @@ class CreateReportViewModel @Inject constructor(
                 onFailure = { Result.failure(it) }
             )
 
-            val message = if (base == null) "Reporte enviado a verificación" else "Cambios guardados"
+            val message = UiText(if (base == null) R.string.create_success else R.string.edit_profile_saved)
             _uiState.update {
                 it.copy(
                     result = saved.fold(

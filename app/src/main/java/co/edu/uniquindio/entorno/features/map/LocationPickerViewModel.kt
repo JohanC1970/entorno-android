@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.map
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.location.AddressResolver
@@ -23,7 +25,7 @@ data class LocationPickerUiState(
     val address: String = "",
     val isResolving: Boolean = false,
     val isLocating: Boolean = false,
-    val message: String? = null
+    val message: UiText? = null
 )
 
 @HiltViewModel
@@ -59,7 +61,7 @@ class LocationPickerViewModel @Inject constructor(
             _uiState.update { it.copy(isLocating = false) }
             if (current == null) {
                 _uiState.update {
-                    it.copy(message = "No pudimos obtener tu ubicación. Activa el GPS o toca el mapa.")
+                    it.copy(message = UiText(R.string.picker_error_location))
                 }
             } else {
                 select(current)
@@ -69,7 +71,7 @@ class LocationPickerViewModel @Inject constructor(
     }
 
     fun onPermissionDenied() = _uiState.update {
-        it.copy(message = "Sin permiso de ubicación. Toca el mapa para elegir el punto.")
+        it.copy(message = UiText(R.string.picker_error_permission))
     }
 
     fun clearMessage() = _uiState.update { it.copy(message = null) }
@@ -90,7 +92,7 @@ class LocationPickerViewModel @Inject constructor(
                     address = resolved?.address.orEmpty(),
                     isResolving = false,
                     message = if (resolved == null) {
-                        "No pudimos obtener la dirección. Podrás escribirla a mano."
+                        UiText(R.string.picker_error_address)
                     } else it.message
                 )
             }

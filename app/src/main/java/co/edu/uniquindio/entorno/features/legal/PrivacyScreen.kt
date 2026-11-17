@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.legal
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,7 +24,7 @@ fun PrivacyScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Política de Privacidad",
+                        text = stringResource(R.string.privacy_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -32,7 +34,7 @@ fun PrivacyScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.action_back),
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -50,7 +52,7 @@ fun PrivacyScreen(
                 .padding(24.dp)
         ) {
             Text(
-                text = "Política de Privacidad de Entorno",
+                text = stringResource(R.string.privacy_heading),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -59,27 +61,27 @@ fun PrivacyScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Última actualización: " + java.time.LocalDate.now(),
+                text = stringResource(R.string.legal_last_update, java.time.LocalDate.now().toString()),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            SectionTitle("1. Información que Recopilamos")
-            SectionText("Para prestar nuestros servicios de seguridad comunitaria, recopilamos tu nombre, correo electrónico, ciudad, dirección y coordenadas de geolocalización cuando registras reportes en tu área.")
+            SectionTitle(stringResource(R.string.privacy_s1_title))
+            SectionText(stringResource(R.string.privacy_s1_body))
 
-            SectionTitle("2. Uso de la Información")
-            SectionText("Tus datos se utilizan exclusivamente para validar tus publicaciones, mostrar reportes relevantes en tu vecindario mediante mapas interactivos y enviar notificaciones importantes sobre el estado de tus incidentes.")
+            SectionTitle(stringResource(R.string.privacy_s2_title))
+            SectionText(stringResource(R.string.privacy_s2_body))
 
-            SectionTitle("3. Almacenamiento Seguro")
-            SectionText("Toda tu información está protegida mediante los protocolos de seguridad de Firebase Cloud Firestore y la autenticación cifrada de Firebase Auth.")
+            SectionTitle(stringResource(R.string.privacy_s3_title))
+            SectionText(stringResource(R.string.privacy_s3_body))
 
-            SectionTitle("4. Compartir Información")
-            SectionText("No vendemos ni comercializamos tus datos personales con terceros. Los reportes comunitarios son públicos de forma anónima o con el nombre del usuario para el bien común del vecindario.")
+            SectionTitle(stringResource(R.string.privacy_s4_title))
+            SectionText(stringResource(R.string.privacy_s4_body))
 
-            SectionTitle("5. Tus Derechos")
-            SectionText("Puedes actualizar o eliminar tus datos en cualquier momento accediendo a la configuración de tu perfil o solicitando la eliminación de tu cuenta.")
+            SectionTitle(stringResource(R.string.privacy_s5_title))
+            SectionText(stringResource(R.string.privacy_s5_body))
 
             Spacer(modifier = Modifier.height(32.dp))
         }

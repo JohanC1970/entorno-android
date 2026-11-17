@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -14,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.edu.uniquindio.entorno.core.navigation.AppNavigation
 import co.edu.uniquindio.entorno.core.theme.EntornoTheme
 import co.edu.uniquindio.entorno.core.theme.ThemeViewModel
+import co.edu.uniquindio.entorno.core.util.LocaleHelper
 import co.edu.uniquindio.entorno.domain.model.ThemeMode
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,6 +23,11 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     private val themeViewModel: ThemeViewModel by viewModels()
+
+    // Aplica el idioma elegido en Configuración antes de inflar cualquier texto.
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.profile
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -133,7 +136,7 @@ private fun ProfileContent(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "${usuario.address}  ·  ${usuario.city}",
+                        text = stringResource(R.string.profile_location, usuario.address, usuario.city),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -142,14 +145,14 @@ private fun ProfileContent(
                 IconButton(onClick = onSettingsClick) {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
-                        contentDescription = "Configuración",
+                        contentDescription = stringResource(R.string.profile_settings),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = onEditarClick) {
                     Icon(
                         imageVector = Icons.Outlined.Edit,
-                        contentDescription = "Editar perfil",
+                        contentDescription = stringResource(R.string.edit_profile_title),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -183,7 +186,7 @@ private fun ProfileContent(
                             ) {
                                 Icon(
                                     imageVector = Icons.Outlined.StarOutline,
-                                    contentDescription = "Nivel",
+                                    contentDescription = stringResource(R.string.profile_level),
                                     tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(24.dp)
                                 )
@@ -191,13 +194,13 @@ private fun ProfileContent(
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "NIVEL ACTUAL",
+                                    text = stringResource(R.string.profile_current_level),
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     letterSpacing = 1.sp
                                 )
                                 Text(
-                                    text = state.nivel.label,
+                                    text = state.nivel.localizedLabel(),
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface
@@ -212,7 +215,7 @@ private fun ProfileContent(
                                 color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                text = "puntos",
+                                text = stringResource(R.string.profile_points),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -239,13 +242,13 @@ private fun ProfileContent(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Faltan ${state.puntosParaSiguienteNivel} puntos",
+                            text = stringResource(R.string.profile_points_to_next, state.puntosParaSiguienteNivel),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        val siguienteLabel = state.siguienteNivel?.label ?: "Máximo"
+                        val siguienteLabel = state.siguienteNivel?.localizedLabel() ?: stringResource(R.string.profile_max)
                         Text(
-                            text = "Siguiente: $siguienteLabel",
+                            text = stringResource(R.string.profile_next, siguienteLabel),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -264,17 +267,17 @@ private fun ProfileContent(
             ) {
                 EstadisticaCard(
                     valor = "${state.reportesTotal}",
-                    etiqueta = "Reportes",
+                    etiqueta = stringResource(R.string.profile_stat_reports),
                     modifier = Modifier.weight(1f)
                 )
                 EstadisticaCard(
                     valor = "${state.verificados}",
-                    etiqueta = "Verificados",
+                    etiqueta = stringResource(R.string.profile_stat_verified),
                     modifier = Modifier.weight(1f)
                 )
                 EstadisticaCard(
                     valor = "${state.votosDados}",
-                    etiqueta = "Votos dados",
+                    etiqueta = stringResource(R.string.profile_stat_votes),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -290,13 +293,13 @@ private fun ProfileContent(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Insignias",
+                    text = stringResource(R.string.badges_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Ver todas",
+                    text = stringResource(R.string.profile_see_all),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.clickable(onClick = onBadgesClick)
@@ -319,7 +322,7 @@ private fun ProfileContent(
         item {
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Actividad reciente",
+                text = stringResource(R.string.profile_recent_activity),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -330,7 +333,7 @@ private fun ProfileContent(
         if (state.actividadReciente.isEmpty()) {
             item {
                 Text(
-                    text = "Cuando reportes o comentes, tu actividad aparecerá aquí.",
+                    text = stringResource(R.string.profile_activity_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
@@ -348,17 +351,17 @@ private fun ProfileContent(
         item {
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Comunidad",
+                text = stringResource(R.string.profile_community),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(start = 20.dp, bottom = 12.dp)
             )
         }
-        item { AccesoCard("Héroes comunitarios", "Ranking de ciudadanos del mes", onHeroesClick) }
-        item { AccesoCard("Estadísticas", "Reportes por categoría y zona", onStatsClick) }
+        item { AccesoCard(stringResource(R.string.profile_heroes), stringResource(R.string.profile_heroes_desc), onHeroesClick) }
+        item { AccesoCard(stringResource(R.string.profile_stats), stringResource(R.string.profile_stats_desc), onStatsClick) }
         if (state.esModerador) {
-            item { AccesoCard("Panel de moderador", "Publicaciones pendientes de revisión", onModeratorClick) }
+            item { AccesoCard(stringResource(R.string.profile_moderator_panel), stringResource(R.string.profile_moderator_panel_desc), onModeratorClick) }
         }
     }
 }
@@ -477,7 +480,7 @@ private fun InsigniaItem(insignia: InsigniaPerfil) {
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = insignia.nombre,
+                contentDescription = (insignia.badge?.localizedLabel() ?: insignia.nombre),
                 tint = iconColor,
                 modifier = Modifier.size(28.dp)
             )
@@ -486,7 +489,7 @@ private fun InsigniaItem(insignia: InsigniaPerfil) {
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = insignia.nombre,
+            text = (insignia.badge?.localizedLabel() ?: insignia.nombre),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -554,7 +557,7 @@ private fun ActividadCard(
             )
 
             Text(
-                text = actividad.tiempo,
+                text = actividad.tiempo.asString(),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

@@ -1,5 +1,16 @@
 package co.edu.uniquindio.entorno.features.settings
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.labelRes
+import co.edu.uniquindio.entorno.core.util.AppLanguage
+import co.edu.uniquindio.entorno.core.util.LocaleHelper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -36,6 +47,9 @@ fun SettingsScreen(
     val state by viewModel.uiState.collectAsState()
     val settings = state.settings
     var confirmLogout by remember { mutableStateOf(false) }
+    var chooseLanguage by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val currentLanguage = remember { LocaleHelper.current(context) }
 
     Column(
         modifier = Modifier
@@ -45,13 +59,13 @@ fun SettingsScreen(
             .navigationBarsPadding()
             .verticalScroll(rememberScrollState())
     ) {
-        ScreenHeader(title = "Configuración", onBack = onBack)
+        ScreenHeader(title = stringResource(R.string.settings_title), onBack = onBack)
 
         Column(
             modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 24.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            SectionLabel("CUENTA")
+            SectionLabel(stringResource(R.string.settings_section_account))
             SettingsCard {
                 Row(
                     modifier = Modifier.fillMaxWidth().clickable(onClick = onEditProfile).padding(16.dp),
@@ -87,23 +101,23 @@ fun SettingsScreen(
                     Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                NavRow(icon = { Icon(Icons.Filled.Lock, contentDescription = null) }, text = "Cambiar contraseña", onClick = onChangePassword)
+                NavRow(icon = { Icon(Icons.Filled.Lock, contentDescription = null) }, text = stringResource(R.string.settings_change_password), onClick = onChangePassword)
             }
 
-            SectionLabel("NOTIFICACIONES")
+            SectionLabel(stringResource(R.string.settings_section_notifications))
             SettingsCard {
-                SwitchRow("Comentarios en mis reportes", settings.notifyCommentsOnMyReports, viewModel::onNotifyCommentsChange)
+                SwitchRow(stringResource(R.string.settings_notify_comments), settings.notifyCommentsOnMyReports, viewModel::onNotifyCommentsChange)
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                SwitchRow("Cambios de nivel e insignias", settings.notifyLevelAndBadges, viewModel::onNotifyLevelChange)
+                SwitchRow(stringResource(R.string.settings_notify_level), settings.notifyLevelAndBadges, viewModel::onNotifyLevelChange)
             }
 
-            SectionLabel("PREFERENCIAS")
+            SectionLabel(stringResource(R.string.settings_section_preferences))
             SettingsCard {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Radio de alertas", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.settings_alert_radius), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
                         Text(
-                            text = "${settings.alertRadiusKm} km",
+                            text = stringResource(R.string.settings_radius_value, settings.alertRadiusKm),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -116,45 +130,49 @@ fun SettingsScreen(
                         steps = 8
                     )
                     Text(
-                        text = "Define cuántos reportes ves en el inicio y el mapa alrededor de tu zona.",
+                        text = stringResource(R.string.settings_radius_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier.fillMaxWidth().clickable { chooseLanguage = true }.padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Idioma", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
-                    Text("Español", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.settings_language), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(stringResource(currentLanguage.labelRes()), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.outline)
+                    }
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Modo oscuro", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.settings_dark_mode), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         ThemeMode.entries.forEach { mode ->
                             FilterChip(
                                 selected = state.themeMode == mode,
                                 onClick = { viewModel.onThemeChange(mode) },
-                                label = { Text(mode.label) }
+                                label = { Text(stringResource(mode.labelRes())) }
                             )
                         }
                     }
                 }
             }
 
-            SectionLabel("ACERCA DE")
+            SectionLabel(stringResource(R.string.settings_section_about))
             SettingsCard {
-                NavRow(text = "Términos y condiciones", onClick = onTerms)
+                NavRow(text = stringResource(R.string.settings_terms), onClick = onTerms)
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                NavRow(text = "Política de privacidad", onClick = onPrivacy)
+                NavRow(text = stringResource(R.string.settings_privacy), onClick = onPrivacy)
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Versión", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
+                    Text(stringResource(R.string.settings_version), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface)
                     Text("v1.0.0", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
@@ -167,7 +185,7 @@ fun SettingsScreen(
             ) {
                 Icon(Icons.AutoMirrored.Filled.Logout, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                 Spacer(Modifier.width(8.dp))
-                Text("Cerrar sesión", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.settings_logout), color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.SemiBold)
             }
         }
     }
@@ -175,17 +193,73 @@ fun SettingsScreen(
     if (confirmLogout) {
         AlertDialog(
             onDismissRequest = { confirmLogout = false },
-            title = { Text("Cerrar sesión") },
-            text = { Text("¿Seguro que quieres salir de tu cuenta?") },
+            title = { Text(stringResource(R.string.settings_logout)) },
+            text = { Text(stringResource(R.string.settings_logout_confirm)) },
             confirmButton = {
                 TextButton(onClick = {
                     confirmLogout = false
                     viewModel.logout()
-                }) { Text("Salir", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.settings_logout_action), color = MaterialTheme.colorScheme.error) }
             },
-            dismissButton = { TextButton(onClick = { confirmLogout = false }) { Text("Cancelar") } }
+            dismissButton = { TextButton(onClick = { confirmLogout = false }) { Text(stringResource(R.string.action_cancel)) } }
         )
     }
+
+    if (chooseLanguage) {
+        LanguageDialog(
+            selected = currentLanguage,
+            onDismiss = { chooseLanguage = false },
+            onSelect = { language ->
+                chooseLanguage = false
+                if (language != currentLanguage) {
+                    LocaleHelper.save(context, language)
+                    // Recrear la Activity vuelve a pasar por attachBaseContext con el idioma nuevo.
+                    context.findActivity()?.recreate()
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun LanguageDialog(
+    selected: AppLanguage,
+    onDismiss: () -> Unit,
+    onSelect: (AppLanguage) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_language_dialog_title)) },
+        text = {
+            Column {
+                AppLanguage.entries.forEach { language ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectable(
+                                selected = language == selected,
+                                onClick = { onSelect(language) },
+                                role = Role.RadioButton
+                            )
+                            .padding(vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(selected = language == selected, onClick = null)
+                        Spacer(Modifier.width(12.dp))
+                        Text(stringResource(language.labelRes()), style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } }
+    )
+}
+
+private tailrec fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
 }
 
 @Composable

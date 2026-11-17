@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.core.component
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,7 +33,7 @@ fun SeverityBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "SEVERIDAD",
+            text = stringResource(R.string.severity_title),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

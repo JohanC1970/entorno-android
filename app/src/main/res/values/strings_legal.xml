@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="legal_last_update">Última actualización: %1$s</string>
+    <string name="terms_title">Términos y Condiciones</string>
+    <string name="terms_heading">Términos de Servicio de Entorno</string>
+    <string name="terms_s1_title">1. Aceptación de los Términos</string>
+    <string name="terms_s1_body">Al registrarte o utilizar la plataforma Entorno, aceptas cumplir con los presentes Términos de Servicio. Si no estás de acuerdo con alguna de las cláusulas, no debes acceder a la aplicación.</string>
+    <string name="terms_s2_title">2. Uso de la Comunidad</string>
+    <string name="terms_s2_body">Entorno es una plataforma colaborativa para reportar incidencias comunitarias y de seguridad. Te comprometes a publicar únicamente información verídica, respetuosa y constructiva sobre eventos en tu vecindario.</string>
+    <string name="terms_s3_title">3. Contenido Prohibido</string>
+    <string name="terms_s3_body">Queda estrictamente prohibido la publicación de información falsa, difamatoria, lenguaje de odio, contenido acosador o material engañoso. La infracción de esta norma puede acarrear la suspensión definitiva de tu cuenta por parte de los moderadores.</string>
+    <string name="terms_s4_title">4. Moderación y Gamificación</string>
+    <string name="terms_s4_body">Los moderadores autorizados revisarán los reportes y asignarán insignias o puntos según la veracidad y utilidad de la información suministrada.</string>
+    <string name="terms_s5_title">5. Modificaciones</string>
+    <string name="terms_s5_body">Nos reservamos el derecho de actualizar estos términos en cualquier momento. Te notificaremos sobre cambios significativos a través de la aplicación.</string>
+    <string name="privacy_title">Política de Privacidad</string>
+    <string name="privacy_heading">Política de Privacidad de Entorno</string>
+    <string name="privacy_s1_title">1. Información que Recopilamos</string>
+    <string name="privacy_s1_body">Para prestar nuestros servicios de seguridad comunitaria, recopilamos tu nombre, correo electrónico, ciudad, dirección y coordenadas de geolocalización cuando registras reportes en tu área.</string>
+    <string name="privacy_s2_title">2. Uso de la Información</string>
+    <string name="privacy_s2_body">Tus datos se utilizan exclusivamente para validar tus publicaciones, mostrar reportes relevantes en tu vecindario mediante mapas interactivos y enviar notificaciones importantes sobre el estado de tus incidentes.</string>
+    <string name="privacy_s3_title">3. Almacenamiento Seguro</string>
+    <string name="privacy_s3_body">Toda tu información está protegida mediante los protocolos de seguridad de Firebase Cloud Firestore y la autenticación cifrada de Firebase Auth.</string>
+    <string name="privacy_s4_title">4. Compartir Información</string>
+    <string name="privacy_s4_body">No vendemos ni comercializamos tus datos personales con terceros. Los reportes comunitarios son públicos de forma anónima o con el nombre del usuario para el bien común del vecindario.</string>
+    <string name="privacy_s5_title">5. Tus Derechos</string>
+    <string name="privacy_s5_body">Puedes actualizar o eliminar tus datos en cualquier momento accediendo a la configuración de tu perfil o solicitando la eliminación de tu cuenta.</string>
+    <string name="notifications_mark_read">Marcar leídas</string>
+    <string name="notifications_filter_all">Todas</string>
+    <string name="notifications_filter_unread">Sin leer</string>
+    <string name="notifications_empty_unread">No tienes notificaciones sin leer.</string>
+    <string name="notifications_empty">Aún no tienes notificaciones.</string>
+</resources>

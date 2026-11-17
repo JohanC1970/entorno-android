@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.report
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -116,12 +119,12 @@ fun CommentsScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Conversación",
+                        text = stringResource(R.string.comments_conversation),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Más recientes",
+                        text = stringResource(R.string.comments_most_recent),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -166,18 +169,18 @@ private fun CommentsHeader(total: Int, onBack: () -> Unit) {
         IconButton(onClick = onBack) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Volver",
+                contentDescription = stringResource(R.string.action_back),
                 tint = MaterialTheme.colorScheme.onSurface
             )
         }
         Column {
             Text(
-                text = "Comentarios",
+                text = stringResource(R.string.comments_title),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "$total en total",
+                text = stringResource(R.string.comments_total, total),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -224,14 +227,14 @@ private fun ReportContextCard(report: Report, onViewReport: () -> Unit) {
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "${report.category.label} · ${report.status.labelForCitizen()}",
+                    text = stringResource(R.string.comments_category_status, report.category.localizedLabel(), report.status.labelForCitizen()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Spacer(Modifier.width(12.dp))
             Text(
-                text = "Ver",
+                text = stringResource(R.string.detail_view),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
@@ -259,14 +262,14 @@ private fun EmptyComments(modifier: Modifier = Modifier) {
         )
         Spacer(Modifier.size(12.dp))
         Text(
-            text = "Todavía no hay comentarios",
+            text = stringResource(R.string.comments_empty_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.size(4.dp))
         Text(
-            text = "Sé el primero en aportar algo sobre este reporte.",
+            text = stringResource(R.string.comments_empty_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -299,7 +302,7 @@ private fun CommentInputBar(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Respondiendo a ${replyingTo.authorName}",
+                        text = stringResource(R.string.comments_replying_to, replyingTo.authorName),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.weight(1f)
@@ -307,7 +310,7 @@ private fun CommentInputBar(
                     IconButton(onClick = onCancelReply) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Cancelar respuesta",
+                            contentDescription = stringResource(R.string.comments_cancel_reply),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -336,7 +339,7 @@ private fun CommentInputBar(
                     value = text,
                     onValueChange = { text = it },
                     modifier = Modifier.weight(1f),
-                    placeholder = { Text(if (replyingTo != null) "Escribe tu respuesta…" else "Escribe un comentario…") },
+                    placeholder = { Text(stringResource(if (replyingTo != null) R.string.comments_reply_placeholder else R.string.comments_placeholder)) },
                     shape = RoundedCornerShape(24.dp),
                     maxLines = 4
                 )
@@ -349,7 +352,7 @@ private fun CommentInputBar(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Enviar comentario"
+                        contentDescription = stringResource(R.string.comments_send)
                     )
                 }
             }
@@ -366,9 +369,10 @@ fun CommentsRoute(
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(state.errorMessage) {
         state.errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.clearError()
         }
     }

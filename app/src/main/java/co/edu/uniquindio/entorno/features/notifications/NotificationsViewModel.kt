@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.notifications
 
+import androidx.annotation.StringRes
+import co.edu.uniquindio.entorno.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.domain.model.AppNotification
@@ -15,9 +17,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-enum class NotificationFilter(val label: String) {
-    TODAS("Todas"),
-    SIN_LEER("Sin leer")
+enum class NotificationFilter(@StringRes val label: Int) {
+    TODAS(R.string.notifications_filter_all),
+    SIN_LEER(R.string.notifications_filter_unread)
 }
 
 data class NotificationsUiState(

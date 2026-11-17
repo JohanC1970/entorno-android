@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.community
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.labelRes
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.domain.model.User
@@ -23,7 +26,7 @@ data class HeroEntry(val rank: Int, val user: User)
 data class HeroesUiState(
     val ranking: List<HeroEntry> = emptyList(),
     val currentUserId: String = "",
-    val tip: String? = null
+    val tip: UiText? = null
 ) {
     val podium: List<HeroEntry> get() = ranking.take(3)
     val rest: List<HeroEntry> get() = ranking.drop(3)
@@ -50,20 +53,22 @@ class HeroesViewModel @Inject constructor(
         }
     }
 
-    private fun buildTip(ranking: List<HeroEntry>, currentId: String): String? {
+    private fun buildTip(ranking: List<HeroEntry>, currentId: String): UiText? {
         val me = ranking.firstOrNull { it.user.id == currentId } ?: return null
         val nextLevel = UserLevel.entries.getOrNull(me.user.level.ordinal + 1)
         val toNext = nextLevel?.let { it.minPoints - me.user.points }
         val fifth = ranking.getOrNull(TOP_N - 1)
         return when {
             me.rank <= TOP_N && toNext != null ->
-                "Estás en el top $TOP_N. Con $toNext puntos más subes a ${nextLevel.label}."
-            me.rank <= TOP_N -> "Estás en el top $TOP_N y ya tienes el nivel máximo."
+                UiText(R.string.heroes_tip_top_next, TOP_N, toNext, UiText(nextLevel.labelRes()))
+            me.rank <= TOP_N -> UiText(R.string.heroes_tip_top_max, TOP_N)
             toNext != null && fifth != null ->
-                "Con $toNext puntos más subes a ${nextLevel.label}; necesitas " +
-                    "${fifth.user.points - me.user.points + 1} para entrar al top $TOP_N."
+                UiText(
+                    R.string.heroes_tip_next_and_top,
+                    toNext, UiText(nextLevel.labelRes()), fifth.user.points - me.user.points + 1, TOP_N
+                )
             fifth != null ->
-                "Necesitas ${fifth.user.points - me.user.points + 1} puntos más para entrar al top $TOP_N."
+                UiText(R.string.heroes_tip_top, fifth.user.points - me.user.points + 1, TOP_N)
             else -> null
         }
     }

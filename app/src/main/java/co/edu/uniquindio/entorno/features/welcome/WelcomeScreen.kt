@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.welcome
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,7 +50,7 @@ fun WelcomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Entorno",
+                    text = stringResource(R.string.app_name),
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -57,7 +59,7 @@ fun WelcomeScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Tu comunidad, más segura",
+                    text = stringResource(R.string.welcome_tagline),
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -75,7 +77,7 @@ fun WelcomeScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Reporta lo que pasa en tu barrio — desde un robo hasta un hueco en la vía — y sigue en qué va cada caso.",
+                    text = stringResource(R.string.welcome_description),
                     fontSize = 15.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -97,7 +99,7 @@ fun WelcomeScreen(
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
-                        text = "Crear cuenta",
+                        text = stringResource(R.string.register_button),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -109,14 +111,14 @@ fun WelcomeScreen(
                 TextButton(onClick = onNavigateToLogin) {
                     val linkColor = MaterialTheme.colorScheme.primary
                     val loginText = buildAnnotatedString {
-                        append("¿Ya tienes cuenta? ")
+                        append(stringResource(R.string.welcome_have_account))
                         withStyle(
                             style = SpanStyle(
                                 color = linkColor,
                                 fontWeight = FontWeight.Bold
                             )
                         ) {
-                            append("Inicia sesión")
+                            append(stringResource(R.string.welcome_login))
                         }
                     }
                     Text(
@@ -131,7 +133,7 @@ fun WelcomeScreen(
                 // Texto legal de términos y privacidad interactivo
                 val linkColor = MaterialTheme.colorScheme.primary
                 val legalText = buildAnnotatedString {
-                    append("Al registrarte, aceptas nuestros ")
+                    append(stringResource(R.string.legal_welcome_prefix))
                     pushStringAnnotation(tag = "terms", annotation = "terms")
                     withStyle(
                         style = SpanStyle(
@@ -140,10 +142,10 @@ fun WelcomeScreen(
                             textDecoration = TextDecoration.Underline
                         )
                     ) {
-                        append("Términos")
+                        append(stringResource(R.string.legal_terms))
                     }
                     pop()
-                    append(" y la ")
+                    append(stringResource(R.string.legal_and))
                     pushStringAnnotation(tag = "privacy", annotation = "privacy")
                     withStyle(
                         style = SpanStyle(
@@ -152,7 +154,7 @@ fun WelcomeScreen(
                             textDecoration = TextDecoration.Underline
                         )
                     ) {
-                        append("Política de privacidad")
+                        append(stringResource(R.string.legal_privacy))
                     }
                     pop()
                     append(".")

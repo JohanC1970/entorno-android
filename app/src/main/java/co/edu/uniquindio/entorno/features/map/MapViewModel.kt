@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.map
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,14 +45,15 @@ data class MapUiState(
     val allDay: Boolean = true,
     /** Hora de inicio (0 a 23) de la franja de 3 horas cuando no es "todo el día". */
     val startHour: Int = 18,
-    val errorMessage: String? = null
+    val errorMessage: UiText? = null
 ) {
     /** Reportes que alimentan el mapa de calor: los del mapa, dentro de la franja elegida. */
     val heatReports: List<Report>
         get() = if (allDay) reports else reports.filter { inWindow(it.hourOfDay(), startHour) }
 
-    val windowLabel: String
-        get() = if (allDay) "Todo el día" else "${formatHour(startHour)} – ${formatHour((startHour + WINDOW_HOURS) % 24)}"
+    val windowLabel: UiText
+        get() = if (allDay) UiText(R.string.heat_all_day)
+        else UiText(R.string.heat_window_range, formatHour(startHour), formatHour((startHour + WINDOW_HOURS) % 24))
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)

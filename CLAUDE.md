@@ -60,6 +60,18 @@ co.edu.uniquindio.entorno/
 
 No traducir ni renombrar lo que ya existe.
 
+### Internacionalización (español / inglés)
+
+- Ningún texto visible va escrito en el código: va en `res/values/strings_*.xml` (español, idioma
+  por defecto) **y** en `res/values-en/strings_*.xml` (inglés), con la misma clave.
+- En composables: `stringResource(R.string.x)` / `pluralStringResource(...)`.
+- En ViewModels (no tienen el idioma de la Activity): exponer `UiText` (`core/util/UiText.kt`) y
+  resolverlo en la pantalla con `.asString()` (o `.asString(context)` dentro de `LaunchedEffect`).
+- Los `label` en español de los enums del dominio no se muestran directamente: usar
+  `localizedLabel()` / `labelRes()` de `core/component/StatusLabels.kt`.
+- El idioma se elige en Configuración y se guarda con `LocaleHelper` (`core/util/AppLanguage.kt`);
+  `MainActivity.attachBaseContext` lo aplica y la Activity se recrea al cambiarlo.
+
 ## Modelos del dominio (ya existentes)
 
 - `Report(id, title, description, category, location, status, imageUrls,

@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.core.component
 
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -34,9 +37,6 @@ import co.edu.uniquindio.entorno.domain.model.ReportCategory
 import co.edu.uniquindio.entorno.domain.model.ReportStatus
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.util.Locale
-
-private val dateFormatter = DateTimeFormatter.ofPattern("d MMM", Locale.forLanguageTag("es"))
 
 @Composable
 fun ReportCard(
@@ -44,6 +44,8 @@ fun ReportCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val locale = LocalConfiguration.current.locales[0]
+    val dateFormatter = remember(locale) { DateTimeFormatter.ofPattern("d MMM", locale) }
     Card(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
@@ -88,7 +90,7 @@ fun ReportCard(
             ) {
                 IconText(
                     icon = painterResource(R.drawable.ic_flag),
-                    text = "Es importante · ${report.importantCount}"
+                    text = stringResource(R.string.report_important_count, report.importantCount)
                 )
                 IconText(
                     icon = painterResource(R.drawable.ic_comment),
@@ -115,7 +117,7 @@ fun CategoryChip(category: ReportCategory) {
             )
             Spacer(Modifier.width(6.dp))
             Text(
-                text = category.label,
+                text = category.localizedLabel(),
                 style = MaterialTheme.typography.labelMedium,
                 color = colors.chipText
             )

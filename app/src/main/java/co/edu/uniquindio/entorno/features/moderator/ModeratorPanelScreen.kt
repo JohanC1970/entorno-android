@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.moderator
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
+import co.edu.uniquindio.entorno.core.util.toRelativeDate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -72,7 +76,7 @@ private fun ModeratorPanelContent(
         // Título
         item {
             Text(
-                text = "Publicaciones pendientes",
+                text = stringResource(R.string.moderator_pending_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground,
@@ -97,7 +101,7 @@ private fun ModeratorPanelContent(
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "${state.totalPendientes} pendientes",
+                        text = stringResource(R.string.moderator_pending_count, state.totalPendientes),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = pendingColors.text
@@ -107,7 +111,7 @@ private fun ModeratorPanelContent(
                 IconButton(onClick = { /* Filtro */ }) {
                     Icon(
                         imageVector = Icons.Outlined.FilterList,
-                        contentDescription = "Filtrar",
+                        contentDescription = stringResource(R.string.moderator_filter),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -161,7 +165,7 @@ private fun ReportePendienteCard(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "${reporte.category.label} · ${reporte.createdAt.toRelativeTime()}",
+                    text = stringResource(R.string.comments_category_status, reporte.category.localizedLabel(), reporte.createdAt.toRelativeTime().asString()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -184,7 +188,7 @@ private fun ThumbnailCategoria(category: ReportCategory) {
             .background(colors.chipBackground),
         contentAlignment = Alignment.Center
     ) {
-        Icon(category.icon(), contentDescription = category.label, tint = colors.icon)
+        Icon(category.icon(), contentDescription = category.localizedLabel(), tint = colors.icon)
     }
 }
 

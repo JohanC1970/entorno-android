@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.core.component
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -23,7 +25,7 @@ fun AuthHeader(
         AppLogo(size = 40)
         Spacer(modifier = Modifier.width(12.dp))
         Text(
-            text = "Entorno",
+            text = stringResource(R.string.app_name),
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground

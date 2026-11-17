@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.auth
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,14 +31,15 @@ fun ForgotPasswordScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(uiState.result) {
         when (val result = uiState.result) {
             is RequestResult.Success -> {
-                snackbarHostState.showSnackbar(result.message)
+                snackbarHostState.showSnackbar(result.message.asString(context))
                 viewModel.clearResult()
             }
             is RequestResult.Failure -> {
-                snackbarHostState.showSnackbar(result.errorMessage)
+                snackbarHostState.showSnackbar(result.errorMessage.asString(context))
                 viewModel.clearResult()
             }
             else -> Unit
@@ -58,7 +62,7 @@ fun ForgotPasswordScreen(
             IconButton(onClick = onBackClick, modifier = Modifier.padding(start = 0.dp)) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Volver",
+                    contentDescription = stringResource(R.string.action_back),
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
@@ -70,7 +74,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Recuperar contraseña",
+                text = stringResource(R.string.forgot_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -79,7 +83,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.",
+                text = stringResource(R.string.forgot_subtitle),
                 fontSize = 15.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -89,11 +93,11 @@ fun ForgotPasswordScreen(
             AppTextField(
                 value = uiState.email,
                 onValueChange = { viewModel.onEmailChange(it) },
-                label = "Correo electrónico",
-                placeholder = "ejemplo@uqvirtual.edu.co",
+                label = stringResource(R.string.field_email),
+                placeholder = stringResource(R.string.field_email_placeholder),
                 leadingIcon = Icons.Default.Email,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                errorMessage = uiState.emailError
+                errorMessage = uiState.emailError?.asString()
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -110,7 +114,7 @@ fun ForgotPasswordScreen(
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
                 } else {
                     Text(
-                        text = "Enviar enlace",
+                        text = stringResource(R.string.forgot_button),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )

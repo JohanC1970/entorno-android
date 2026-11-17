@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.core.util
 
+import co.edu.uniquindio.entorno.R
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.CancellationException
@@ -52,13 +53,26 @@ private const val DAY_MS = 24 * HOUR_MS
  * Formatea un epoch en milisegundos como tiempo relativo: "ahora", "hace 45 min",
  * "hace 3 h", "hace 2 días". Un valor sin asignar (<= 0) o a futuro (p. ej. un
  * timestamp de servidor que aún no llega) se muestra como "ahora".
+ * Devuelve [UiText] para que la pantalla lo muestre en el idioma elegido.
  */
-fun Long.toRelativeTime(now: Long = System.currentTimeMillis()): String {
+fun Long.toRelativeTime(now: Long = System.currentTimeMillis()): UiText {
     val elapsed = if (this <= 0L) 0L else now - this
     return when {
-        elapsed < MINUTE_MS -> "ahora"
-        elapsed < HOUR_MS -> "hace ${elapsed / MINUTE_MS} min"
-        elapsed < DAY_MS -> "hace ${elapsed / HOUR_MS} h"
-        else -> (elapsed / DAY_MS).let { days -> if (days == 1L) "hace 1 día" else "hace $days días" }
+        elapsed < MINUTE_MS -> UiText(R.string.time_now)
+        elapsed < HOUR_MS -> (elapsed / MINUTE_MS).toInt().let { UiText.plural(R.plurals.time_minutes_ago, it, it) }
+        elapsed < DAY_MS -> (elapsed / HOUR_MS).toInt().let { UiText.plural(R.plurals.time_hours_ago, it, it) }
+        else -> (elapsed / DAY_MS).toInt().let { UiText.plural(R.plurals.time_days_ago, it, it) }
+    }
+}
+
+/** Fecha relativa por días: "hoy", "ayer", "hace 3 días", "hace 2 semanas"... */
+fun java.time.LocalDate.toRelativeDate(today: java.time.LocalDate = java.time.LocalDate.now()): UiText {
+    val days = java.time.temporal.ChronoUnit.DAYS.between(this, today).toInt().coerceAtLeast(0)
+    return when {
+        days == 0 -> UiText(R.string.time_today)
+        days == 1 -> UiText(R.string.time_yesterday)
+        days < 7 -> UiText.plural(R.plurals.time_days_ago, days, days)
+        days < 30 -> (days / 7).let { UiText.plural(R.plurals.time_weeks_ago, it, it) }
+        else -> (days / 30).let { UiText.plural(R.plurals.time_months_ago, it, it) }
     }
 }

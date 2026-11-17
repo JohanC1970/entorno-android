@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.home
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -74,9 +78,10 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.clearError()
         }
     }
@@ -115,7 +120,7 @@ fun HomeContent(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Crear reporte")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.home_create_report))
             }
         }
     ) { innerPadding ->
@@ -135,9 +140,9 @@ fun HomeContent(
             when (uiState.scope) {
                 LocationScope.NEARBY -> if (uiState.radiusKm > 0) {
                     item {
-                        val hidden = if (uiState.hiddenByScope > 0) " · ${uiState.hiddenByScope} fuera del radio" else ""
+                        val hidden = if (uiState.hiddenByScope > 0) stringResource(R.string.home_hidden_by_radius, uiState.hiddenByScope) else ""
                         Text(
-                            text = "Mostrando reportes a menos de ${uiState.radiusKm} km$hidden",
+                            text = stringResource(R.string.home_showing_radius, uiState.radiusKm, hidden),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -145,7 +150,7 @@ fun HomeContent(
                 }
                 LocationScope.NEIGHBORHOOD -> item {
                     Text(
-                        text = "Mostrando reportes de ${uiState.neighborhood}",
+                        text = stringResource(R.string.home_showing_neighborhood, uiState.neighborhood),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -166,12 +171,12 @@ fun HomeContent(
                     Text(
                         text = when {
                             uiState.query.isNotBlank() || uiState.selectedCategory != null ->
-                                "No encontramos reportes con esos filtros"
+                                stringResource(R.string.home_empty_filtered)
                             uiState.scope == LocationScope.NEIGHBORHOOD ->
-                                "Aún no hay reportes en tu barrio"
+                                stringResource(R.string.home_empty_neighborhood)
                             uiState.scope == LocationScope.NEARBY ->
-                                "Aún no hay reportes cerca de ti"
-                            else -> "Aún no hay reportes en la ciudad"
+                                stringResource(R.string.home_empty_nearby)
+                            else -> stringResource(R.string.home_empty_city)
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -191,9 +196,9 @@ fun HomeContent(
 private fun Greeting(userName: String, unreadCount: Int, onNotificationsClick: () -> Unit) {
     val hour = java.time.LocalTime.now().hour
     val greeting = when {
-        hour < 12 -> "Buenos días"
-        hour < 19 -> "Buenas tardes"
-        else -> "Buenas noches"
+        hour < 12 -> stringResource(R.string.home_good_morning)
+        hour < 19 -> stringResource(R.string.home_good_afternoon)
+        else -> stringResource(R.string.home_good_evening)
     }
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -234,7 +239,7 @@ private fun Greeting(userName: String, unreadCount: Int, onNotificationsClick: (
         ) {
             Icon(
                 imageVector = Icons.Default.Notifications,
-                contentDescription = "Notificaciones",
+                contentDescription = stringResource(R.string.home_notifications),
                 tint = MaterialTheme.colorScheme.onBackground
             )
             if (unreadCount > 0) {
@@ -257,12 +262,12 @@ private fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
         value = query,
         onValueChange = onQueryChange,
         modifier = Modifier.fillMaxWidth(),
-        placeholder = { Text("Buscar en tu zona") },
+        placeholder = { Text(stringResource(R.string.home_search_placeholder)) },
         leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = null) },
         trailingIcon = {
             if (query.isNotEmpty()) {
                 IconButton(onClick = { onQueryChange("") }) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Borrar búsqueda")
+                    Icon(imageVector = Icons.Default.Close, contentDescription = stringResource(R.string.home_clear_search))
                 }
             }
         },
@@ -284,7 +289,7 @@ private fun CategoryFilters(selected: ReportCategory?, onSelected: (ReportCatego
             FilterChip(
                 selected = selected == null,
                 onClick = { onSelected(null) },
-                label = { Text("Todos") },
+                label = { Text(stringResource(R.string.home_filter_all)) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = MaterialTheme.colorScheme.primary,
                     selectedLabelColor = MaterialTheme.colorScheme.onPrimary
@@ -296,7 +301,7 @@ private fun CategoryFilters(selected: ReportCategory?, onSelected: (ReportCatego
             FilterChip(
                 selected = selected == category,
                 onClick = { onSelected(if (selected == category) null else category) },
-                label = { Text(category.label) },
+                label = { Text(category.localizedLabel()) },
                 leadingIcon = {
                     Icon(
                         imageVector = category.icon(),
@@ -326,12 +331,12 @@ private fun SectionHeader(onMapClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Reportes cerca de ti",
+            text = stringResource(R.string.home_nearby_title),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground
         )
         Text(
-            text = "Ver mapa",
+            text = stringResource(R.string.home_see_map),
             style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.clickable(onClick = onMapClick)

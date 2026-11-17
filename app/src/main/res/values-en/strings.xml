@@ -1,0 +1,97 @@
+<resources>
+    <!-- Common actions -->
+    <string name="action_back">Back</string>
+    <string name="action_close">Close</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
+    <string name="action_send">Send</string>
+    <string name="action_retry">Retry</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_search">Search</string>
+    <string name="action_see_all">See all</string>
+
+    <!-- Report status -->
+    <string name="status_in_review">Under review</string>
+    <string name="status_pending">Pending</string>
+    <string name="status_verified">Verified</string>
+    <string name="status_rejected">Rejected</string>
+    <string name="status_resolved">Resolved</string>
+
+    <!-- Severity -->
+    <string name="severity_low">Low</string>
+    <string name="severity_medium">Medium</string>
+    <string name="severity_high">High</string>
+
+    <!-- Categories -->
+    <string name="category_security">Security</string>
+    <string name="category_medical">Medical emergencies</string>
+    <string name="category_infrastructure">Infrastructure</string>
+    <string name="category_pets">Pets</string>
+    <string name="category_community">Community</string>
+
+    <!-- Levels -->
+    <string name="level_novice">Newcomer</string>
+    <string name="level_collaborator">Contributor</string>
+    <string name="level_guardian">Guardian</string>
+    <string name="level_community_hero">Community Hero</string>
+
+    <!-- Badges -->
+    <string name="badge_first_report">First report</string>
+    <string name="badge_first_report_desc">You created your first report</string>
+    <string name="badge_first_comment">First contribution</string>
+    <string name="badge_first_comment_desc">You posted your first comment</string>
+    <string name="badge_trusted_citizen">Trusted citizen</string>
+    <string name="badge_trusted_citizen_desc">10 verified reports</string>
+    <string name="badge_top_of_month">Top of the month</string>
+    <string name="badge_top_of_month_desc">Your report was the most voted this month</string>
+
+    <!-- Theme and language -->
+    <string name="theme_system">System default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="language_system">System default</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Something went wrong</string>
+    <string name="error_unexpected">Something unexpected happened. Please try again</string>
+    <string name="error_no_connection">No internet connection. Please try again</string>
+    <string name="error_no_account">There is no account with that email</string>
+    <string name="error_invalid_credentials">Incorrect email or password</string>
+    <string name="error_email_in_use">An account with this email already exists</string>
+    <string name="error_weak_password">The password is too weak</string>
+    <string name="error_email_required">Email is required</string>
+    <string name="error_email_invalid">Invalid email</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_password_min">At least 6 characters</string>
+    <string name="error_passwords_mismatch">Passwords do not match</string>
+    <string name="error_name_required">Name is required</string>
+    <string name="error_city_required">City is required</string>
+    <string name="error_address_required">Address is required</string>
+
+    <!-- Relative time -->
+    <string name="time_now">just now</string>
+    <string name="time_yesterday">yesterday</string>
+    <string name="time_today">today</string>
+    <plurals name="time_minutes_ago">
+        <item quantity="one">%d min ago</item>
+        <item quantity="other">%d min ago</item>
+    </plurals>
+    <plurals name="time_hours_ago">
+        <item quantity="one">%d h ago</item>
+        <item quantity="other">%d h ago</item>
+    </plurals>
+    <plurals name="time_days_ago">
+        <item quantity="one">%d day ago</item>
+        <item quantity="other">%d days ago</item>
+    </plurals>
+    <plurals name="time_weeks_ago">
+        <item quantity="one">%d week ago</item>
+        <item quantity="other">%d weeks ago</item>
+    </plurals>
+    <plurals name="time_months_ago">
+        <item quantity="one">%d month ago</item>
+        <item quantity="other">%d months ago</item>
+    </plurals>
+</resources>

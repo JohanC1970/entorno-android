@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="report_important_count">Important · %1$d</string>
+    <string name="comment_you">You · %1$s</string>
+    <string name="comment_useful">Helpful · %1$d</string>
+    <string name="comment_reply">Reply</string>
+    <string name="comment_moderator_tag">MODERATOR</string>
+    <string name="auth_tab_login">Log in</string>
+    <string name="auth_tab_register">Sign up</string>
+    <string name="severity_title">SEVERITY</string>
+    <string name="app_logo_description">Entorno logo</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_map">Map</string>
+    <string name="nav_my_reports">My reports</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_moderation">Moderation</string>
+    <string name="share_report_title">Report on Entorno: %1$s</string>
+    <string name="share_report_zone">Area: %1$s</string>
+    <string name="share_report_chooser">Share report</string>
+</resources>

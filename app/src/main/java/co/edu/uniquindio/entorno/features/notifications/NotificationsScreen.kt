@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.notifications
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -102,19 +105,19 @@ private fun NotificationsContent(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver",
+                        contentDescription = stringResource(R.string.action_back),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
-                    text = "Notificaciones",
+                    text = stringResource(R.string.home_notifications),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = "Marcar leídas",
+                    text = stringResource(R.string.notifications_mark_read),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
@@ -136,7 +139,7 @@ private fun NotificationsContent(
                         label = {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    text = filtro.label,
+                                    text = stringResource(filtro.label),
                                     style = MaterialTheme.typography.labelLarge,
                                     fontWeight = if (state.filtroActual == filtro)
                                         FontWeight.SemiBold else FontWeight.Normal
@@ -183,7 +186,7 @@ private fun NotificationsContent(
             item {
                 Text(
                     text = if (state.filtroActual == NotificationFilter.SIN_LEER)
-                        "No tienes notificaciones sin leer." else "Aún no tienes notificaciones.",
+                        stringResource(R.string.notifications_empty_unread) else stringResource(R.string.notifications_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 24.dp)
@@ -243,7 +246,7 @@ private fun NotificacionCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = notificacion.createdAt.toRelativeTime(),
+                    text = notificacion.createdAt.toRelativeTime().asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

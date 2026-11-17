@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="comments_conversation">Conversation</string>
+    <string name="comments_most_recent">Most recent</string>
+    <string name="comments_title">Comments</string>
+    <string name="comments_total">%1$d in total</string>
+    <string name="comments_category_status">%1$s · %2$s</string>
+    <string name="comments_empty_title">No comments yet</string>
+    <string name="comments_empty_body">Be the first to add something about this report.</string>
+    <string name="comments_replying_to">Replying to %1$s</string>
+    <string name="comments_cancel_reply">Cancel reply</string>
+    <string name="comments_reply_placeholder">Write your reply…</string>
+    <string name="comments_placeholder">Write a comment…</string>
+    <string name="comments_send">Send comment</string>
+    <string name="comments_login_required">You must log in to comment</string>
+    <string name="create_title">Create report</string>
+    <string name="create_publishing">Publishing…</string>
+    <string name="create_publish">Publish report</string>
+    <string name="create_section_category">CATEGORY</string>
+    <string name="create_section_details">DETAILS</string>
+    <string name="create_title_placeholder">What is happening?</string>
+    <string name="create_description_placeholder">Describe what happened, since when and who it affects</string>
+    <string name="create_description_counter">%1$d / %2$d</string>
+    <string name="create_section_photos">PHOTOS · AT LEAST ONE</string>
+    <string name="create_section_location">LOCATION</string>
+    <string name="create_selected">Selected</string>
+    <string name="create_photo">Report photo</string>
+    <string name="create_remove_photo">Remove photo</string>
+    <string name="create_add_photo">Add</string>
+    <string name="create_location_value">Location: %1$s</string>
+    <string name="create_change_location">Change</string>
+    <string name="create_login_required">You must log in to publish</string>
+    <string name="create_success">Report sent for review</string>
+</resources>

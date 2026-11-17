@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Settings</string>
+    <string name="settings_section_account">ACCOUNT</string>
+    <string name="settings_change_password">Change password</string>
+    <string name="settings_section_notifications">NOTIFICATIONS</string>
+    <string name="settings_notify_nearby">Reports near me</string>
+    <string name="settings_notify_comments">Comments on my reports</string>
+    <string name="settings_notify_level">Level and badge updates</string>
+    <string name="settings_section_preferences">PREFERENCES</string>
+    <string name="settings_alert_radius">Alert radius</string>
+    <string name="settings_radius_value">%1$d km</string>
+    <string name="settings_radius_hint">Sets how many reports you see on the home feed and map around your area.</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_dialog_title">Choose language</string>
+    <string name="settings_dark_mode">Dark mode</string>
+    <string name="settings_section_about">ABOUT</string>
+    <string name="settings_terms">Terms and conditions</string>
+    <string name="settings_privacy">Privacy policy</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_logout">Log out</string>
+    <string name="settings_logout_confirm">Are you sure you want to log out?</string>
+    <string name="settings_logout_action">Log out</string>
+</resources>

@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.moderator
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -57,9 +61,10 @@ fun ReviewReportScreen(
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(state.mensajeError) {
         state.mensajeError?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.mensajeMostrado()
         }
     }
@@ -111,12 +116,12 @@ private fun ReviewReportContent(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver",
+                        contentDescription = stringResource(R.string.action_back),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
-                    text = "Revisar publicación",
+                    text = stringResource(R.string.review_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -161,7 +166,7 @@ private fun ReviewReportContent(
                         .padding(horizontal = 10.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = reporte.category.label,
+                        text = reporte.category.localizedLabel(),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -208,7 +213,7 @@ private fun ReviewReportContent(
             ) {
                 Column(modifier = Modifier.padding(14.dp)) {
                     Text(
-                        text = "Ubicación",
+                        text = stringResource(R.string.review_location),
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -228,7 +233,7 @@ private fun ReviewReportContent(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
             ) {
                 Text(
-                    text = "Motivo del rechazo (obligatorio si rechazas)",
+                    text = stringResource(R.string.review_reason_label),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 6.dp)
@@ -243,7 +248,7 @@ private fun ReviewReportContent(
                     shape = RoundedCornerShape(12.dp),
                     placeholder = {
                         Text(
-                            text = "Ej. La imagen no corresponde a la ubicación reportada",
+                            text = stringResource(R.string.review_reason_placeholder),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                         )
@@ -281,7 +286,7 @@ private fun ReviewReportContent(
                     enabled = !state.rechazando && !state.verificando
                 ) {
                     Text(
-                        text = "Rechazar",
+                        text = stringResource(R.string.review_reject),
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -296,7 +301,7 @@ private fun ReviewReportContent(
                     enabled = !state.verificando && !state.rechazando
                 ) {
                     Text(
-                        text = "Verificar",
+                        text = stringResource(R.string.review_verify),
                         fontWeight = FontWeight.SemiBold
                     )
                 }

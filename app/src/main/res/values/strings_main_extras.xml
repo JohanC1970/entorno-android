@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scope_all">Toda la ciudad</string>
+    <string name="scope_nearby">Cercanos</string>
+    <string name="scope_neighborhood">Mi barrio</string>
+    <string name="home_showing_neighborhood">Mostrando reportes de %1$s</string>
+    <string name="home_empty_neighborhood">Aún no hay reportes en tu barrio</string>
+    <string name="home_empty_nearby">Aún no hay reportes cerca de ti</string>
+    <string name="home_empty_city">Aún no hay reportes en la ciudad</string>
+    <string name="register_pick_location">Elegir mi ubicación en el mapa</string>
+    <string name="register_location_chosen">Ubicación elegida · Cambiar</string>
+    <string name="picker_subtitle_gps">Usa el GPS o toca el mapa</string>
+    <string name="picker_use_current">Usar mi ubicación actual</string>
+    <string name="picker_tap_map">Toca el mapa para elegir un punto</string>
+    <string name="picker_resolving">Buscando dirección…</string>
+    <string name="picker_no_address">Dirección no disponible</string>
+    <string name="picker_no_city">Ciudad no disponible</string>
+    <string name="picker_city_coords">%1$s · %2$s</string>
+    <string name="picker_error_location">No pudimos obtener tu ubicación. Activa el GPS o toca el mapa.</string>
+    <string name="picker_error_permission">Sin permiso de ubicación. Toca el mapa para elegir el punto.</string>
+    <string name="picker_error_address">No pudimos obtener la dirección. Podrás escribirla a mano.</string>
+    <string name="map_hide_heat">Ocultar mapa de calor</string>
+    <string name="map_show_heat">Mostrar mapa de calor</string>
+    <string name="heat_total">Mapa de calor · %1$d reportes</string>
+    <string name="heat_low_density">Baja densidad</string>
+    <string name="heat_high_density">Alta densidad</string>
+    <string name="edit_profile_email_readonly">Correo electrónico (no editable)</string>
+    <string name="duplicates_title">¿Ya lo reportaron?</string>
+    <string name="duplicates_body">Estos reportes cercanos parecen ser el mismo evento. Marcarlo como importante o comentar ayuda más que crear uno nuevo.</string>
+    <string name="duplicates_publish_anyway">Publicar de todos modos</string>
+    <string name="duplicates_keep_editing">Seguir editando</string>
+    <string name="edit_report_title">Editar reporte</string>
+    <string name="edit_report_saving">Guardando…</string>
+    <string name="create_choose_where">Elige dónde ocurrió</string>
+    <string name="create_location_chosen">Ubicación elegida</string>
+    <string name="create_tap_choose">Toca «Elegir» para abrir el mapa</string>
+    <string name="create_choose">Elegir</string>
+    <string name="create_cannot_edit">No puedes editar este reporte</string>
+    <string name="detail_edit">Editar</string>
+    <string name="detail_delete_title">Eliminar reporte</string>
+    <string name="detail_delete_body">Se borrarán también sus comentarios y votos. Esta acción no se puede deshacer.</string>
+</resources>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="edit_profile_saved">Cambios guardados</string>
+    <string name="edit_profile_delete_title">Eliminar mi cuenta</string>
+    <string name="edit_profile_delete_body">Esta acción no se puede deshacer. Escribe tu contraseña para confirmar.</string>
+    <string name="edit_profile_title">Editar perfil</string>
+    <string name="edit_profile_change_photo">Cambiar foto</string>
+    <string name="edit_profile_phone">Teléfono</string>
+    <string name="edit_profile_neighborhood">Barrio / zona</string>
+    <string name="edit_profile_password_required">Escribe tu contraseña para confirmar</string>
+    <string name="badges_screen_title">Insignias y nivel</string>
+    <string name="badges_title">Insignias</string>
+    <string name="badges_points_progress">%1$d / %2$d pts</string>
+    <string name="badges_points">%1$d pts</string>
+    <string name="badges_points_missing">Te faltan %1$d puntos para ser %2$s.</string>
+    <string name="badges_max_level">Alcanzaste el nivel máximo. ¡Gracias por cuidar tu comunidad!</string>
+    <string name="profile_location">"%1$s  ·  %2$s"</string>
+    <string name="profile_settings">Configuración</string>
+    <string name="profile_level">Nivel</string>
+    <string name="profile_current_level">NIVEL ACTUAL</string>
+    <string name="profile_points">puntos</string>
+    <string name="profile_points_to_next">Faltan %1$d puntos</string>
+    <string name="profile_max">Máximo</string>
+    <string name="profile_next">Siguiente: %1$s</string>
+    <string name="profile_stat_reports">Reportes</string>
+    <string name="profile_stat_verified">Verificados</string>
+    <string name="profile_stat_votes">Votos dados</string>
+    <string name="profile_see_all">Ver todas</string>
+    <string name="profile_recent_activity">Actividad reciente</string>
+    <string name="profile_activity_empty">Cuando reportes o comentes, tu actividad aparecerá aquí.</string>
+    <string name="profile_community">Comunidad</string>
+    <string name="profile_heroes">Héroes comunitarios</string>
+    <string name="profile_heroes_desc">Ranking de ciudadanos del mes</string>
+    <string name="profile_stats">Estadísticas</string>
+    <string name="profile_stats_desc">Reportes por categoría y zona</string>
+    <string name="profile_moderator_panel">Panel de moderador</string>
+    <string name="profile_moderator_panel_desc">Publicaciones pendientes de revisión</string>
+    <string name="heroes_subtitle">Armenia · este mes</string>
+    <string name="heroes_empty">Aún no hay ciudadanos en el ranking.</string>
+    <string name="heroes_points">%1$d pts</string>
+    <string name="heroes_you">Tú · %1$s</string>
+    <string name="heroes_tip_top_next">Estás en el top %1$d. Con %2$d puntos más subes a %3$s.</string>
+    <string name="heroes_tip_top_max">Estás en el top %1$d y ya tienes el nivel máximo.</string>
+    <string name="heroes_tip_next_and_top">Con %1$d puntos más subes a %2$s; necesitas %3$d para entrar al top %4$d.</string>
+    <string name="heroes_tip_top">Necesitas %1$d puntos más para entrar al top %2$d.</string>
+</resources>

@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.profile
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedDescription
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,7 +47,7 @@ fun InsigniasScreen(
     val state by viewModel.uiState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().navigationBarsPadding()) {
-        ScreenHeader(title = "Insignias y nivel", onBack = onBack)
+        ScreenHeader(title = stringResource(R.string.badges_screen_title), onBack = onBack)
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
@@ -52,7 +56,7 @@ fun InsigniasScreen(
         item { LevelCard(state) }
         item {
             Text(
-                text = "Insignias",
+                text = stringResource(R.string.badges_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -85,14 +89,14 @@ private fun LevelCard(state: InsigniasUiState) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = state.level.label,
+                    text = state.level.localizedLabel(),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 val next = state.nextLevel
                 Text(
-                    text = if (next != null) "${state.points} / ${next.minPoints} pts" else "${state.points} pts",
+                    text = if (next != null) stringResource(R.string.badges_points_progress, state.points, next.minPoints) else stringResource(R.string.badges_points, state.points),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -107,7 +111,7 @@ private fun LevelCard(state: InsigniasUiState) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 UserLevel.entries.forEach { level ->
                     Text(
-                        text = level.label.substringBefore(" "),
+                        text = level.localizedLabel().substringBefore(" "),
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = if (level == state.level) FontWeight.Bold else FontWeight.Normal,
                         color = if (level == state.level) MaterialTheme.colorScheme.primary
@@ -117,8 +121,8 @@ private fun LevelCard(state: InsigniasUiState) {
             }
             val next = state.nextLevel
             Text(
-                text = if (next != null) "Te faltan ${next.minPoints - state.points} puntos para ser ${next.label}."
-                else "Alcanzaste el nivel máximo. ¡Gracias por cuidar tu comunidad!",
+                text = if (next != null) stringResource(R.string.badges_points_missing, next.minPoints - state.points, next.localizedLabel())
+                else stringResource(R.string.badges_max_level),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -156,14 +160,14 @@ private fun BadgeCard(detail: BadgeDetail, modifier: Modifier = Modifier) {
                 )
             }
             Text(
-                text = detail.badge.label,
+                text = detail.badge.localizedLabel(),
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = detail.badge.description,
+                text = detail.badge.localizedDescription(),
                 style = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant

@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.auth
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.RequestResult
@@ -16,7 +18,7 @@ import jakarta.inject.Inject
 
 data class ForgotPasswordUiState(
     val email: String = "",
-    val emailError: String? = null,
+    val emailError: UiText? = null,
     val result: RequestResult? = null
 ) {
     val isFormValid: Boolean get() = email.isNotBlank() && emailError == null
@@ -41,7 +43,7 @@ class ForgotPasswordViewModel @Inject constructor(
             _uiState.update { it.copy(result = RequestResult.Loading) }
             val result = sendPasswordResetUseCase(s.email).fold(
                 // Mensaje neutro: no revela si el correo tiene cuenta o no
-                onSuccess = { RequestResult.Success("Si el correo está registrado, recibirás un enlace para restablecer tu contraseña") },
+                onSuccess = { RequestResult.Success(UiText(R.string.forgot_success)) },
                 onFailure = { RequestResult.Failure(it.toUserMessage()) }
             )
             _uiState.update { it.copy(result = result) }

@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.map
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -76,7 +78,7 @@ fun LocationPickerScreen(
     }
     LaunchedEffect(state.message) {
         state.message?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.clearMessage()
         }
     }
@@ -114,8 +116,8 @@ fun LocationPickerScreen(
             modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding().padding(12.dp)
         ) {
             ScreenHeader(
-                title = "Elegir ubicación",
-                subtitle = "Usa el GPS o toca el mapa",
+                title = stringResource(R.string.picker_title),
+                subtitle = stringResource(R.string.picker_subtitle_gps),
                 onBack = onBack
             )
         }
@@ -130,7 +132,7 @@ fun LocationPickerScreen(
             if (state.isLocating) {
                 CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
             } else {
-                Icon(Icons.Filled.MyLocation, contentDescription = "Usar mi ubicación actual")
+                Icon(Icons.Filled.MyLocation, contentDescription = stringResource(R.string.picker_use_current))
             }
         }
 
@@ -146,10 +148,10 @@ fun LocationPickerScreen(
             ) {
                 Text(
                     text = when {
-                        picked == null -> "Toca el mapa para elegir un punto"
-                        state.isResolving -> "Buscando dirección…"
+                        picked == null -> stringResource(R.string.picker_tap_map)
+                        state.isResolving -> stringResource(R.string.picker_resolving)
                         state.address.isNotBlank() -> state.address
-                        else -> "Dirección no disponible"
+                        else -> stringResource(R.string.picker_no_address)
                     },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
@@ -157,7 +159,7 @@ fun LocationPickerScreen(
                 )
                 if (picked != null) {
                     Text(
-                        text = "${state.city.ifBlank { "Ciudad no disponible" }} · ${Geo.format(picked)}",
+                        text = stringResource(R.string.picker_city_coords, state.city.ifBlank { stringResource(R.string.picker_no_city) }, Geo.format(picked)),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -170,7 +172,7 @@ fun LocationPickerScreen(
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth().height(52.dp)
                 ) {
-                    Text("Usar esta ubicación", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.picker_use), fontWeight = FontWeight.SemiBold)
                 }
             }
         }

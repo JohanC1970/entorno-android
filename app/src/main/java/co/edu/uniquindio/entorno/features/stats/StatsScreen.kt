@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.stats
 
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -24,7 +28,7 @@ fun StatsScreen(
     val state by viewModel.uiState.collectAsState()
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().navigationBarsPadding()) {
-        ScreenHeader(title = "Estadísticas", subtitle = "Armenia · últimos 30 días", onBack = onBack)
+        ScreenHeader(title = stringResource(R.string.profile_stats), subtitle = stringResource(R.string.stats_subtitle), onBack = onBack)
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 24.dp),
@@ -33,21 +37,21 @@ fun StatsScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatCard("Reportes activos", "${state.activos}", highlighted = true, modifier = Modifier.weight(1f))
-                    StatCard("Resueltos", "${state.resueltos}", modifier = Modifier.weight(1f))
+                    StatCard(stringResource(R.string.stats_active_reports), "${state.activos}", highlighted = true, modifier = Modifier.weight(1f))
+                    StatCard(stringResource(R.string.filter_resolved), "${state.resueltos}", modifier = Modifier.weight(1f))
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    StatCard("Ciudadanos activos", "${state.ciudadanosActivos}", modifier = Modifier.weight(1f))
-                    StatCard("Tasa de resolución", "${state.tasaResolucion} %", modifier = Modifier.weight(1f))
+                    StatCard(stringResource(R.string.stats_active_citizens), "${state.ciudadanosActivos}", modifier = Modifier.weight(1f))
+                    StatCard(stringResource(R.string.stats_resolution_rate), stringResource(R.string.stats_percent, state.tasaResolucion), modifier = Modifier.weight(1f))
                 }
             }
         }
         item {
-            SectionCard(title = "Reportes por categoría", trailing = "${state.totalCategorias} total") {
+            SectionCard(title = stringResource(R.string.stats_by_category), trailing = stringResource(R.string.stats_total, state.totalCategorias)) {
                 val maxCount = max(1, state.porCategoria.maxOfOrNull { it.count } ?: 1)
                 state.porCategoria.forEach { stat ->
                     CategoryBar(
-                        label = stat.category.label,
+                        label = stat.category.localizedLabel(),
                         count = stat.count,
                         fraction = stat.count / maxCount.toFloat(),
                         color = categoryColors(stat.category).icon
@@ -56,10 +60,10 @@ fun StatsScreen(
             }
         }
         item {
-            SectionCard(title = "Zonas más reportadas") {
+            SectionCard(title = stringResource(R.string.stats_top_zones)) {
                 if (state.zonas.isEmpty()) {
                     Text(
-                        text = "Aún no hay reportes en el periodo.",
+                        text = stringResource(R.string.stats_empty),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -92,7 +96,7 @@ fun StatsScreen(
                             modifier = Modifier.weight(1f)
                         )
                         Text(
-                            text = "${zone.count} reportes",
+                            text = pluralStringResource(R.plurals.stats_zone_reports, zone.count, zone.count),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
