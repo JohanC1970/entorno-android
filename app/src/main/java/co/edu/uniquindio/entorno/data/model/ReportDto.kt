@@ -1,9 +1,11 @@
 package co.edu.uniquindio.entorno.data.model
 
+import androidx.annotation.Keep
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
+@Keep // Firestore llena esta clase por reflexión, buscando sus atributos por nombre
 data class ReportDto(
     @DocumentId val id: String = "",
     val ownerId: String = "",

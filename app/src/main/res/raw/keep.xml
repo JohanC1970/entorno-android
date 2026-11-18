@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  El reductor de recursos de R8 borra lo que no ve referenciado en el código.
+  El SDK de Mapbox busca el token por nombre en tiempo de ejecución, así que
+  hay que protegerlo o el mapa lanza MapboxConfigurationException en release.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@string/mapbox_access_token" />
