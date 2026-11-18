@@ -46,16 +46,29 @@ android {
         //API KEY - GEMINI
         resValue("string", "gemini_api_key", localProperties.getProperty("GEMINI_API_KEY", ""))
     }
+    signingConfigs {
+        // Llave propia para firmar la versión release
+        create("release") {
+            // Si local.properties no tiene la llave, storeFile queda nulo y debug sigue compilando
+            storeFile = localProperties.getProperty("RELEASE_STORE_FILE")?.let { file(it) }
+            storePassword = localProperties.getProperty("RELEASE_STORE_PASSWORD", "")
+            keyAlias = localProperties.getProperty("RELEASE_KEY_ALIAS", "")
+            keyPassword = localProperties.getProperty("RELEASE_KEY_PASSWORD", "")
+        }
+    }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+            // R8 elimina el código y los recursos que la app no usa
+            optimization { enable = true }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
