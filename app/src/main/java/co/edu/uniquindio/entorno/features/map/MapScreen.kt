@@ -136,6 +136,7 @@ fun MapScreen(
         selected?.let { mapViewportState.easeTo(cameraAt(it.location, ZOOM_REPORT)) }
     }
 
+    val notFoundMessage = stringResource(R.string.map_not_found)
     fun search() {
         val text = query.trim()
         val neighborhood = Geo.neighborhoods.firstOrNull { it.name.contains(text, ignoreCase = true) }
@@ -143,7 +144,7 @@ fun MapScreen(
             text.isEmpty() -> Unit
             neighborhood != null ->
                 mapViewportState.easeTo(cameraAt(neighborhood.center, ZOOM_NEIGHBORHOOD))
-            else -> scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.map_not_found)) }
+            else -> scope.launch { snackbarHostState.showSnackbar(notFoundMessage) }
         }
     }
 

@@ -63,9 +63,10 @@ fun EditProfileScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val context = LocalContext.current
+    val savedMessage = stringResource(R.string.edit_profile_saved)
     LaunchedEffect(state.guardadoExitoso) {
         if (state.guardadoExitoso) {
-            snackbarHostState.showSnackbar(context.getString(R.string.edit_profile_saved))
+            snackbarHostState.showSnackbar(savedMessage)
             viewModel.mensajeMostrado()
         }
     }
