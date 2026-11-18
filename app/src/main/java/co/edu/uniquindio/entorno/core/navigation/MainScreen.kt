@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.core.navigation
 
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.WindowInsets
@@ -61,21 +64,21 @@ import kotlin.reflect.KClass
 
 /** Destino de la barra inferior: [route] es a donde se navega y [routeClass] sirve para saber si está activo. */
 private data class BottomDestination(
-    val label: String,
+    @StringRes val label: Int,
     val route: Any,
     val routeClass: KClass<*>,
     val icon: ImageVector
 )
 
 private val citizenDestinations = listOf(
-    BottomDestination("Inicio", Home, Home::class, Icons.Filled.Home),
-    BottomDestination("Mapa", MapRoute(), MapRoute::class, Icons.Filled.Map),
-    BottomDestination("Mis reportes", MyReports, MyReports::class, Icons.Filled.Description),
-    BottomDestination("Perfil", Profile, Profile::class, Icons.Filled.Person)
+    BottomDestination(R.string.nav_home, Home, Home::class, Icons.Filled.Home),
+    BottomDestination(R.string.nav_map, MapRoute(), MapRoute::class, Icons.Filled.Map),
+    BottomDestination(R.string.nav_my_reports, MyReports, MyReports::class, Icons.Filled.Description),
+    BottomDestination(R.string.nav_profile, Profile, Profile::class, Icons.Filled.Person)
 )
 
 private val moderatorDestination =
-    BottomDestination("Moderación", ModeratorPanel, ModeratorPanel::class, Icons.Filled.AdminPanelSettings)
+    BottomDestination(R.string.nav_moderation, ModeratorPanel, ModeratorPanel::class, Icons.Filled.AdminPanelSettings)
 
 /**
  * App principal: barra inferior (Inicio, Mapa, Mis reportes, Perfil y, para moderadores,
@@ -112,8 +115,8 @@ fun MainScreen(session: UserSession) {
                                     restoreState = true
                                 }
                             },
-                            icon = { Icon(destination.icon, contentDescription = destination.label) },
-                            label = { Text(destination.label) }
+                            icon = { Icon(destination.icon, contentDescription = stringResource(destination.label)) },
+                            label = { Text(stringResource(destination.label)) }
                         )
                     }
                 }
@@ -267,13 +270,13 @@ private fun MainNavHost(navController: NavHostController, modifier: Modifier) {
 /** Comparte el reporte con otras apps (WhatsApp, correo, etc.). */
 private fun shareReport(context: Context, report: Report) {
     val text = buildString {
-        append("Reporte en Entorno: ").append(report.title).append('\n')
+        append(context.getString(R.string.share_report_title, report.title)).append('\n')
         append(report.description).append('\n')
-        append("Zona: ").append(report.neighborhood.ifBlank { "Armenia" })
+        append(context.getString(R.string.share_report_zone, report.neighborhood.ifBlank { "Armenia" }))
     }
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
         putExtra(Intent.EXTRA_TEXT, text)
     }
-    context.startActivity(Intent.createChooser(intent, "Compartir reporte"))
+    context.startActivity(Intent.createChooser(intent, context.getString(R.string.share_report_chooser)))
 }

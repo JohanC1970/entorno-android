@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.login
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.RequestResult
@@ -17,8 +19,8 @@ import jakarta.inject.Inject
 data class LoginUiState(
     val email: String = "",
     val password: String = "",
-    val emailError: String? = null,
-    val passwordError: String? = null,
+    val emailError: UiText? = null,
+    val passwordError: UiText? = null,
     val loginResult: RequestResult? = null
 ) {
     val isFormValid: Boolean
@@ -47,7 +49,7 @@ class LoginViewModel @Inject constructor(
             _uiState.update { it.copy(loginResult = RequestResult.Loading) }
 
             val result = loginUserUseCase(state.email, state.password).fold(
-                onSuccess = { RequestResult.Success("Bienvenido, ${it.name}") },
+                onSuccess = { RequestResult.Success(UiText(R.string.login_welcome_user, it.name)) },
                 onFailure = { RequestResult.Failure(it.toUserMessage()) }
             )
             // Si fue exitoso, la sesión queda guardada y AppNavigation cambia sola a MainScreen.

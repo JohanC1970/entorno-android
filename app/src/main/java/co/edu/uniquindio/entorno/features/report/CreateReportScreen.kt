@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.report
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -87,11 +91,12 @@ fun CreateReportScreen(
         viewModel::onPhotosPicked
     )
 
+    val context = LocalContext.current
     LaunchedEffect(uiState.result) {
         when (val result = uiState.result) {
             is RequestResult.Success -> onPublished()
             is RequestResult.Failure -> {
-                snackbarHostState.showSnackbar(result.errorMessage)
+                snackbarHostState.showSnackbar(result.errorMessage.asString(context))
                 viewModel.clearResult()
             }
             else -> Unit
@@ -136,12 +141,11 @@ private fun DuplicatesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("¿Ya lo reportaron?") },
+        title = { Text(stringResource(R.string.duplicates_title)) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    "Estos reportes cercanos parecen ser el mismo evento. Marcarlo como importante o " +
-                        "comentar ayuda más que crear uno nuevo.",
+                    stringResource(R.string.duplicates_body),
                     style = MaterialTheme.typography.bodyMedium
                 )
                 duplicates.forEach { report ->
@@ -154,18 +158,18 @@ private fun DuplicatesDialog(
                                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                             )
                             Text(
-                                "${report.category.label} · ${report.neighborhood}",
+                                stringResource(R.string.comments_category_status, report.category.localizedLabel(), report.neighborhood),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        TextButton(onClick = { onView(report.id) }) { Text("Ver") }
+                        TextButton(onClick = { onView(report.id) }) { Text(stringResource(R.string.detail_view)) }
                     }
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onPublishAnyway) { Text("Publicar de todos modos") } },
-        dismissButton = { TextButton(onClick = onDismiss) { Text("Seguir editando") } }
+        confirmButton = { TextButton(onClick = onPublishAnyway) { Text(stringResource(R.string.duplicates_publish_anyway)) } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.duplicates_keep_editing)) } }
     )
 }
 
@@ -196,10 +200,10 @@ private fun CreateReportContent(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.isEditing) "Editar reporte" else "Crear reporte", style = MaterialTheme.typography.titleLarge) },
+                title = { Text(stringResource(if (uiState.isEditing) R.string.edit_report_title else R.string.create_title), style = MaterialTheme.typography.titleLarge) },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Default.Close, contentDescription = "Cerrar")
+                        Icon(Icons.Default.Close, contentDescription = stringResource(R.string.action_close))
                     }
                 }
             )
@@ -222,9 +226,9 @@ private fun CreateReportContent(
                     ) {
                         Text(
                             when {
-                                uiState.isLoading -> if (uiState.isEditing) "Guardando…" else "Publicando…"
-                                uiState.isEditing -> "Guardar cambios"
-                                else -> "Publicar reporte"
+                                uiState.isLoading -> stringResource(if (uiState.isEditing) R.string.edit_report_saving else R.string.create_publishing)
+                                uiState.isEditing -> stringResource(R.string.change_password_save)
+                                else -> stringResource(R.string.create_publish)
                             },
                             style = MaterialTheme.typography.titleMedium
                         )
@@ -240,16 +244,16 @@ private fun CreateReportContent(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            SectionLabel("CATEGORÍA")
+            SectionLabel(stringResource(R.string.create_section_category))
             CategoryGrid(selected = category, onSelect = onCategoryChange)
 
             Spacer(Modifier.height(4.dp))
-            SectionLabel("DETALLES")
+            SectionLabel(stringResource(R.string.create_section_details))
             OutlinedTextField(
                 value = title,
                 onValueChange = onTitleChange,
                 singleLine = true,
-                placeholder = { Text("¿Qué está pasando?") },
+                placeholder = { Text(stringResource(R.string.create_title_placeholder)) },
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             )
@@ -257,12 +261,12 @@ private fun CreateReportContent(
                 value = description,
                 onValueChange = onDescriptionChange,
                 minLines = 4,
-                placeholder = { Text("Describe qué pasó, desde cuándo y a quién afecta") },
+                placeholder = { Text(stringResource(R.string.create_description_placeholder)) },
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = "${description.length} / $MAX_DESCRIPTION",
+                text = stringResource(R.string.create_description_counter, description.length, MAX_DESCRIPTION),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.End,
@@ -270,7 +274,7 @@ private fun CreateReportContent(
             )
 
             Spacer(Modifier.height(4.dp))
-            SectionLabel("FOTOS · MÍNIMO UNA")
+            SectionLabel(stringResource(R.string.create_section_photos))
             PhotoRow(
                 urls = uiState.existingImageUrls,
                 uris = imageUris,
@@ -280,7 +284,7 @@ private fun CreateReportContent(
             )
 
             Spacer(Modifier.height(4.dp))
-            SectionLabel("UBICACIÓN")
+            SectionLabel(stringResource(R.string.create_section_location))
             LocationCard(
                 location = uiState.location,
                 onChangeLocation = onChangeLocation
@@ -355,7 +359,7 @@ private fun CategoryCell(
                 modifier = Modifier.size(28.dp)
             )
             Text(
-                text = category.label,
+                text = category.localizedLabel(),
                 style = MaterialTheme.typography.labelMedium,
                 color = if (isSelected) colors.chipText else MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
@@ -364,7 +368,7 @@ private fun CategoryCell(
         if (isSelected) {
             Icon(
                 imageVector = Icons.Default.Check,
-                contentDescription = "Seleccionada",
+                contentDescription = stringResource(R.string.create_selected),
                 tint = colors.icon,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -409,7 +413,7 @@ private fun PhotoThumbnail(model: String, onRemove: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Quitar foto",
+                contentDescription = stringResource(R.string.create_remove_photo),
                 tint = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.size(14.dp)
             )
@@ -444,7 +448,7 @@ private fun AddPhotoBox(onClick: () -> Unit) {
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            text = "Añadir",
+            text = stringResource(R.string.create_add_photo),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -474,17 +478,17 @@ private fun LocationCard(location: Location?, onChangeLocation: () -> Unit) {
                     .padding(horizontal = 12.dp)
             ) {
                 Text(
-                    text = if (location == null) "Elige dónde ocurrió" else "Ubicación elegida",
+                    text = stringResource(if (location == null) R.string.create_choose_where else R.string.create_location_chosen),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
-                    text = location?.let(Geo::format) ?: "Toca «Elegir» para abrir el mapa",
+                    text = location?.let(Geo::format) ?: stringResource(R.string.create_tap_choose),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             TextButton(onClick = onChangeLocation) {
-                Text(if (location == null) "Elegir" else "Cambiar")
+                Text(stringResource(if (location == null) R.string.create_choose else R.string.create_change_location))
             }
         }
     }

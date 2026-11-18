@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.report
 
+import androidx.annotation.StringRes
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -80,11 +84,9 @@ import co.edu.uniquindio.entorno.features.home.SampleReports
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private val dateFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("es"))
+private data class Milestone(@StringRes val label: Int, val reached: Boolean, val date: String? = null)
 
-private data class Milestone(val label: String, val reached: Boolean, val date: String? = null)
-
-private fun Report.milestones(): List<Milestone> {
+private fun Report.milestones(dateFormatter: DateTimeFormatter): List<Milestone> {
     val reachedCount = when (status) {
         ReportStatus.PENDING -> 1
         ReportStatus.VERIFIED -> 2
@@ -92,14 +94,14 @@ private fun Report.milestones(): List<Milestone> {
         ReportStatus.REJECTED -> 1
     }
     val secondLabel = when (status) {
-        ReportStatus.REJECTED -> "Rechazado"
-        ReportStatus.PENDING, ReportStatus.VERIFIED, ReportStatus.RESOLVED -> "Verificado"
+        ReportStatus.REJECTED -> R.string.status_rejected
+        ReportStatus.PENDING, ReportStatus.VERIFIED, ReportStatus.RESOLVED -> R.string.status_verified
     }
     // TODO: fechas por hito cuando Report tenga verifiedAt y resolvedAt
     return listOf(
-        Milestone("Reportado", reachedCount >= 1, date.format(dateFormatter).replace(".", "")),
+        Milestone(R.string.detail_milestone_reported, reachedCount >= 1, date.format(dateFormatter).replace(".", "")),
         Milestone(secondLabel, reachedCount >= 2),
-        Milestone("Resuelto", reachedCount >= 3)
+        Milestone(R.string.status_resolved, reachedCount >= 3)
     )
 }
 
@@ -115,15 +117,16 @@ fun ReportDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.clearError()
         }
     }
     LaunchedEffect(uiState.infoMessage) {
         uiState.infoMessage?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.clearInfo()
         }
     }
@@ -176,12 +179,12 @@ private fun ReportDetailPlaceholder(
                 CircularProgressIndicator()
             } else {
                 Text(
-                    text = "No encontramos este reporte",
+                    text = stringResource(R.string.detail_not_found),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(Modifier.height(16.dp))
-                OutlinedButton(onClick = onBack) { Text("Volver") }
+                OutlinedButton(onClick = onBack) { Text(stringResource(R.string.action_back)) }
             }
         }
     }
@@ -231,7 +234,7 @@ fun ReportDetailContent(
                     if (report.status == ReportStatus.VERIFIED) {
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "por un moderador",
+                            text = stringResource(R.string.detail_by_moderator),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -266,7 +269,7 @@ fun ReportDetailContent(
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth().height(48.dp)
                     ) {
-                        Text("Marcar como resuelto")
+                        Text(stringResource(R.string.detail_mark_resolved))
                     }
                 }
 
@@ -285,7 +288,7 @@ fun ReportDetailContent(
                             ) {
                                 Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text("Editar")
+                                Text(stringResource(R.string.detail_edit))
                             }
                         }
                         if (canDelete) {
@@ -298,7 +301,7 @@ fun ReportDetailContent(
                             ) {
                                 Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text("Eliminar")
+                                Text(stringResource(R.string.action_delete))
                             }
                         }
                     }
@@ -307,14 +310,14 @@ fun ReportDetailContent(
                 if (confirmDelete) {
                     AlertDialog(
                         onDismissRequest = { confirmDelete = false },
-                        title = { Text("Eliminar reporte") },
-                        text = { Text("Se borrarán también sus comentarios y votos. Esta acción no se puede deshacer.") },
+                        title = { Text(stringResource(R.string.detail_delete_title)) },
+                        text = { Text(stringResource(R.string.detail_delete_body)) },
                         confirmButton = {
                             TextButton(onClick = { confirmDelete = false; onDelete() }) {
-                                Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                                Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error)
                             }
                         },
-                        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text("Cancelar") } }
+                        dismissButton = { TextButton(onClick = { confirmDelete = false }) { Text(stringResource(R.string.action_cancel)) } }
                     )
                 }
 
@@ -325,11 +328,13 @@ fun ReportDetailContent(
                 }
 
                 Text(
-                    text = "Seguimiento",
+                    text = stringResource(R.string.detail_tracking),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Timeline(report.milestones())
+                val locale = LocalConfiguration.current.locales[0]
+                val dateFormatter = remember(locale) { DateTimeFormatter.ofPattern("d MMM yyyy", locale) }
+                Timeline(report.milestones(dateFormatter))
             }
         }
     }
@@ -374,7 +379,7 @@ private fun ImageHeader(report: Report, onBack: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver"
+                    contentDescription = stringResource(R.string.action_back)
                 )
             }
 
@@ -389,7 +394,7 @@ private fun ImageHeader(report: Report, onBack: () -> Unit) {
                     modifier = Modifier.align(Alignment.BottomEnd)
                 ) {
                     Text(
-                        text = "1 / ${report.imageUrls.size}",
+                        text = stringResource(R.string.detail_image_counter, report.imageUrls.size),
                         style = MaterialTheme.typography.labelMedium,
                         color = Color.White,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
@@ -417,7 +422,7 @@ private fun ActionsRow(
             modifier = Modifier.size(18.dp)
         )
         Spacer(Modifier.width(8.dp))
-        Text("Es importante · ${report.importantCount}")
+        Text(stringResource(R.string.report_important_count, report.importantCount))
     }
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -453,7 +458,7 @@ private fun ActionsRow(
         ) {
             Icon(
                 imageVector = Icons.Default.Share,
-                contentDescription = "Compartir",
+                contentDescription = stringResource(R.string.detail_share),
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -469,7 +474,7 @@ private fun ActionsRow(
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_comment),
-                contentDescription = "Comentarios",
+                contentDescription = stringResource(R.string.detail_comments),
                 modifier = Modifier.size(18.dp)
             )
             Spacer(Modifier.width(6.dp))
@@ -505,7 +510,7 @@ private fun LocationCard(report: Report, onViewOnMap: () -> Unit) {
                 modifier = Modifier.weight(1f)
             )
             Text(
-                text = "Ver",
+                text = stringResource(R.string.detail_view),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable(onClick = onViewOnMap)
@@ -527,7 +532,7 @@ private fun RejectionCard(reason: String) {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "Motivo del rechazo",
+                text = stringResource(R.string.detail_rejection_reason),
                 style = MaterialTheme.typography.labelLarge,
                 color = colors.text
             )
@@ -564,7 +569,7 @@ private fun Timeline(milestones: List<Milestone>) {
                 Spacer(Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = milestone.label,
+                        text = stringResource(milestone.label),
                         style = MaterialTheme.typography.bodyLarge,
                         color = if (milestone.reached) MaterialTheme.colorScheme.onSurface
                         else MaterialTheme.colorScheme.onSurfaceVariant

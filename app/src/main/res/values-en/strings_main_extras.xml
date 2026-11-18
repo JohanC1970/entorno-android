@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="scope_all">Whole city</string>
+    <string name="scope_nearby">Nearby</string>
+    <string name="scope_neighborhood">My neighborhood</string>
+    <string name="home_showing_neighborhood">Showing reports from %1$s</string>
+    <string name="home_empty_neighborhood">There are no reports in your neighborhood yet</string>
+    <string name="home_empty_nearby">There are no reports near you yet</string>
+    <string name="home_empty_city">There are no reports in the city yet</string>
+    <string name="register_pick_location">Choose my location on the map</string>
+    <string name="register_location_chosen">Location chosen · Change</string>
+    <string name="picker_subtitle_gps">Use GPS or tap the map</string>
+    <string name="picker_use_current">Use my current location</string>
+    <string name="picker_tap_map">Tap the map to choose a point</string>
+    <string name="picker_resolving">Looking up address…</string>
+    <string name="picker_no_address">Address not available</string>
+    <string name="picker_no_city">City not available</string>
+    <string name="picker_city_coords">%1$s · %2$s</string>
+    <string name="picker_error_location">We could not get your location. Turn on GPS or tap the map.</string>
+    <string name="picker_error_permission">No location permission. Tap the map to choose the point.</string>
+    <string name="picker_error_address">We could not get the address. You can type it in manually.</string>
+    <string name="map_hide_heat">Hide heat map</string>
+    <string name="map_show_heat">Show heat map</string>
+    <string name="heat_total">Heat map · %1$d reports</string>
+    <string name="heat_low_density">Low density</string>
+    <string name="heat_high_density">High density</string>
+    <string name="edit_profile_email_readonly">Email (cannot be changed)</string>
+    <string name="duplicates_title">Already reported?</string>
+    <string name="duplicates_body">These nearby reports look like the same event. Marking one as important or commenting helps more than creating a new one.</string>
+    <string name="duplicates_publish_anyway">Publish anyway</string>
+    <string name="duplicates_keep_editing">Keep editing</string>
+    <string name="edit_report_title">Edit report</string>
+    <string name="edit_report_saving">Saving…</string>
+    <string name="create_choose_where">Choose where it happened</string>
+    <string name="create_location_chosen">Location chosen</string>
+    <string name="create_tap_choose">Tap “Choose” to open the map</string>
+    <string name="create_choose">Choose</string>
+    <string name="create_cannot_edit">You cannot edit this report</string>
+    <string name="detail_edit">Edit</string>
+    <string name="detail_delete_title">Delete report</string>
+    <string name="detail_delete_body">Its comments and votes will also be deleted. This action cannot be undone.</string>
+</resources>

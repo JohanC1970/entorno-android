@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.legal
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,7 +24,7 @@ fun TermsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Términos y Condiciones",
+                        text = stringResource(R.string.terms_title),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -32,7 +34,7 @@ fun TermsScreen(
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Volver",
+                            contentDescription = stringResource(R.string.action_back),
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
@@ -50,7 +52,7 @@ fun TermsScreen(
                 .padding(24.dp)
         ) {
             Text(
-                text = "Términos de Servicio de Entorno",
+                text = stringResource(R.string.terms_heading),
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -59,27 +61,27 @@ fun TermsScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Última actualización: " + java.time.LocalDate.now(),
+                text = stringResource(R.string.legal_last_update, java.time.LocalDate.now().toString()),
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            SectionTitle("1. Aceptación de los Términos")
-            SectionText("Al registrarte o utilizar la plataforma Entorno, aceptas cumplir con los presentes Términos de Servicio. Si no estás de acuerdo con alguna de las cláusulas, no debes acceder a la aplicación.")
+            SectionTitle(stringResource(R.string.terms_s1_title))
+            SectionText(stringResource(R.string.terms_s1_body))
 
-            SectionTitle("2. Uso de la Comunidad")
-            SectionText("Entorno es una plataforma colaborativa para reportar incidencias comunitarias y de seguridad. Te comprometes a publicar únicamente información verídica, respetuosa y constructiva sobre eventos en tu vecindario.")
+            SectionTitle(stringResource(R.string.terms_s2_title))
+            SectionText(stringResource(R.string.terms_s2_body))
 
-            SectionTitle("3. Contenido Prohibido")
-            SectionText("Queda estrictamente prohibido la publicación de información falsa, difamatoria, lenguaje de odio, contenido acosador o material engañoso. La infracción de esta norma puede acarrear la suspensión definitiva de tu cuenta por parte de los moderadores.")
+            SectionTitle(stringResource(R.string.terms_s3_title))
+            SectionText(stringResource(R.string.terms_s3_body))
 
-            SectionTitle("4. Moderación y Gamificación")
-            SectionText("Los moderadores autorizados revisarán los reportes y asignarán insignias o puntos según la veracidad y utilidad de la información suministrada.")
+            SectionTitle(stringResource(R.string.terms_s4_title))
+            SectionText(stringResource(R.string.terms_s4_body))
 
-            SectionTitle("5. Modificaciones")
-            SectionText("Nos reservamos el derecho de actualizar estos términos en cualquier momento. Te notificaremos sobre cambios significativos a través de la aplicación.")
+            SectionTitle(stringResource(R.string.terms_s5_title))
+            SectionText(stringResource(R.string.terms_s5_body))
 
             Spacer(modifier = Modifier.height(32.dp))
         }

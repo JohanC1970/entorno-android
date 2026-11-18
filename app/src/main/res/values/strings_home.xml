@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_create_report">Crear reporte</string>
+    <string name="home_hidden_by_radius">" · %1$d fuera del radio"</string>
+    <string name="home_showing_radius">Mostrando reportes a menos de %1$d km%2$s</string>
+    <string name="home_empty_filtered">No encontramos reportes con esos filtros</string>
+    <string name="home_empty">Aún no hay reportes en tu zona</string>
+    <string name="home_good_morning">Buenos días</string>
+    <string name="home_good_afternoon">Buenas tardes</string>
+    <string name="home_good_evening">Buenas noches</string>
+    <string name="home_notifications">Notificaciones</string>
+    <string name="home_search_placeholder">Buscar en tu zona</string>
+    <string name="home_clear_search">Borrar búsqueda</string>
+    <string name="home_filter_all">Todos</string>
+    <string name="home_nearby_title">Reportes cerca de ti</string>
+    <string name="home_see_map">Ver mapa</string>
+</resources>

@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.auth
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -51,15 +54,16 @@ fun RegisterScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(uiState.registerResult) {
         when (val result = uiState.registerResult) {
             is RequestResult.Success -> {
-                snackbarHostState.showSnackbar(result.message)
+                snackbarHostState.showSnackbar(result.message.asString(context))
                 viewModel.clearResult()
                 onRegisterSuccess()
             }
             is RequestResult.Failure -> {
-                snackbarHostState.showSnackbar(result.errorMessage)
+                snackbarHostState.showSnackbar(result.errorMessage.asString(context))
                 viewModel.clearResult()
             }
             else -> Unit
@@ -85,7 +89,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Crea tu cuenta",
+                text = stringResource(R.string.register_title),
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -94,7 +98,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Únete para reportar y seguir lo que pasa en tu zona.",
+                text = stringResource(R.string.register_subtitle),
                 fontSize = 15.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -116,10 +120,10 @@ fun RegisterScreen(
             AppTextField(
                 value = uiState.name,
                 onValueChange = { viewModel.onNameChange(it) },
-                label = "Nombre completo",
+                label = stringResource(R.string.field_full_name),
                 placeholder = "Andres Osorio",
                 leadingIcon = Icons.Default.Person,
-                errorMessage = uiState.nameError
+                errorMessage = uiState.nameError?.asString()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -128,11 +132,11 @@ fun RegisterScreen(
             AppTextField(
                 value = uiState.email,
                 onValueChange = { viewModel.onEmailChange(it) },
-                label = "Correo electrónico",
-                placeholder = "ejemplo@uqvirtual.edu.co",
+                label = stringResource(R.string.field_email),
+                placeholder = stringResource(R.string.field_email_placeholder),
                 leadingIcon = Icons.Default.Email,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                errorMessage = uiState.emailError
+                errorMessage = uiState.emailError?.asString()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -146,8 +150,8 @@ fun RegisterScreen(
                 Icon(Icons.Default.MyLocation, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = if (uiState.location == null) "Elegir mi ubicación en el mapa"
-                    else "Ubicación elegida · Cambiar",
+                    text = if (uiState.location == null) stringResource(R.string.register_pick_location)
+                    else stringResource(R.string.register_location_chosen),
                     fontWeight = FontWeight.SemiBold
                 )
             }
@@ -158,10 +162,10 @@ fun RegisterScreen(
             AppTextField(
                 value = uiState.city,
                 onValueChange = { viewModel.onCityChange(it) },
-                label = "Ciudad",
+                label = stringResource(R.string.field_city),
                 placeholder = "Armenia",
                 leadingIcon = Icons.Default.LocationCity,
-                errorMessage = uiState.cityError
+                errorMessage = uiState.cityError?.asString()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -170,10 +174,10 @@ fun RegisterScreen(
             AppTextField(
                 value = uiState.address,
                 onValueChange = { viewModel.onAddressChange(it) },
-                label = "Dirección",
-                placeholder = "Calle 12 # 23-45",
+                label = stringResource(R.string.field_address),
+                placeholder = stringResource(R.string.field_address_placeholder),
                 leadingIcon = Icons.Default.Place,
-                errorMessage = uiState.addressError
+                errorMessage = uiState.addressError?.asString()
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -182,17 +186,17 @@ fun RegisterScreen(
             AppTextField(
                 value = uiState.password,
                 onValueChange = { viewModel.onPasswordChange(it) },
-                label = "Contraseña",
+                label = stringResource(R.string.field_password),
                 placeholder = "••••••••",
                 leadingIcon = Icons.Default.Lock,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                errorMessage = uiState.passwordError,
+                errorMessage = uiState.passwordError?.asString(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                            contentDescription = stringResource(if (passwordVisible) R.string.password_hide else R.string.password_show),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -205,17 +209,17 @@ fun RegisterScreen(
             AppTextField(
                 value = uiState.confirmPassword,
                 onValueChange = { viewModel.onConfirmPasswordChange(it) },
-                label = "Confirmar contraseña",
+                label = stringResource(R.string.field_confirm_password),
                 placeholder = "••••••••",
                 leadingIcon = Icons.Default.Lock,
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                errorMessage = uiState.confirmPasswordError,
+                errorMessage = uiState.confirmPasswordError?.asString(),
                 trailingIcon = {
                     IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                         Icon(
                             imageVector = if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                            contentDescription = if (confirmPasswordVisible) "Ocultar contraseña" else "Mostrar contraseña",
+                            contentDescription = stringResource(if (confirmPasswordVisible) R.string.password_hide else R.string.password_show),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -227,7 +231,7 @@ fun RegisterScreen(
             // Texto legal interactivo
             val linkColor = MaterialTheme.colorScheme.primary
             val legalText = buildAnnotatedString {
-                append("Al registrarte aceptas los ")
+                append(stringResource(R.string.legal_register_prefix))
                 pushStringAnnotation(tag = "terms", annotation = "terms")
                 withStyle(
                     style = SpanStyle(
@@ -236,10 +240,10 @@ fun RegisterScreen(
                         textDecoration = TextDecoration.Underline
                     )
                 ) {
-                    append("Términos")
+                    append(stringResource(R.string.legal_terms))
                 }
                 pop()
-                append(" y la ")
+                append(stringResource(R.string.legal_and))
                 pushStringAnnotation(tag = "privacy", annotation = "privacy")
                 withStyle(
                     style = SpanStyle(
@@ -248,7 +252,7 @@ fun RegisterScreen(
                         textDecoration = TextDecoration.Underline
                     )
                 ) {
-                    append("Política de privacidad")
+                    append(stringResource(R.string.legal_privacy))
                 }
                 pop()
                 append(".")
@@ -282,7 +286,7 @@ fun RegisterScreen(
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(24.dp))
                 } else {
                     Text(
-                        text = "Crear cuenta",
+                        text = stringResource(R.string.register_button),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )

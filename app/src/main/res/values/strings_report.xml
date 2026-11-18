@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="comments_conversation">Conversación</string>
+    <string name="comments_most_recent">Más recientes</string>
+    <string name="comments_title">Comentarios</string>
+    <string name="comments_total">%1$d en total</string>
+    <string name="comments_category_status">%1$s · %2$s</string>
+    <string name="comments_empty_title">Todavía no hay comentarios</string>
+    <string name="comments_empty_body">Sé el primero en aportar algo sobre este reporte.</string>
+    <string name="comments_replying_to">Respondiendo a %1$s</string>
+    <string name="comments_cancel_reply">Cancelar respuesta</string>
+    <string name="comments_reply_placeholder">Escribe tu respuesta…</string>
+    <string name="comments_placeholder">Escribe un comentario…</string>
+    <string name="comments_send">Enviar comentario</string>
+    <string name="comments_login_required">Debes iniciar sesión para comentar</string>
+    <string name="create_title">Crear reporte</string>
+    <string name="create_publishing">Publicando…</string>
+    <string name="create_publish">Publicar reporte</string>
+    <string name="create_section_category">CATEGORÍA</string>
+    <string name="create_section_details">DETALLES</string>
+    <string name="create_title_placeholder">¿Qué está pasando?</string>
+    <string name="create_description_placeholder">Describe qué pasó, desde cuándo y a quién afecta</string>
+    <string name="create_description_counter">%1$d / %2$d</string>
+    <string name="create_section_photos">FOTOS · MÍNIMO UNA</string>
+    <string name="create_section_location">UBICACIÓN</string>
+    <string name="create_selected">Seleccionada</string>
+    <string name="create_photo">Foto del reporte</string>
+    <string name="create_remove_photo">Quitar foto</string>
+    <string name="create_add_photo">Añadir</string>
+    <string name="create_location_value">Ubicación: %1$s</string>
+    <string name="create_change_location">Cambiar</string>
+    <string name="create_login_required">Debes iniciar sesión para publicar</string>
+    <string name="create_success">Reporte enviado a verificación</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Configuración</string>
+    <string name="settings_section_account">CUENTA</string>
+    <string name="settings_change_password">Cambiar contraseña</string>
+    <string name="settings_section_notifications">NOTIFICACIONES</string>
+    <string name="settings_notify_nearby">Reportes cerca de mí</string>
+    <string name="settings_notify_comments">Comentarios en mis reportes</string>
+    <string name="settings_notify_level">Cambios de nivel e insignias</string>
+    <string name="settings_section_preferences">PREFERENCIAS</string>
+    <string name="settings_alert_radius">Radio de alertas</string>
+    <string name="settings_radius_value">%1$d km</string>
+    <string name="settings_radius_hint">Define cuántos reportes ves en el inicio y el mapa alrededor de tu zona.</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_dialog_title">Elige el idioma</string>
+    <string name="settings_dark_mode">Modo oscuro</string>
+    <string name="settings_section_about">ACERCA DE</string>
+    <string name="settings_terms">Términos y condiciones</string>
+    <string name="settings_privacy">Política de privacidad</string>
+    <string name="settings_version">Versión</string>
+    <string name="settings_logout">Cerrar sesión</string>
+    <string name="settings_logout_confirm">¿Seguro que quieres salir de tu cuenta?</string>
+    <string name="settings_logout_action">Salir</string>
+</resources>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_reports_title">Mis reportes</string>
+    <string name="my_reports_total">%1$d en total</string>
+    <string name="my_reports_votes">Votos importantes</string>
+    <string name="filter_all">Todos</string>
+    <string name="filter_active">Activos</string>
+    <string name="filter_resolved">Resueltos</string>
+    <string name="filter_rejected">Rechazados</string>
+    <string name="moderator_pending_title">Publicaciones pendientes</string>
+    <string name="moderator_pending_count">%1$d pendientes</string>
+    <string name="moderator_filter">Filtrar</string>
+    <string name="review_title">Revisar publicación</string>
+    <string name="review_location">Ubicación</string>
+    <string name="review_reason_label">Motivo del rechazo (obligatorio si rechazas)</string>
+    <string name="review_reason_placeholder">Ej. La imagen no corresponde a la ubicación reportada</string>
+    <string name="review_reject">Rechazar</string>
+    <string name="review_verify">Verificar</string>
+    <string name="review_verified">Reporte verificado</string>
+    <string name="review_rejected">Reporte rechazado</string>
+    <string name="review_reason_required">Escribe el motivo del rechazo</string>
+</resources>

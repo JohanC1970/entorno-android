@@ -1,5 +1,10 @@
 package co.edu.uniquindio.entorno.features.report
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.citizenLabelRes
+import co.edu.uniquindio.entorno.core.component.localizedLabel
+import co.edu.uniquindio.entorno.core.util.toRelativeDate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -84,13 +89,13 @@ private fun MyReportsContent(
                 verticalAlignment = Alignment.Bottom
             ) {
                 Text(
-                    text = "Mis reportes",
+                    text = stringResource(R.string.my_reports_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "${state.totalReportes} en total",
+                    text = stringResource(R.string.my_reports_total, state.totalReportes),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -110,7 +115,7 @@ private fun MyReportsContent(
                         onClick = { onFiltroClick(filtro) },
                         label = {
                             Text(
-                                text = filtro.label,
+                                text = stringResource(filtro.label),
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = if (state.filtroActual == filtro) FontWeight.SemiBold else FontWeight.Normal
                             )
@@ -180,7 +185,7 @@ private fun ReporteCard(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "${reporte.category.label} · ${formatearTiempo(reporte.date)}",
+                    text = stringResource(R.string.comments_category_status, reporte.category.localizedLabel(), reporte.date.toRelativeDate().asString()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -201,7 +206,7 @@ private fun ReporteCard(
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(
                             imageVector = Icons.Outlined.Flag,
-                            contentDescription = "Votos importantes",
+                            contentDescription = stringResource(R.string.my_reports_votes),
                             modifier = Modifier.size(14.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -230,21 +235,10 @@ private fun CategoriaIcono(category: ReportCategory) {
     ) {
         Icon(
             imageVector = category.icon(),
-            contentDescription = category.label,
+            contentDescription = category.localizedLabel(),
             tint = colors.icon,
             modifier = Modifier.size(28.dp)
         )
-    }
-}
-
-private fun formatearTiempo(date: LocalDate): String {
-    val dias = ChronoUnit.DAYS.between(date, LocalDate.now())
-    return when {
-        dias == 0L -> "hoy"
-        dias == 1L -> "ayer"
-        dias < 7 -> "hace $dias días"
-        dias < 30 -> "hace ${dias / 7} semanas"
-        else -> "hace ${dias / 30} meses"
     }
 }
 

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="my_reports_title">My reports</string>
+    <string name="my_reports_total">%1$d in total</string>
+    <string name="my_reports_votes">Important votes</string>
+    <string name="filter_all">All</string>
+    <string name="filter_active">Active</string>
+    <string name="filter_resolved">Resolved</string>
+    <string name="filter_rejected">Rejected</string>
+    <string name="moderator_pending_title">Pending posts</string>
+    <string name="moderator_pending_count">%1$d pending</string>
+    <string name="moderator_filter">Filter</string>
+    <string name="review_title">Review post</string>
+    <string name="review_location">Location</string>
+    <string name="review_reason_label">Rejection reason (required if you reject)</string>
+    <string name="review_reason_placeholder">E.g. The image does not match the reported location</string>
+    <string name="review_reject">Reject</string>
+    <string name="review_verify">Verify</string>
+    <string name="review_verified">Report verified</string>
+    <string name="review_rejected">Report rejected</string>
+    <string name="review_reason_required">Write the rejection reason</string>
+</resources>

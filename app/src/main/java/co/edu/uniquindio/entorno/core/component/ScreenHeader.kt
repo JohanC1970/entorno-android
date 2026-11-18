@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.core.component
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,7 +40,7 @@ fun ScreenHeader(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Volver",
+                    contentDescription = stringResource(R.string.action_back),
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }

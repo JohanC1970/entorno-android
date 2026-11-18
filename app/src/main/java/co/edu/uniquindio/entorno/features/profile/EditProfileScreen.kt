@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.profile
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -59,15 +62,16 @@ fun EditProfileScreen(
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(state.guardadoExitoso) {
         if (state.guardadoExitoso) {
-            snackbarHostState.showSnackbar("Cambios guardados")
+            snackbarHostState.showSnackbar(context.getString(R.string.edit_profile_saved))
             viewModel.mensajeMostrado()
         }
     }
     LaunchedEffect(state.mensajeError) {
         state.mensajeError?.let {
-            snackbarHostState.showSnackbar(it)
+            snackbarHostState.showSnackbar(it.asString(context))
             viewModel.mensajeMostrado()
         }
     }
@@ -101,15 +105,15 @@ private fun EditProfileContent(
     if (mostrarDialogoEliminar) {
         AlertDialog(
             onDismissRequest = { mostrarDialogoEliminar = false },
-            title = { Text("Eliminar mi cuenta") },
+            title = { Text(stringResource(R.string.edit_profile_delete_title)) },
             text = {
                 Column {
-                    Text("Esta acción no se puede deshacer. Escribe tu contraseña para confirmar.")
+                    Text(stringResource(R.string.edit_profile_delete_body))
                     Spacer(modifier = Modifier.height(12.dp))
                     OutlinedTextField(
                         value = contrasenaEliminar,
                         onValueChange = { contrasenaEliminar = it },
-                        label = { Text("Contraseña") },
+                        label = { Text(stringResource(R.string.field_password)) },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation()
                     )
@@ -123,13 +127,13 @@ private fun EditProfileContent(
                         contrasenaEliminar = ""
                     },
                     enabled = !state.eliminando
-                ) { Text("Eliminar", color = MaterialTheme.colorScheme.error) }
+                ) { Text(stringResource(R.string.action_delete), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = {
                     mostrarDialogoEliminar = false
                     contrasenaEliminar = ""
-                }) { Text("Cancelar") }
+                }) { Text(stringResource(R.string.action_cancel)) }
             }
         )
     }
@@ -157,12 +161,12 @@ private fun EditProfileContent(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Volver",
+                        contentDescription = stringResource(R.string.action_back),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
                 Text(
-                    text = "Editar perfil",
+                    text = stringResource(R.string.edit_profile_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -203,7 +207,7 @@ private fun EditProfileContent(
                     ) {
                         Icon(
                             imageVector = Icons.Outlined.CameraAlt,
-                            contentDescription = "Cambiar foto",
+                            contentDescription = stringResource(R.string.edit_profile_change_photo),
                             tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -213,7 +217,7 @@ private fun EditProfileContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Cambiar foto",
+                    text = stringResource(R.string.edit_profile_change_photo),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium,
@@ -225,18 +229,18 @@ private fun EditProfileContent(
         // Campo: Nombre completo
         item {
             CampoEditar(
-                etiqueta = "Nombre completo",
+                etiqueta = stringResource(R.string.field_full_name),
                 valor = state.nombreCompleto,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
                 onValueChange = onNombreChange,
-                error = state.nombreError
+                error = state.nombreError?.asString()
             )
         }
 
         // Campo: Correo electrónico (no editable)
         item {
             CampoEditar(
-                etiqueta = "Correo electrónico (no editable)",
+                etiqueta = stringResource(R.string.edit_profile_email_readonly),
                 valor = state.correo,
                 onValueChange = {},
                 enabled = false,
@@ -247,7 +251,7 @@ private fun EditProfileContent(
         // Campo: Teléfono
         item {
             CampoEditar(
-                etiqueta = "Teléfono",
+                etiqueta = stringResource(R.string.edit_profile_phone),
                 valor = state.telefono,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
                 onValueChange = onTelefonoChange
@@ -257,7 +261,7 @@ private fun EditProfileContent(
         // Campo: Barrio / zona
         item {
             CampoEditar(
-                etiqueta = "Barrio / zona",
+                etiqueta = stringResource(R.string.edit_profile_neighborhood),
                 valor = state.barrio,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 6.dp),
                 onValueChange = onBarrioChange
@@ -280,7 +284,7 @@ private fun EditProfileContent(
                 enabled = !state.guardando && !state.eliminando
             ) {
                 Text(
-                    text = "Guardar cambios",
+                    text = stringResource(R.string.change_password_save),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.SemiBold
                 )
@@ -295,7 +299,7 @@ private fun EditProfileContent(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Eliminar mi cuenta",
+                    text = stringResource(R.string.edit_profile_delete_title),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.SemiBold,

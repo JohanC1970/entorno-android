@@ -1,3 +1,104 @@
 <resources>
     <string name="app_name">Entorno</string>
+
+    <!-- Acciones comunes -->
+    <string name="action_back">Volver</string>
+    <string name="action_close">Cerrar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_save">Guardar</string>
+    <string name="action_send">Enviar</string>
+    <string name="action_retry">Reintentar</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_search">Buscar</string>
+    <string name="action_see_all">Ver todos</string>
+
+    <!-- Estados del reporte -->
+    <string name="status_in_review">En verificación</string>
+    <string name="status_pending">Pendiente</string>
+    <string name="status_verified">Verificado</string>
+    <string name="status_rejected">Rechazado</string>
+    <string name="status_resolved">Resuelto</string>
+
+    <!-- Severidad -->
+    <string name="severity_low">Baja</string>
+    <string name="severity_medium">Media</string>
+    <string name="severity_high">Alta</string>
+
+    <!-- Categorías -->
+    <string name="category_security">Seguridad</string>
+    <string name="category_medical">Emergencias médicas</string>
+    <string name="category_infrastructure">Infraestructura</string>
+    <string name="category_pets">Mascotas</string>
+    <string name="category_community">Comunidad</string>
+
+    <!-- Niveles -->
+    <string name="level_novice">Novato</string>
+    <string name="level_collaborator">Colaborador</string>
+    <string name="level_guardian">Guardián</string>
+    <string name="level_community_hero">Héroe Comunitario</string>
+
+    <!-- Insignias -->
+    <string name="badge_first_report">Primer reporte</string>
+    <string name="badge_first_report_desc">Creaste tu primer reporte</string>
+    <string name="badge_first_comment">Primer aporte</string>
+    <string name="badge_first_comment_desc">Hiciste tu primer comentario</string>
+    <string name="badge_trusted_citizen">Ciudadano confiable</string>
+    <string name="badge_trusted_citizen_desc">10 reportes verificados</string>
+    <string name="badge_top_of_month">Destacado del mes</string>
+    <string name="badge_top_of_month_desc">Tu reporte fue el más votado del mes</string>
+
+    <!-- Tema e idioma -->
+    <string name="theme_system">Según el sistema</string>
+    <string name="theme_light">Claro</string>
+    <string name="theme_dark">Oscuro</string>
+    <string name="language_system">Según el sistema</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_english">English</string>
+
+    <!-- Errores -->
+    <string name="error_generic">Ocurrió un error</string>
+    <string name="error_unexpected">Ocurrió un error inesperado. Inténtalo de nuevo</string>
+    <string name="error_no_connection">Sin conexión a internet. Inténtalo de nuevo</string>
+    <string name="error_no_account">No existe una cuenta con ese correo</string>
+    <string name="error_invalid_credentials">Correo o contraseña incorrectos</string>
+    <string name="error_email_in_use">Ya existe una cuenta con este correo</string>
+    <string name="error_weak_password">La contraseña es demasiado débil</string>
+    <string name="error_email_required">El correo es obligatorio</string>
+    <string name="error_email_invalid">Correo no válido</string>
+    <string name="error_password_required">La contraseña es obligatoria</string>
+    <string name="error_password_min">Mínimo 6 caracteres</string>
+    <string name="error_passwords_mismatch">Las contraseñas no coinciden</string>
+    <string name="error_name_required">El nombre es obligatorio</string>
+    <string name="error_city_required">La ciudad es obligatoria</string>
+    <string name="error_address_required">La dirección es obligatoria</string>
+
+    <!-- Tiempo relativo -->
+    <string name="time_now">ahora</string>
+    <string name="time_yesterday">ayer</string>
+    <string name="time_today">hoy</string>
+    <plurals name="time_minutes_ago">
+        <item quantity="one">hace %d min</item>
+        <item quantity="many">hace %d min</item>
+        <item quantity="other">hace %d min</item>
+    </plurals>
+    <plurals name="time_hours_ago">
+        <item quantity="one">hace %d h</item>
+        <item quantity="many">hace %d h</item>
+        <item quantity="other">hace %d h</item>
+    </plurals>
+    <plurals name="time_days_ago">
+        <item quantity="one">hace %d día</item>
+        <item quantity="many">hace %d días</item>
+        <item quantity="other">hace %d días</item>
+    </plurals>
+    <plurals name="time_weeks_ago">
+        <item quantity="one">hace %d semana</item>
+        <item quantity="many">hace %d semanas</item>
+        <item quantity="other">hace %d semanas</item>
+    </plurals>
+    <plurals name="time_months_ago">
+        <item quantity="one">hace %d mes</item>
+        <item quantity="many">hace %d meses</item>
+        <item quantity="other">hace %d meses</item>
+    </plurals>
 </resources>

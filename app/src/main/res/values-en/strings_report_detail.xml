@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="detail_milestone_reported">Reported</string>
+    <string name="detail_not_found">We could not find this report</string>
+    <string name="detail_by_moderator">by a moderator</string>
+    <string name="detail_mark_resolved">Mark as resolved</string>
+    <string name="detail_tracking">Progress</string>
+    <string name="detail_image_counter">1 / %1$d</string>
+    <string name="detail_share">Share</string>
+    <string name="detail_comments">Comments</string>
+    <string name="detail_view">View</string>
+    <string name="detail_rejection_reason">Rejection reason</string>
+    <string name="detail_login_to_vote">You must log in to mark a report</string>
+    <string name="detail_marked_resolved">Report marked as resolved</string>
+</resources>

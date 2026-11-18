@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.auth
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.RequestResult
@@ -24,12 +26,12 @@ data class RegisterUiState(
     val city: String = "",
     val address: String = "",
     val location: Location? = null,      // dirección elegida en el mapa (lat/lng)
-    val nameError: String? = null,
-    val emailError: String? = null,
-    val passwordError: String? = null,
-    val confirmPasswordError: String? = null,
-    val cityError: String? = null,
-    val addressError: String? = null,
+    val nameError: UiText? = null,
+    val emailError: UiText? = null,
+    val passwordError: UiText? = null,
+    val confirmPasswordError: UiText? = null,
+    val cityError: UiText? = null,
+    val addressError: UiText? = null,
     val registerResult: RequestResult? = null
 ) {
     val isFormValid: Boolean
@@ -48,7 +50,7 @@ class RegisterViewModel @Inject constructor(
     val uiState: StateFlow<RegisterUiState> = _uiState.asStateFlow()
 
     fun onNameChange(v: String) =
-        _uiState.update { it.copy(name = v, nameError = Validators.required(v, "El nombre")) }
+        _uiState.update { it.copy(name = v, nameError = Validators.required(v, R.string.error_name_required)) }
 
     fun onEmailChange(v: String) =
         _uiState.update { it.copy(email = v, emailError = Validators.email(v)) }
@@ -68,10 +70,10 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun onCityChange(v: String) =
-        _uiState.update { it.copy(city = v, cityError = Validators.required(v, "La ciudad")) }
+        _uiState.update { it.copy(city = v, cityError = Validators.required(v, R.string.error_city_required)) }
 
     fun onAddressChange(v: String) =
-        _uiState.update { it.copy(address = v, addressError = Validators.required(v, "La dirección")) }
+        _uiState.update { it.copy(address = v, addressError = Validators.required(v, R.string.error_address_required)) }
 
     /** Llega del selector de mapa: guarda las coordenadas y rellena ciudad y dirección. */
     fun onPlaceSelected(place: PickedPlace) = _uiState.update {
@@ -96,7 +98,7 @@ class RegisterViewModel @Inject constructor(
                 address = s.address, location = s.location
             )
             val result = registerUserUseCase(user, s.password).fold(
-                onSuccess = { RequestResult.Success("Registro exitoso. Ya puedes iniciar sesión") },
+                onSuccess = { RequestResult.Success(UiText(R.string.register_success)) },
                 onFailure = { RequestResult.Failure(it.toUserMessage()) }
             )
             _uiState.update { it.copy(registerResult = result) }

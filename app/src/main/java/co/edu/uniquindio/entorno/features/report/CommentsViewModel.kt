@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.report
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -31,7 +33,7 @@ data class CommentsUiState(
     /** Comentarios marcados como "Útil" por el usuario en esta sesión. */
     val usefulIds: Set<String> = emptySet(),
     val isSending: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: UiText? = null
 ) {
     val moderatorIds: Set<String>
         get() = comments.filter { it.authorRole == UserRole.MODERATOR }.map { it.authorId }.toSet()
@@ -80,7 +82,7 @@ class CommentsViewModel @Inject constructor(
         viewModelScope.launch {
             val session = sessionRepository.session.first()
             if (session == null) {
-                _uiState.update { it.copy(errorMessage = "Debes iniciar sesión para comentar") }
+                _uiState.update { it.copy(errorMessage = UiText(R.string.comments_login_required)) }
                 return@launch
             }
             _uiState.update { it.copy(isSending = true) }

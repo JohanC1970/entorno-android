@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.report
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,9 +31,9 @@ data class ReportDetailUiState(
     val report: Report? = null,
     val isImportant: Boolean = false,
     val isLoading: Boolean = true,
-    val errorMessage: String? = null,
+    val errorMessage: UiText? = null,
     /** Mensaje informativo (por ejemplo, confirmación de una acción). */
-    val infoMessage: String? = null,
+    val infoMessage: UiText? = null,
     /** El autor o un moderador pueden marcar como resuelto un reporte verificado. */
     val canResolve: Boolean = false,
     /** Solo el autor edita, y solo mientras el reporte siga activo */
@@ -96,7 +98,7 @@ class ReportDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val session = sessionRepository.session.first()
             if (session == null) {
-                _uiState.update { it.copy(errorMessage = "Debes iniciar sesión para marcar un reporte") }
+                _uiState.update { it.copy(errorMessage = UiText(R.string.detail_login_to_vote)) }
                 return@launch
             }
             reportRepository.toggleImportant(reportId, session.userId).onFailure { error ->
@@ -109,7 +111,7 @@ class ReportDetailViewModel @Inject constructor(
         viewModelScope.launch {
             val session = sessionRepository.session.first() ?: return@launch
             reportRepository.markResolved(reportId, session.userId)
-                .onSuccess { _uiState.update { it.copy(infoMessage = "Reporte marcado como resuelto") } }
+                .onSuccess { _uiState.update { it.copy(infoMessage = UiText(R.string.detail_marked_resolved)) } }
                 .onFailure { error -> _uiState.update { it.copy(errorMessage = error.toUserMessage()) } }
         }
     }

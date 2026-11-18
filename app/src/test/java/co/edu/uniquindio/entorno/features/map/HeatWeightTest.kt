@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.map
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import co.edu.uniquindio.entorno.domain.model.Location
 import co.edu.uniquindio.entorno.domain.model.Report
 import co.edu.uniquindio.entorno.domain.model.ReportCategory
@@ -39,8 +41,8 @@ class HeatWeightTest {
     }
 
     @Test fun `formatHour usa formato de 12 horas`() {
-        assertEquals("12 a. m.", formatHour(0))
-        assertEquals("12 p. m.", formatHour(12))
-        assertEquals("6 p. m.", formatHour(18))
+        assertEquals(UiText(R.string.hour_am, 12), formatHour(0))
+        assertEquals(UiText(R.string.hour_pm, 12), formatHour(12))
+        assertEquals(UiText(R.string.hour_pm, 6), formatHour(18))
     }
 }

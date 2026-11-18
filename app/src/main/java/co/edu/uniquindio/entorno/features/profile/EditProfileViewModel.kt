@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.profile
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.Validators
@@ -26,8 +28,8 @@ data class EditProfileUiState(
     val iniciales: String = "",
     val guardando: Boolean = false,
     val guardadoExitoso: Boolean = false,
-    val nombreError: String? = null,
-    val mensajeError: String? = null,
+    val nombreError: UiText? = null,
+    val mensajeError: UiText? = null,
     val eliminando: Boolean = false
 )
 
@@ -80,7 +82,7 @@ class EditProfileViewModel @Inject constructor(
     fun guardarCambios() {
         val state = _uiState.value
         val base = original ?: return
-        val nombreError = Validators.required(state.nombreCompleto, "El nombre")
+        val nombreError = Validators.required(state.nombreCompleto, R.string.error_name_required)
         if (nombreError != null) {
             _uiState.update { it.copy(nombreError = nombreError) }
             return
@@ -110,7 +112,7 @@ class EditProfileViewModel @Inject constructor(
     /** Elimina la cuenta; al quedar sin sesión la app vuelve sola a la pantalla de bienvenida. */
     fun eliminarCuenta(contrasena: String) {
         if (contrasena.isBlank()) {
-            _uiState.update { it.copy(mensajeError = "Escribe tu contraseña para confirmar") }
+            _uiState.update { it.copy(mensajeError = UiText(R.string.edit_profile_password_required)) }
             return
         }
         viewModelScope.launch {

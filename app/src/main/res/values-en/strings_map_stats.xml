@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="heat_title">Heat map</string>
+    <string name="heat_subtitle">Armenia · last 30 days · %1$d reports</string>
+    <string name="heat_time_window">Time window</string>
+    <string name="heat_all_day">All day</string>
+    <string name="heat_window_range">%1$s – %2$s</string>
+    <string name="hour_am">%1$d AM</string>
+    <string name="hour_pm">%1$d PM</string>
+    <string name="heat_concentration">Report density</string>
+    <string name="heat_empty">No reports in this time window. Try another hour or category.</string>
+    <string name="picker_chosen">Chosen location</string>
+    <string name="picker_title">Choose location</string>
+    <string name="picker_subtitle">Tap the map to move the pin</string>
+    <string name="picker_my_location">Back to my location</string>
+    <string name="picker_use">Use this location</string>
+    <string name="map_not_found">We could not find that neighborhood</string>
+    <string name="map_search_placeholder">Search neighborhood</string>
+    <string name="map_zoom_in">Zoom in</string>
+    <string name="map_zoom_out">Zoom out</string>
+    <string name="map_my_location">My location</string>
+    <string name="map_report_summary">%1$s · Important: %2$d</string>
+    <string name="map_view_detail">View details</string>
+    <string name="stats_subtitle">Armenia · last 30 days</string>
+    <string name="stats_active_reports">Active reports</string>
+    <string name="stats_active_citizens">Active citizens</string>
+    <string name="stats_resolution_rate">Resolution rate</string>
+    <string name="stats_percent">%1$d%%</string>
+    <string name="stats_by_category">Reports by category</string>
+    <string name="stats_total">%1$d total</string>
+    <string name="stats_top_zones">Most reported areas</string>
+    <string name="stats_empty">There are no reports in this period yet.</string>
+    <plurals name="map_reports_on_map">
+        <item quantity="one">%1$d report on the map</item>
+        <item quantity="other">%1$d reports on the map</item>
+    </plurals>
+    <plurals name="stats_zone_reports">
+        <item quantity="one">%1$d report</item>
+        <item quantity="other">%1$d reports</item>
+    </plurals>
+</resources>

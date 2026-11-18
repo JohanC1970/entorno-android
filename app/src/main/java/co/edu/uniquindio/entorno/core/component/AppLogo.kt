@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.core.component
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
@@ -28,7 +29,7 @@ fun AppLogo(
     ) {
         Icon(
             painter = painterResource(id = R.drawable.ic_app_logo),
-            contentDescription = "Logo Entorno",
+            contentDescription = stringResource(R.string.app_logo_description),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size((size * 0.5).dp)
         )

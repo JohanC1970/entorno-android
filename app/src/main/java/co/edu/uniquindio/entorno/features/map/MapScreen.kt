@@ -1,5 +1,9 @@
 package co.edu.uniquindio.entorno.features.map
 
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -139,7 +143,7 @@ fun MapScreen(
             text.isEmpty() -> Unit
             neighborhood != null ->
                 mapViewportState.easeTo(cameraAt(neighborhood.center, ZOOM_NEIGHBORHOOD))
-            else -> scope.launch { snackbarHostState.showSnackbar("No encontramos ese barrio") }
+            else -> scope.launch { snackbarHostState.showSnackbar(context.getString(R.string.map_not_found)) }
         }
     }
 
@@ -226,7 +230,7 @@ fun MapScreen(
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                placeholder = { Text("Buscar barrio") },
+                placeholder = { Text(stringResource(R.string.map_search_placeholder)) },
                 leadingIcon = { Icon(Icons.Filled.Search, contentDescription = null) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -253,14 +257,14 @@ fun MapScreen(
             ) {
                 Icon(
                     imageVector = Icons.Filled.LocalFireDepartment,
-                    contentDescription = if (state.showHeat) "Ocultar mapa de calor" else "Mostrar mapa de calor"
+                    contentDescription = stringResource(if (state.showHeat) R.string.map_hide_heat else R.string.map_show_heat)
                 )
             }
             // Mapbox no trae botón de "mi ubicación": se centra en la ubicación del usuario.
             SmallFloatingActionButton(
                 onClick = { mapViewportState.easeTo(cameraAt(state.userLocation, ZOOM_USER)) }
             ) {
-                Icon(Icons.Filled.MyLocation, contentDescription = "Mi ubicación")
+                Icon(Icons.Filled.MyLocation, contentDescription = stringResource(R.string.map_my_location))
             }
         }
 
@@ -275,13 +279,13 @@ fun MapScreen(
                 total = heatReports.size,
                 allDay = state.allDay,
                 startHour = state.startHour,
-                windowLabel = state.windowLabel,
+                windowLabel = state.windowLabel.asString(),
                 onAllDayChange = viewModel::onAllDayChange,
                 onStartHourChange = viewModel::onStartHourChange,
                 modifier = Modifier.align(Alignment.BottomCenter).padding(start = 12.dp, end = 12.dp, bottom = 44.dp)
             )
             else -> Text(
-                text = "${state.reports.size} reportes en el mapa",
+                text = pluralStringResource(R.plurals.map_reports_on_map, state.reports.size, state.reports.size),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
@@ -311,7 +315,7 @@ fun CategoryFilterRow(
             FilterChip(
                 selected = selected == null,
                 onClick = { onSelected(null) },
-                label = { Text("Todos") },
+                label = { Text(stringResource(R.string.home_filter_all)) },
                 colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
@@ -319,7 +323,7 @@ fun CategoryFilterRow(
             FilterChip(
                 selected = selected == category,
                 onClick = { onSelected(if (selected == category) null else category) },
-                label = { Text(category.label) },
+                label = { Text(category.localizedLabel()) },
                 colors = FilterChipDefaults.filterChipColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
@@ -346,12 +350,12 @@ private fun SelectedReportCard(report: Report, onClick: () -> Unit, modifier: Mo
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = "${report.neighborhood} · Es importante: ${report.importantCount}",
+                text = stringResource(R.string.map_report_summary, report.neighborhood, report.importantCount),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "Ver detalle",
+                text = stringResource(R.string.map_view_detail),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.SemiBold
@@ -387,7 +391,7 @@ private fun HeatPanel(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Franja horaria",
+                    text = stringResource(R.string.heat_time_window),
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -403,7 +407,7 @@ private fun HeatPanel(
                 FilterChip(
                     selected = allDay,
                     onClick = { onAllDayChange(!allDay) },
-                    label = { Text("Todo el día") }
+                    label = { Text(stringResource(R.string.heat_all_day)) }
                 )
                 Slider(
                     value = startHour.toFloat(),
@@ -415,7 +419,7 @@ private fun HeatPanel(
                 )
             }
             Text(
-                text = "Mapa de calor · $total reportes",
+                text = stringResource(R.string.heat_total, total),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -440,19 +444,19 @@ private fun HeatPanel(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Baja densidad",
+                    text = stringResource(R.string.heat_low_density),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Alta densidad",
+                    text = stringResource(R.string.heat_high_density),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             if (total == 0) {
                 Text(
-                    text = "No hay reportes en esta franja. Prueba con otra hora o categoría.",
+                    text = stringResource(R.string.heat_empty),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

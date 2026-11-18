@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.moderator
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -25,9 +27,9 @@ data class ReviewReportUiState(
     val verificando: Boolean = false,
     val rechazando: Boolean = false,
     val accionCompletada: Boolean = false,
-    val mensajeError: String? = null,
+    val mensajeError: UiText? = null,
     /** Texto de confirmación que se muestra antes de volver al panel. */
-    val mensajeExito: String? = null
+    val mensajeExito: UiText? = null
 )
 
 @HiltViewModel
@@ -61,7 +63,7 @@ class ReviewReportViewModel @Inject constructor(
                 .mapCatching { moderatorId -> reportRepository.verifyReport(reportId, moderatorId).getOrThrow() }
                 .onSuccess {
                     _uiState.update {
-                        it.copy(verificando = false, accionCompletada = true, mensajeExito = "Reporte verificado")
+                        it.copy(verificando = false, accionCompletada = true, mensajeExito = UiText(R.string.review_verified))
                     }
                 }
                 .onFailure { error ->
@@ -73,7 +75,7 @@ class ReviewReportViewModel @Inject constructor(
     fun rechazar() {
         val motivo = _uiState.value.motivoRechazo
         if (motivo.isBlank()) {
-            _uiState.update { it.copy(mensajeError = "Escribe el motivo del rechazo") }
+            _uiState.update { it.copy(mensajeError = UiText(R.string.review_reason_required)) }
             return
         }
         if (_uiState.value.verificando || _uiState.value.rechazando) return
@@ -85,7 +87,7 @@ class ReviewReportViewModel @Inject constructor(
                 }
                 .onSuccess {
                     _uiState.update {
-                        it.copy(rechazando = false, accionCompletada = true, mensajeExito = "Reporte rechazado")
+                        it.copy(rechazando = false, accionCompletada = true, mensajeExito = UiText(R.string.review_rejected))
                     }
                 }
                 .onFailure { error ->

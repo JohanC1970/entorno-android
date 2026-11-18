@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="legal_last_update">Last updated: %1$s</string>
+    <string name="terms_title">Terms and Conditions</string>
+    <string name="terms_heading">Entorno Terms of Service</string>
+    <string name="terms_s1_title">1. Acceptance of the Terms</string>
+    <string name="terms_s1_body">By signing up for or using the Entorno platform, you agree to comply with these Terms of Service. If you do not agree with any of the clauses, you must not access the app.</string>
+    <string name="terms_s2_title">2. Community Use</string>
+    <string name="terms_s2_body">Entorno is a collaborative platform for reporting community and safety incidents. You agree to post only truthful, respectful and constructive information about events in your neighborhood.</string>
+    <string name="terms_s3_title">3. Prohibited Content</string>
+    <string name="terms_s3_body">Posting false or defamatory information, hate speech, harassing content or misleading material is strictly prohibited. Breaking this rule may lead moderators to permanently suspend your account.</string>
+    <string name="terms_s4_title">4. Moderation and Gamification</string>
+    <string name="terms_s4_body">Authorized moderators will review reports and award badges or points based on how truthful and useful the information provided is.</string>
+    <string name="terms_s5_title">5. Changes</string>
+    <string name="terms_s5_body">We reserve the right to update these terms at any time. We will notify you of significant changes through the app.</string>
+    <string name="privacy_title">Privacy Policy</string>
+    <string name="privacy_heading">Entorno Privacy Policy</string>
+    <string name="privacy_s1_title">1. Information We Collect</string>
+    <string name="privacy_s1_body">To provide our community safety services, we collect your name, email, city, address and geolocation coordinates when you submit reports in your area.</string>
+    <string name="privacy_s2_title">2. How We Use Information</string>
+    <string name="privacy_s2_body">Your data is used only to validate your posts, show relevant reports in your neighborhood through interactive maps and send important notifications about the status of your incidents.</string>
+    <string name="privacy_s3_title">3. Secure Storage</string>
+    <string name="privacy_s3_body">All your information is protected by Firebase Cloud Firestore security protocols and Firebase Auth encrypted authentication.</string>
+    <string name="privacy_s4_title">4. Sharing Information</string>
+    <string name="privacy_s4_body">We do not sell or trade your personal data with third parties. Community reports are public, either anonymously or with the user\'s name, for the common good of the neighborhood.</string>
+    <string name="privacy_s5_title">5. Your Rights</string>
+    <string name="privacy_s5_body">You can update or delete your data at any time from your profile settings or by requesting that your account be deleted.</string>
+    <string name="notifications_mark_read">Mark as read</string>
+    <string name="notifications_filter_all">All</string>
+    <string name="notifications_filter_unread">Unread</string>
+    <string name="notifications_empty_unread">You have no unread notifications.</string>
+    <string name="notifications_empty">You have no notifications yet.</string>
+</resources>

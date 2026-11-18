@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.core.component
 
+import co.edu.uniquindio.entorno.R
+import androidx.compose.ui.res.stringResource
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +51,7 @@ fun CommentItem(
     val borderColor = if (isModerator) colors.primary else colors.outlineVariant
     val bodyColor = if (isModerator) colors.onPrimaryContainer else colors.onSurface
     val nameColor = if (isModerator || isCurrentUser) colors.onPrimaryContainer else colors.onSurface
-    val displayName = if (isCurrentUser) "Tú · ${comment.authorName}" else comment.authorName
+    val displayName = if (isCurrentUser) stringResource(R.string.comment_you, comment.authorName) else comment.authorName
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -82,7 +84,7 @@ fun CommentItem(
                     if (isModerator) ModeratorTag()
                 }
                 Text(
-                    text = comment.createdAt.toRelativeTime(),
+                    text = comment.createdAt.toRelativeTime().asString(),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (isModerator) colors.onPrimaryContainer else colors.onSurfaceVariant
                 )
@@ -93,8 +95,8 @@ fun CommentItem(
                     color = bodyColor
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    CommentAction(text = "Útil · $usefulCount", onClick = onUseful)
-                    CommentAction(text = "Responder", onClick = onReply)
+                    CommentAction(text = stringResource(R.string.comment_useful, usefulCount), onClick = onUseful)
+                    CommentAction(text = stringResource(R.string.comment_reply), onClick = onReply)
                 }
             }
         }
@@ -160,7 +162,7 @@ private fun ModeratorTag() {
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "MODERADOR",
+                text = stringResource(R.string.comment_moderator_tag),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onPrimary,
                 maxLines = 1

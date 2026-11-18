@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.auth
 
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -33,15 +36,16 @@ fun ChangePasswordScreen(
     val state by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     LaunchedEffect(state.result) {
         when (val result = state.result) {
             is RequestResult.Success -> {
-                snackbarHostState.showSnackbar(result.message)
+                snackbarHostState.showSnackbar(result.message.asString(context))
                 viewModel.clearResult()
                 onBack()
             }
             is RequestResult.Failure -> {
-                snackbarHostState.showSnackbar(result.errorMessage)
+                snackbarHostState.showSnackbar(result.errorMessage.asString(context))
                 viewModel.clearResult()
             }
             else -> Unit
@@ -57,36 +61,36 @@ fun ChangePasswordScreen(
                 .imePadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            ScreenHeader(title = "Cambiar contraseña", onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.change_password_title), onBack = onBack)
 
             Column(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(
-                    text = "Usa una contraseña de al menos 8 caracteres, con letras y números.",
+                    text = stringResource(R.string.change_password_hint),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 PasswordField(
-                    label = "Contraseña actual",
+                    label = stringResource(R.string.change_password_current),
                     value = state.currentPassword,
                     onValueChange = viewModel::onCurrentChange,
-                    error = state.currentError
+                    error = state.currentError?.asString()
                 )
                 PasswordField(
-                    label = "Nueva contraseña",
+                    label = stringResource(R.string.change_password_new),
                     value = state.newPassword,
                     onValueChange = viewModel::onNewChange,
-                    placeholder = "Mínimo 8 caracteres"
+                    placeholder = stringResource(R.string.change_password_new_placeholder)
                 )
                 PasswordField(
-                    label = "Confirmar nueva contraseña",
+                    label = stringResource(R.string.change_password_confirm),
                     value = state.confirmPassword,
                     onValueChange = viewModel::onConfirmChange,
-                    placeholder = "Repite la nueva contraseña",
-                    error = state.confirmError
+                    placeholder = stringResource(R.string.change_password_confirm_placeholder),
+                    error = state.confirmError?.asString()
                 )
 
                 Card(
@@ -98,14 +102,14 @@ fun ChangePasswordScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Tu contraseña debe tener:",
+                            text = stringResource(R.string.change_password_requirements),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
                         )
-                        Requirement("Al menos 8 caracteres", state.hasMinLength)
-                        Requirement("Una letra mayúscula", state.hasUppercase)
-                        Requirement("Un número", state.hasDigit)
+                        Requirement(stringResource(R.string.change_password_req_length), state.hasMinLength)
+                        Requirement(stringResource(R.string.change_password_req_upper), state.hasUppercase)
+                        Requirement(stringResource(R.string.change_password_req_digit), state.hasDigit)
                     }
                 }
 
@@ -122,7 +126,7 @@ fun ChangePasswordScreen(
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                     } else {
-                        Text("Guardar cambios", fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.change_password_save), fontWeight = FontWeight.SemiBold)
                     }
                 }
             }
@@ -154,7 +158,7 @@ private fun PasswordField(
             IconButton(onClick = { visible = !visible }) {
                 Icon(
                     imageVector = if (visible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                    contentDescription = if (visible) "Ocultar contraseña" else "Mostrar contraseña"
+                    contentDescription = stringResource(if (visible) R.string.password_hide else R.string.password_show)
                 )
             }
         },

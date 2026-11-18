@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.features.community
 
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.component.localizedLabel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -36,12 +39,12 @@ fun HeroesScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
-            ScreenHeader(title = "Héroes comunitarios", subtitle = "Armenia · este mes", onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.profile_heroes), subtitle = stringResource(R.string.heroes_subtitle), onBack = onBack)
         }
         if (state.ranking.isEmpty()) {
             item {
                 Text(
-                    text = "Aún no hay ciudadanos en el ranking.",
+                    text = stringResource(R.string.heroes_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(20.dp)
@@ -54,7 +57,7 @@ fun HeroesScreen(
             }
             val tip = state.tip
             if (tip != null) {
-                item { TipCard(tip) }
+                item { TipCard(tip.asString()) }
             }
         }
     }
@@ -99,7 +102,7 @@ private fun PodiumColumn(entry: HeroEntry, modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center
         )
         Text(
-            text = entry.user.level.label,
+            text = entry.user.level.localizedLabel(),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -124,7 +127,7 @@ private fun PodiumColumn(entry: HeroEntry, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = "${entry.user.points} pts",
+                    text = stringResource(R.string.heroes_points, entry.user.points),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -161,13 +164,13 @@ private fun RankRow(entry: HeroEntry, isMe: Boolean) {
             Avatar(name = entry.user.name, size = 40.dp, highlighted = isMe)
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = if (isMe) "Tú · ${shortName(entry.user.name)}" else shortName(entry.user.name),
+                    text = if (isMe) stringResource(R.string.heroes_you, shortName(entry.user.name)) else shortName(entry.user.name),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text = entry.user.level.label,
+                    text = entry.user.level.localizedLabel(),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

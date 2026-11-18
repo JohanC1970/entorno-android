@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.auth
 
+import co.edu.uniquindio.entorno.R
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.RequestResult
@@ -19,8 +21,8 @@ data class ChangePasswordUiState(
     val currentPassword: String = "",
     val newPassword: String = "",
     val confirmPassword: String = "",
-    val currentError: String? = null,
-    val confirmError: String? = null,
+    val currentError: UiText? = null,
+    val confirmError: UiText? = null,
     val result: RequestResult? = null
 ) {
     val hasMinLength: Boolean get() = newPassword.length >= MIN_LENGTH
@@ -55,11 +57,11 @@ class ChangePasswordViewModel @Inject constructor(
         val state = _uiState.value
         if (!state.canSubmit) return
         if (state.newPassword != state.confirmPassword) {
-            _uiState.update { it.copy(confirmError = "Las contraseñas no coinciden") }
+            _uiState.update { it.copy(confirmError = UiText(R.string.error_passwords_mismatch)) }
             return
         }
         if (state.newPassword == state.currentPassword) {
-            _uiState.update { it.copy(confirmError = "La nueva contraseña debe ser distinta a la actual") }
+            _uiState.update { it.copy(confirmError = UiText(R.string.change_password_must_differ)) }
             return
         }
         viewModelScope.launch {
@@ -67,7 +69,7 @@ class ChangePasswordViewModel @Inject constructor(
             changePasswordUseCase(state.currentPassword, state.newPassword)
                 .onSuccess {
                     _uiState.update {
-                        it.copy(result = RequestResult.Success("Contraseña actualizada"))
+                        it.copy(result = RequestResult.Success(UiText(R.string.change_password_success)))
                     }
                 }
                 .onFailure { error ->

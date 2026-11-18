@@ -1,5 +1,6 @@
 package co.edu.uniquindio.entorno.features.profile
 
+import co.edu.uniquindio.entorno.core.util.UiText
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.core.util.toRelativeTime
@@ -32,7 +33,7 @@ data class ActividadReciente(
     val id: String,
     val icono: ActividadTipo,
     val texto: String,
-    val tiempo: String
+    val tiempo: UiText
 )
 
 enum class ActividadTipo {

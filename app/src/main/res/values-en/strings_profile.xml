@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="edit_profile_saved">Changes saved</string>
+    <string name="edit_profile_delete_title">Delete my account</string>
+    <string name="edit_profile_delete_body">This action cannot be undone. Enter your password to confirm.</string>
+    <string name="edit_profile_title">Edit profile</string>
+    <string name="edit_profile_change_photo">Change photo</string>
+    <string name="edit_profile_phone">Phone</string>
+    <string name="edit_profile_neighborhood">Neighborhood / area</string>
+    <string name="edit_profile_password_required">Enter your password to confirm</string>
+    <string name="badges_screen_title">Badges and level</string>
+    <string name="badges_title">Badges</string>
+    <string name="badges_points_progress">%1$d / %2$d pts</string>
+    <string name="badges_points">%1$d pts</string>
+    <string name="badges_points_missing">You need %1$d more points to become %2$s.</string>
+    <string name="badges_max_level">You reached the highest level. Thanks for looking after your community!</string>
+    <string name="profile_location">"%1$s  ·  %2$s"</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_level">Level</string>
+    <string name="profile_current_level">CURRENT LEVEL</string>
+    <string name="profile_points">points</string>
+    <string name="profile_points_to_next">%1$d points to go</string>
+    <string name="profile_max">Maximum</string>
+    <string name="profile_next">Next: %1$s</string>
+    <string name="profile_stat_reports">Reports</string>
+    <string name="profile_stat_verified">Verified</string>
+    <string name="profile_stat_votes">Votes given</string>
+    <string name="profile_see_all">See all</string>
+    <string name="profile_recent_activity">Recent activity</string>
+    <string name="profile_activity_empty">When you report or comment, your activity will show up here.</string>
+    <string name="profile_community">Community</string>
+    <string name="profile_heroes">Community heroes</string>
+    <string name="profile_heroes_desc">Citizen ranking of the month</string>
+    <string name="profile_stats">Statistics</string>
+    <string name="profile_stats_desc">Reports by category and area</string>
+    <string name="profile_moderator_panel">Moderator panel</string>
+    <string name="profile_moderator_panel_desc">Posts waiting for review</string>
+    <string name="heroes_subtitle">Armenia · this month</string>
+    <string name="heroes_empty">There are no citizens in the ranking yet.</string>
+    <string name="heroes_points">%1$d pts</string>
+    <string name="heroes_you">You · %1$s</string>
+    <string name="heroes_tip_top_next">You are in the top %1$d. With %2$d more points you reach %3$s.</string>
+    <string name="heroes_tip_top_max">You are in the top %1$d and already have the highest level.</string>
+    <string name="heroes_tip_next_and_top">With %1$d more points you reach %2$s; you need %3$d to enter the top %4$d.</string>
+    <string name="heroes_tip_top">You need %1$d more points to enter the top %2$d.</string>
+</resources>

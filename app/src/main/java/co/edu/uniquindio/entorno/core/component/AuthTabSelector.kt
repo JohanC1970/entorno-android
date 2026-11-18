@@ -1,5 +1,8 @@
 package co.edu.uniquindio.entorno.core.component
 
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import co.edu.uniquindio.entorno.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -15,9 +18,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-enum class AuthTab(val label: String) {
-    LOGIN("Iniciar sesión"),
-    REGISTER("Registrarse")
+enum class AuthTab(@StringRes val label: Int) {
+    LOGIN(R.string.auth_tab_login),
+    REGISTER(R.string.auth_tab_register)
 }
 
 @Composable
@@ -47,7 +50,7 @@ fun AuthTabSelector(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = tab.label,
+                    text = stringResource(tab.label),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = if (selected) MaterialTheme.colorScheme.onSurface

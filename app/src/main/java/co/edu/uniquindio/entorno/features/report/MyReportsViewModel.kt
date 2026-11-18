@@ -1,5 +1,7 @@
 package co.edu.uniquindio.entorno.features.report
 
+import androidx.annotation.StringRes
+import co.edu.uniquindio.entorno.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uniquindio.entorno.domain.model.Report
@@ -15,11 +17,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-enum class ReportFilter(val label: String) {
-    TODOS("Todos"),
-    ACTIVOS("Activos"),
-    RESUELTOS("Resueltos"),
-    RECHAZADOS("Rechazados")
+enum class ReportFilter(@StringRes val label: Int) {
+    TODOS(R.string.filter_all),
+    ACTIVOS(R.string.filter_active),
+    RESUELTOS(R.string.filter_resolved),
+    RECHAZADOS(R.string.filter_rejected)
 }
 
 data class MyReportsUiState(
